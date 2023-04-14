@@ -49,6 +49,7 @@ vim.opt.list = true
 -- })
 
 
+vim.o.clipboard = 'unnamedplus'
 vim.o.wrap = false
 
 -- vim.o.modifiable = true
