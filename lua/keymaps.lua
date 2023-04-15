@@ -58,6 +58,7 @@ local normal_mode_maps = {
     { key = 'K', map = [[<cmd>lua vim.lsp.buf.hover()<cr>]] },
     { key = '<C-k>', map = [[<cmd>lua vim.lsp.buf.definition()<cr>]] },
     { key = 'gi', map = [[<cmd>lua vim.lsp.buf.implementation()<cr>]] },
+    { key = 'gn', map = [[<cmd>lua vim.lsp.buf.rename()<cr>]] },
     { key = '<leader>o', map = [[<cmd>TroubleToggle<cr>]] },
     { key = '<leader>dd', map = [[<cmd>lua require'dapui'.toggle()<cr>]] },
 
