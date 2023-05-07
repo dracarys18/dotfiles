@@ -236,6 +236,10 @@ local opts = {
             vim.keymap.set("n", "<S-K>", rt.hover_actions.hover_actions, { buffer = bufnr })
             -- Code action groups
             vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+            vim.keymap.set("v", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+            vim.api.nvim_set_keymap('n', '<c-.>', '<cmd>lua vim.lsp.buf.code_action()<cr>', {})
+            vim.api.nvim_set_keymap('v', '<c-.>', '<cmd>lua vim.lsp.buf.code_action()<cr>', {})
+
             lsp_signature.on_attach(client, bufnr)
             lspstatus.on_attach(client)
         end,
