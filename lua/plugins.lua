@@ -40,7 +40,6 @@ return require('lazy').setup({
     -- 'b0o/SchemaStore.nvim',
     -- 'rcarriga/nvim-notify',
     'folke/todo-comments.nvim',
-    { 'github/copilot.vim',            event = "LspAttach" },
     -- 'ggandor/leap.nvim',
     { 'shortcuts/no-neck-pain.nvim',   version = "*" },
     -- { 'folke/zen-mode.nvim',         config = function() require('zen-mode').setup() end },
@@ -220,8 +219,22 @@ return require('lazy').setup({
         dependencies =
         'nvim-tree/nvim-web-devicons'
     },
-    { 'lewis6991/gitsigns.nvim', config = function() require('gitsigns').setup() end },
-    { 'ms-jpq/chadtree',         lazy = false,                                       build = ':CHADdeps' },
+    {
+        'lewis6991/gitsigns.nvim',
+        lazy = false,
+        config = function() require('gitsigns').setup { current_line_blame = true, } end
+    },
+    {
+        'jbyuki/instant.nvim',
+        lazy = false,
+    },
+
+    {
+        'ms-jpq/chadtree',
+        lazy = false,
+        build =
+        ':CHADdeps'
+    },
     {
         'ms-jpq/coq.thirdparty',
         config = function()
@@ -234,8 +247,7 @@ return require('lazy').setup({
                     deadline = 500,
                     unsafe = { "rm", "poweroff", "mv" }
                 },
-                { src = "bc",      short_name = "MATH", precision = 6 },
-                { src = "copilot", short_name = "COP",  accept_key = "<C-l>" },
+                { src = "bc", short_name = "MATH", precision = 6 },
                 { src = "dap" }
             })
         end
@@ -247,7 +259,12 @@ return require('lazy').setup({
     --         require("lsp_lines").setup()
     --     end,
     -- })
-
+    {
+        "giusgad/pets.nvim",
+        dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
+        lazy = false,
+        config = function() require "pets".setup() end,
+    },
     {
         'lukas-reineke/indent-blankline.nvim',
         config = function()

@@ -91,7 +91,6 @@ vim.g.coq_settings = {
     }
 }
 -- vim.g.rooter_manual_only = 1
-vim.g.copilot_node_command = "~/.local/share/nvm/v16.18.1/bin/node"
 
 require('keymaps')
 require('plugins')
@@ -105,4 +104,5 @@ require 'nvim-treesitter.configs'.setup {
         additional_vim_regex_highlighting = false,
     },
 }
+vim.cmd [[let g:instant_username = "dracarys_18"]]
 -- vim.notify = require 'notify'

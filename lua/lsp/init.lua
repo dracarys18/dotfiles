@@ -41,6 +41,7 @@ require('mason-lspconfig').setup_handlers({
     end,
 })
 
+
 require("bufferline").setup {
     options = { diagnostics = "nvm_lsp" },
 }

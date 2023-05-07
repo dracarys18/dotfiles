@@ -8,7 +8,7 @@ require("toggleterm").setup{
   start_in_insert = true,
   persist_size = true,
   -- direction = 'vertical' | 'horizontal' | 'window' | 'float',
-  direction = 'vertical',
+  direction = 'float',
   close_on_exit = true, -- close the terminal window when the process exits
   shell = vim.o.shell, -- change the default shell
   -- This field is only relevant if direction is set to 'float'
@@ -19,8 +19,8 @@ require("toggleterm").setup{
     -- not natively supported but implemented in this plugin.
     -- border = 'single' | 'double' | 'shadow' | 'curved' | ... other options supported by win open
     border = 'single',
-    width = 30,
-    height = 30,
+    width = 200,
+    height = 50,
     winblend = 3,
     highlights = {
       border = "Normal",
