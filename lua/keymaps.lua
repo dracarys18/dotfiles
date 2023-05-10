@@ -70,8 +70,8 @@ local normal_mode_maps = {
     { key = 'T',                map = [[<cmd>lua require'lsp_extensions'.inlay_hints()<cr>]] },
     { key = '<leader>bp',       map = ':BufferLinePick<cr>' },
     { key = '<leader>ct',       map = ':BufferLinePickClose<cr>' },
-    { key = '<leader>tl',       map = ':BufferLineCycleNext<cr>' },
-    { key = '<leader>tr',       map = ':BufferLineCyclePrev<cr>' },
+    { key = '<leader>tn',       map = ':BufferLineCycleNext<cr>' },
+    { key = '<leader>tp',       map = ':BufferLineCyclePrev<cr>' },
     { key = '<leader>ml',       map = ':BufferLineMoveNext<cr>' },
     { key = '<leader>mr',       map = ':BufferLineMovePrev<cr>' },
 
