@@ -50,6 +50,7 @@ local normal_mode_maps = {
     { key = 'vff',              map = [[<cmd>vertical Gdiffsplit<cr>]] },
     { key = 'vff!',             map = [[<cmd>vertical Gdiffsplit!<cr>]] },
     { key = 'ssr',              map = [[<cmd>lua require'rust-tools'.ssr.ssr(query)<cr>]] },
+    { key = 'mcr',              map = [[<cmd>lua require'rust-tools'.expand_macro.expand_macro()<cr>]] },
 
     -- Session
     { key = '<leader>ss',       map = [[<cmd>SessionSave<cr>]] },
@@ -74,7 +75,6 @@ local normal_mode_maps = {
     { key = '<leader>tp',       map = ':BufferLineCyclePrev<cr>' },
     { key = '<leader>ml',       map = ':BufferLineMoveNext<cr>' },
     { key = '<leader>mr',       map = ':BufferLineMovePrev<cr>' },
-
     { key = '<C-W>%',           map = [[<cmd>vsplit<cr>]] },
     { key = '<C-l>',            map = [[<cmd>:SymbolsOutline<cr>]] },
 
