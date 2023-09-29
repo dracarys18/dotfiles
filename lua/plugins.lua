@@ -105,10 +105,11 @@ return require('lazy').setup({
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "rust_analyzer" },
+                ensure_installed = { "lua_ls", "rust_analyzer", "jedi_language_server" },
                 automatic_installation = true,
             })
-        end
+        end,
+        lazy = false
     },
     {
         'NTBBloodbath/galaxyline.nvim',
