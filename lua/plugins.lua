@@ -105,7 +105,7 @@ return require('lazy').setup({
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp" },
+                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls" },
                 automatic_installation = true,
             })
         end,
@@ -260,6 +260,22 @@ return require('lazy').setup({
     --         require("lsp_lines").setup()
     --     end,
     -- })
+    {
+        "ray-x/go.nvim",
+        dependencies = { -- optional packages
+            "ray-x/guihua.lua",
+            "neovim/nvim-lspconfig",
+            "nvim-treesitter/nvim-treesitter",
+        },
+        lazy = false,
+        config = function()
+            require("go").setup()
+        end,
+        event = { "CmdlineEnter" },
+        ft = { "go", 'gomod' },
+        build = ':lua require("go.install").update_all_sync()' -- if you need to install/update all binaries
+    }
+    ,
     {
         "giusgad/pets.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },

@@ -6,6 +6,7 @@ require 'lsp.clangd'
 
 require 'lspconfig'.tsserver.setup {}
 require 'lspconfig'.sqlls.setup {}
+require 'lspconfig'.gopls.setup {}
 -- require'lspconfig'.jsonls.setup {
 --     settings = {
 --         json = {
