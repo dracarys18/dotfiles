@@ -2,7 +2,9 @@
 -- local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0'
 -- local codelldb_path = extension_path .. 'adapter/codelldb'
 -- local liblldb_path = extension_path .. 'lldb/lib/liblldb.dylib'
-local rt = require('rustaceanvim')
+local codelldb_path = '/Users/fs0c131y/.vscode-oss/extensions/vadimcn.vscode-lldb-1.8.1-universal/adapter/codelldb'
+local liblldb_path = '/Users/fs0c131y/.vscode-oss/extensions/vadimcn.vscode-lldb-1.8.1-universal/lldb/lib/liblldb.dylib'
+local rt = require('rust-tools')
 local lspstatus = require('lsp-status')
 local lsp_signature = require('lsp_signature')
 local coq = require('coq')
@@ -23,7 +25,7 @@ local opts = {
 
         -- how to execute terminal commands
         -- options right now: termopen / quickfix
-        executor = require("rustaceanvim/executors").termopen,
+        executor = require("rust-tools/executors").termopen,
         -- callback to execute once rust-analyzer is done initializing the workspace
         -- The callback receives one parameter indicating the `health` of the server: "ok" | "warning" | "error"
         on_initialized = nil,
@@ -257,4 +259,4 @@ local opts = {
 }
 
 -- vim.cmd([[autocmd BufEnter,BufWinEnter,TabEnter *.rs :lua require('rust-tools.inlay_hints').set_inlay_hints()]])
-rt.setup(opts)
+require('rust-tools').setup(opts)
