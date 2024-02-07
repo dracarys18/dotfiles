@@ -2,16 +2,14 @@
 -- local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0'
 -- local codelldb_path = extension_path .. 'adapter/codelldb'
 -- local liblldb_path = extension_path .. 'lldb/lib/liblldb.dylib'
-local codelldb_path = '/Users/fs0c131y/.vscode-oss/extensions/vadimcn.vscode-lldb-1.8.1-universal/adapter/codelldb'
-local liblldb_path = '/Users/fs0c131y/.vscode-oss/extensions/vadimcn.vscode-lldb-1.8.1-universal/lldb/lib/liblldb.dylib'
-local rt = require('rust-tools')
+local rt = require('rustaceanvim')
 local lspstatus = require('lsp-status')
 local lsp_signature = require('lsp_signature')
 local coq = require('coq')
 
 local opts = {
     tools = {
-        -- rust-tools options
+        -- rustaceanvim options
         -- automatically set inlay hints (type hints)
         -- There is an issue due to which the hints are not applied on the first
         -- opened file. For now, write to the file to trigger a reapplication of
@@ -25,7 +23,7 @@ local opts = {
 
         -- how to execute terminal commands
         -- options right now: termopen / quickfix
-        executor = require("rust-tools/executors").termopen,
+        executor = require("rustaceanvim/executors").termopen,
         -- callback to execute once rust-analyzer is done initializing the workspace
         -- The callback receives one parameter indicating the `health` of the server: "ok" | "warning" | "error"
         on_initialized = nil,
@@ -157,7 +155,7 @@ local opts = {
         },
     },
     -- all the opts to send to nvim-lspconfig
-    -- these override the defaults set by rust-tools.nvim
+    -- these override the defaults set by rustaceanvim.nvim
     -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
     server = {
         -- standalone file support
@@ -253,10 +251,8 @@ local opts = {
         --     command = "lldb-vscode",
         --     name = "rt_lldb",
         -- },
-        adapter = require('rust-tools.dap').get_codelldb_adapter(
-            codelldb_path, liblldb_path)
     },
 }
 
--- vim.cmd([[autocmd BufEnter,BufWinEnter,TabEnter *.rs :lua require('rust-tools.inlay_hints').set_inlay_hints()]])
-require('rust-tools').setup(opts)
+-- vim.cmd([[autocmd BufEnter,BufWinEnter,TabEnter *.rs :lua require('rustaceanvim.inlay_hints').set_inlay_hints()]])
+require('rustaceanvim').setup(opts)

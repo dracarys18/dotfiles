@@ -330,12 +330,9 @@ return require('lazy').setup({
     --     end,
     -- },
     {
-        'simrat39/rust-tools.nvim',
-        ft = 'rust',
-        config = function()
-            require 'setup.rust-tools'
-        end,
-        dependencies = "ms-jpq/coq_nvim"
+        'mrcjkb/rustaceanvim',
+        version = '^4', -- Recommended
+        ft = { 'rust' },
     },
     {
         "rcarriga/nvim-dap-ui",

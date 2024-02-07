@@ -3,7 +3,6 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-export AWS_PROFILE=AWSAdministratorAccess-997208230940
 
 alias cd='z'
 alias ls='exa'
