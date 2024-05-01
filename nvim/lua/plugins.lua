@@ -229,12 +229,13 @@ return require('lazy').setup({
         'jbyuki/instant.nvim',
         lazy = false,
     },
-
     {
-        'ms-jpq/chadtree',
+        'stevearc/oil.nvim',
+        opts = {},
+        -- Optional dependencies
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         lazy = false,
-        build =
-        ':CHADdeps'
+        config = function() require('oil').setup() end
     },
     {
         'ms-jpq/coq.thirdparty',

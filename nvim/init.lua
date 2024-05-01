@@ -82,6 +82,9 @@ vim.g.coq_settings = {
         lsp = {
             weight_adjust = 2
         },
+        tabnine = {
+            enabled = true,
+        }
         -- buffers = {
         --     -- weight_adjust = -0.5
         -- },

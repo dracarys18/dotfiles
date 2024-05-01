@@ -37,7 +37,7 @@ local normal_mode_maps = {
     { key = '<leader>n',        map = [[<cmd>bnext<cr>]] },
     { key = '<leader>p',        map = [[<cmd>bprev<cr>]] },
     { key = '<leader>q',        map = [[<cmd>bw<cr>]] },
-    { key = '<leader>v',        map = [[<cmd>CHADopen<cr>]] },
+    { key = '<leader>v',        map = [[<cmd>lua require'oil'.open()<cr>]] },
 
     -- " Find files using Telescope command-line sugar.
     { key = '<leader>ff',       map = [[<cmd>lua require('telescope.builtin').find_files()<cr>]] },
