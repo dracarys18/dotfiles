@@ -173,7 +173,7 @@ return require('lazy').setup({
     },
     {
         'neovim/nvim-lspconfig',
-        ft = { "rust", "toml", "lua" },
+        ft = { "rust", "toml", "lua", "go" },
         config = function()
             require(
                 "lsp")
