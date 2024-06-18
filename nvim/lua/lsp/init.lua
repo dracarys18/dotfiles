@@ -4,6 +4,10 @@
 require 'lsp.lua-language-server'
 require 'lsp.clangd'
 
+local lspconfig = require 'lspconfig'
+local lspstatus = require 'lsp-status'
+local coq = require 'coq'
+
 require 'lspconfig'.tsserver.setup {}
 require 'lspconfig'.sqlls.setup {}
 require 'lspconfig'.gopls.setup {}
@@ -28,16 +32,15 @@ vim.o.clipboard = "unnamedplus"
 vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 -- vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-local lspconfig = require 'lspconfig'
-local lspstatus = require 'lsp-status'
-local coq = require 'coq'
 
 require('mason-lspconfig').setup_handlers({
     function(server_name)
-        lspconfig[server_name].setup({
-            on_attach = lspstatus.on_attach,
-            capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),
-        })
+        if server_name ~= "rust_analyzer" then
+            lspconfig[server_name].setup({
+                on_attach = lspstatus.on_attach,
+                capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),
+            })
+        end
     end,
 })
 

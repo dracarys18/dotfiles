@@ -107,5 +107,6 @@ require 'nvim-treesitter.configs'.setup {
         additional_vim_regex_highlighting = false,
     },
 }
+vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 vim.cmd [[let g:instant_username = "dracarys_18"]]
 -- vim.notify = require 'notify'

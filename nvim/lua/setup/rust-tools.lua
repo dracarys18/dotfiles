@@ -30,7 +30,7 @@ local opts = {
         -- These apply to the default RustSetInlayHints command
         inlay_hints = {
             -- Only show inlay hints for the current line
-            only_current_line = false,
+            only_current_line = true,
             -- Event which triggers a refersh of the inlay hints.
             -- You can make this "CursorMoved" or "CursorMoved,CursorMovedI" but
             -- not that this may cause higher CPU usage.
@@ -181,7 +181,7 @@ local opts = {
                 -- inlayHints.closureReturnTypeHints.enable
                 inlayHints = {
                     -- Only show inlay hints for the current line
-                    only_current_line = false,
+                    only_current_line = true,
                     -- Event which triggers a refersh of the inlay hints.
                     -- You can make this "CursorMoved" or "CursorMoved,CursorMovedI" but
                     -- not that this may cause higher CPU usage.
@@ -237,7 +237,6 @@ local opts = {
             vim.keymap.set("v", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
             vim.api.nvim_set_keymap('n', '<c-.>', '<cmd>lua vim.lsp.buf.code_action()<cr>', {})
             vim.api.nvim_set_keymap('v', '<c-.>', '<cmd>lua vim.lsp.buf.code_action()<cr>', {})
-
             lsp_signature.on_attach(client, bufnr)
             lspstatus.on_attach(client)
         end,
@@ -254,5 +253,4 @@ local opts = {
     },
 }
 
--- vim.cmd([[autocmd BufEnter,BufWinEnter,TabEnter *.rs :lua require('rustaceanvim.inlay_hints').set_inlay_hints()]])
 require('rustaceanvim').setup(opts)
