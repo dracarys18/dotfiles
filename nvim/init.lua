@@ -101,7 +101,7 @@ require('plugins')
 require 'nvim-treesitter.configs'.setup {
     -- ensure_installed = "all",
     ensure_installed = { "c", "rust", "toml", "lua", "json", "python", "cmake", "make", "typescript", "bash", "cpp",
-        "comment", "css", "fish", "http", "html", "vim", "yaml", "go", "gomod", "gowork" },
+        "comment", "css", "fish", "http", "html", "vim", "yaml", "go", "gomod", "gowork", "zig" },
     highlight = {
         enable = true, -- false will disable the whole extension
         additional_vim_regex_highlighting = false,
