@@ -105,7 +105,7 @@ return require('lazy').setup({
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "tsserver", "zls" },
+                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "ocamllsp", "terraformls" },
                 automatic_installation = true,
             })
         end,
@@ -240,10 +240,6 @@ return require('lazy').setup({
         config = function() require('gitsigns').setup { current_line_blame = true, } end
     },
     {
-        'jbyuki/instant.nvim',
-        lazy = false,
-    },
-    {
         'stevearc/oil.nvim',
         opts = {},
         -- Optional dependencies
@@ -294,7 +290,7 @@ return require('lazy').setup({
     {
         "giusgad/pets.nvim",
         dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
-        lazy = false,
+        lazy = true,
         config = function() require "pets".setup() end,
     },
     {
@@ -346,7 +342,7 @@ return require('lazy').setup({
     -- },
     {
         'mrcjkb/rustaceanvim',
-        version = '^4', -- Recommended
+        version = '^5', -- Recommended
         ft = { 'rust' },
     },
     {

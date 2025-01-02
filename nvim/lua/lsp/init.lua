@@ -8,7 +8,7 @@ local lspconfig = require 'lspconfig'
 local lspstatus = require 'lsp-status'
 local coq = require 'coq'
 
-require 'lspconfig'.tsserver.setup {}
+require 'lspconfig'.ts_ls.setup {}
 require 'lspconfig'.sqlls.setup {}
 require 'lspconfig'.gopls.setup {}
 -- require'lspconfig'.jsonls.setup {

@@ -100,13 +100,12 @@ require('plugins')
 
 require 'nvim-treesitter.configs'.setup {
     -- ensure_installed = "all",
-    ensure_installed = { "c", "rust", "toml", "lua", "json", "python", "cmake", "make", "typescript", "bash", "cpp",
-        "comment", "css", "fish", "http", "html", "vim", "yaml", "go", "gomod", "gowork", "zig" },
+    ensure_installed = { "c", "rust", "terraform", "toml", "lua", "json", "python", "cmake", "make", "typescript", "bash", "cpp",
+        "comment", "css", "fish", "http", "html", "vim", "yaml", "go", "gomod", "gowork", "zig", "ocaml" },
     highlight = {
         enable = true, -- false will disable the whole extension
         additional_vim_regex_highlighting = false,
     },
 }
 vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-vim.cmd [[let g:instant_username = "dracarys_18"]]
 -- vim.notify = require 'notify'
