@@ -8,6 +8,9 @@ alias cd='z'
 alias ls='exa'
 alias cat='bat'
 alias sshat='ssh arch -t "fish"'
+alias vim='nvim'
+alias vi='nvim'
+alias tf='terraform'
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -78,9 +81,6 @@ ZSH_THEME="robbyrussell"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting kubectl)
 
 source $ZSH/oh-my-zsh.sh
-zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
-source <(carapace _carapace)
-export CARAPACE_MATCH=CASE_INSENSITIVE
 
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
@@ -116,3 +116,22 @@ fi
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 [ -f "/Users/karthikey.hegde/.ghcup/env" ] && source "/Users/karthikey.hegde/.ghcup/env" # ghcup-env
+
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+
+
+# BEGIN opam configuration
+# This is useful if you're using opam as it adds:
+#   - the correct directories to the PATH
+#   - auto-completion for the opam binary
+# This section can be safely removed at any time if needed.
+[[ ! -r '/Users/karthihegde/.opam/opam-init/init.zsh' ]] || source '/Users/karthihegde/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
+# END opam configuration
+
+bindkey '^[[A' history-search-backword
+bindkey '^[[B' history-search-forward
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+

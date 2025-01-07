@@ -23,3 +23,4 @@ window-vsync = true
 # Keybinds
 keybind = alt+enter=toggle_fullscreen
 keybind = ctrl+shift+w=quit
+keybind = ctrl+shift+r=reload_config
