@@ -1,6 +1,6 @@
-local lspconfig = require'lspconfig'
-local lspstatus = require'lsp-status'
-local coq = require'coq'
+local lspconfig = require 'lspconfig'
+local lspstatus = require 'lsp-status'
+local coq = require 'coq'
 
 lspconfig.clangd.setup {
     capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),

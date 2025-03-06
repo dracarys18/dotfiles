@@ -36,7 +36,6 @@ return require('lazy').setup({
     'tpope/vim-abolish',
     { 'yuttie/comfortable-motion.vim', lazy = false },
     -- 'ruanyl/vim-gh-line',
-    'rest-nvim/rest.nvim',
     -- 'b0o/SchemaStore.nvim',
     -- 'rcarriga/nvim-notify',
     'folke/todo-comments.nvim',
@@ -80,13 +79,6 @@ return require('lazy').setup({
     --     },
     -- },
     {
-        'akinsho/git-conflict.nvim',
-        version = "*",
-        config = function()
-            require('git-conflict').setup()
-        end
-    },
-    {
         'williamboman/mason.nvim',
         cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
         config = function()
@@ -105,7 +97,7 @@ return require('lazy').setup({
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "ocamllsp", "terraformls" },
+                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "terraformls" },
                 automatic_installation = true,
             })
         end,
@@ -212,15 +204,6 @@ return require('lazy').setup({
         ft = "d2",
     },
     {
-        'andweeb/presence.nvim',
-        config = function()
-            require "presence".setup({
-                auto_update = true,
-                main_image = "file",
-            })
-        end
-    },
-    {
         'ms-jpq/coq_nvim',
         ft = { "rust", "toml", "lua" },
         dependencies = { 'ms-jpq/coq.artifacts', 'ms-jpq/coq.thirdparty' },
@@ -325,21 +308,6 @@ return require('lazy').setup({
         'nvim-treesitter/nvim-treesitter-context',
         dependencies = { 'nvim-treesitter/nvim-treesitter' }
     },
-    -- {
-    --     'saecki/crates.nvim',
-    --     tag = 'v0.2.1',
-    --     dependencies = { 'nvim-lua/plenary.nvim' },
-    --     config = function()
-    --         require('crates').setup {
-    --             src = {
-    --                 coq = {
-    --                     enabled = true,
-    --                     name = "crates.nvim",
-    --                 },
-    --             },
-    --         }
-    --     end,
-    -- },
     {
         'mrcjkb/rustaceanvim',
         version = '^5', -- Recommended
@@ -350,15 +318,6 @@ return require('lazy').setup({
         dependencies = { "mfussenegger/nvim-dap" },
         config = function() require("dapui").setup() end
     },
-    -- {
-    --     'phaazon/hop.nvim',
-    --     branch = 'v2', -- optional but strongly recommended
-    --     config = function()
-    --         -- you can configure Hop the way you like here; see :h hop-config
-    --         require 'hop'.setup { keys = 'etovxqpdygfblzhckisuran' }
-    --     end
-    -- },
-    -- https://github.com/simrat39/symbols-outline.nvim
     {
         'simrat39/symbols-outline.nvim',
         cmd = "SymbolsOutline",
@@ -384,6 +343,21 @@ return require('lazy').setup({
         config = function()
             require("fidget").setup({})
         end
+    },
+    {
+        "andweeb/presence.nvim",
+        config = function()
+            require("presence").setup({
+                auto_update = true,
+                main_image = "neovim",
+                show_time = true,
+                editing_text = "Cooking kood",
+                file_explorer_text = "Browsing ingrediants",
+                git_commit_text = "Serving",
+                workspace_text = "Working on Secret"
+            })
+        end,
+        lazy = false
     }
 }, {
     defaults = {

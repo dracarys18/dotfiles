@@ -11,6 +11,7 @@ local coq = require 'coq'
 require 'lspconfig'.ts_ls.setup {}
 require 'lspconfig'.sqlls.setup {}
 require 'lspconfig'.gopls.setup {}
+require 'lspconfig'.zls.setup {}
 -- require'lspconfig'.jsonls.setup {
 --     settings = {
 --         json = {

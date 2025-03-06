@@ -55,13 +55,13 @@ local colors = {
 
 local mode_color = function()
     local mode_colors = {
-        n       = colors.blue,
-        i       = colors.green,
-        c       = colors.yellow,
-        V       = colors.purple,
-        ['']    = colors.purple,
-        v       = colors.purple,
-        R       = colors.red,
+        n    = colors.blue,
+        i    = colors.green,
+        c    = colors.yellow,
+        V    = colors.purple,
+        [''] = colors.purple,
+        v    = colors.purple,
+        R    = colors.red,
     }
 
     local color = mode_colors[vim.fn.mode()]
@@ -88,23 +88,23 @@ gls.left[1] = {
                 v = 'VISUAL',
                 R = 'REPLACE',
             }
-            vim.api.nvim_command('hi GalaxyViMode guifg='..mode_color())
+            vim.api.nvim_command('hi GalaxyViMode guifg=' .. mode_color())
             local alias_mode = alias[vim.fn.mode()]
             if alias_mode == nil then
                 alias_mode = vim.fn.mode()
             end
-            return '▋ '..alias_mode..' '
+            return '▋ ' .. alias_mode .. ' '
         end,
-        highlight = { colors.fg , colors.bg2 },
+        highlight = { colors.fg, colors.bg2 },
         separator = '',
-        separator_highlight = { colors.bg2 ,
-                function()
-                    if condition.check_git_workspace() then
-                        return colors.bg1
-                    else
-                        return colors.dark_black
-                    end
+        separator_highlight = { colors.bg2,
+            function()
+                if condition.check_git_workspace() then
+                    return colors.bg1
+                else
+                    return colors.dark_black
                 end
+            end
         },
 
     }
@@ -112,17 +112,17 @@ gls.left[1] = {
 
 gls.left[2] = {
     GitBranch = {
-        provider = function() return vcs.get_git_branch()..' ' end,
+        provider = function() return vcs.get_git_branch() .. ' ' end,
         condition = function()
             local function is_empty()
                 return vcs.get_git_branch() ~= nil
             end
             return condition.check_git_workspace() and condition.hide_in_width() and is_empty()
         end,
-        highlight = { colors.purple , colors.bg1 },
+        highlight = { colors.purple, colors.bg1 },
         icon = '  ',
         separator = '',
-        separator_highlight = { colors.bg1 , colors.dark_black },
+        separator_highlight = { colors.bg1, colors.dark_black },
     }
 }
 
@@ -146,50 +146,49 @@ gls.left[2] = {
 
 
 gls.right[1] = {
-  DiagnosticError = {
-    provider = 'DiagnosticError',
-    icon = '  ',
-    highlight = {colors.red,colors.bg}
-  }
+    DiagnosticError = {
+        provider = 'DiagnosticError',
+        icon = '  ',
+        highlight = { colors.red, colors.bg }
+    }
 }
 gls.right[2] = {
-  DiagnosticWarn = {
-    provider = 'DiagnosticWarn',
-    icon = '  ',
-    highlight = {colors.yellow,colors.bg},
-  }
+    DiagnosticWarn = {
+        provider = 'DiagnosticWarn',
+        icon = '  ',
+        highlight = { colors.yellow, colors.bg },
+    }
 }
 
 gls.right[3] = {
-  DiagnosticHint = {
-    provider = 'DiagnosticHint',
-    icon = '  ',
-    highlight = {colors.cyan,colors.bg},
-  }
+    DiagnosticHint = {
+        provider = 'DiagnosticHint',
+        icon = '  ',
+        highlight = { colors.cyan, colors.bg },
+    }
 }
 
 gls.right[4] = {
-  DiagnosticInfo = {
-    provider = 'DiagnosticInfo',
-    icon = '  ',
-    highlight = {colors.blue,colors.bg},
-  }
+    DiagnosticInfo = {
+        provider = 'DiagnosticInfo',
+        icon = '  ',
+        highlight = { colors.blue, colors.bg },
+    }
 }
 
 gls.right[5] = {
-  LineInfo = {
-    provider = 'LineColumn',
-    highlight = { colors.grey , colors.bg3 },
-    separator = '',
-    separator_highlight = { colors.bg3, colors.dark_black },
-  },
+    LineInfo = {
+        provider = 'LineColumn',
+        highlight = { colors.grey, colors.bg3 },
+        separator = '',
+        separator_highlight = { colors.bg3, colors.dark_black },
+    },
 }
 gls.right[6] = {
-  PerCent = {
-    provider = 'LinePercent',
-    highlight = { colors.blue, colors.bg1 },
-    separator = '',
-    separator_highlight = { colors.bg1 , colors.bg3 },
-  }
+    PerCent = {
+        provider = 'LinePercent',
+        highlight = { colors.blue, colors.bg1 },
+        separator = '',
+        separator_highlight = { colors.bg1, colors.bg3 },
+    }
 }
-
