@@ -344,21 +344,6 @@ return require('lazy').setup({
             require("fidget").setup({})
         end
     },
-    {
-        "andweeb/presence.nvim",
-        config = function()
-            require("presence").setup({
-                auto_update = true,
-                main_image = "neovim",
-                show_time = true,
-                editing_text = "Cooking kood",
-                file_explorer_text = "Browsing ingrediants",
-                git_commit_text = "Serving",
-                workspace_text = "Working on Secret"
-            })
-        end,
-        lazy = false
-    }
 }, {
     defaults = {
         lazy = true,
