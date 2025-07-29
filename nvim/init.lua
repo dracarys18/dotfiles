@@ -73,26 +73,6 @@ vim.g.python_highlight_all = 1
 
 vim.o.completeopt = 'menuone,noselect'
 
-vim.g.coq_settings = {
-    auto_start = 'shut-up',
-    weights = {
-        prefix_matches = 4
-    },
-    clients = {
-        lsp = {
-            weight_adjust = 2
-        },
-        tabnine = {
-            enabled = true,
-        }
-        -- buffers = {
-        --     -- weight_adjust = -0.5
-        -- },
-        -- snippets = {
-        --     -- weight_adjust = -0.1
-        -- }
-    }
-}
 -- vim.g.rooter_manual_only = 1
 
 require('keymaps')

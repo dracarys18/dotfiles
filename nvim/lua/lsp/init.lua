@@ -6,7 +6,7 @@ require 'lsp.clangd'
 
 local lspconfig = require 'lspconfig'
 local lspstatus = require 'lsp-status'
-local coq = require 'coq'
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require 'lspconfig'.ts_ls.setup {}
 require 'lspconfig'.sqlls.setup {}
@@ -33,13 +33,16 @@ vim.o.clipboard = "unnamedplus"
 vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 -- vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
+local function starts_with(str, start)
+    return str:sub(1, #start) ~= start
+end
 
-require('mason-lspconfig').setup_handlers({
+require('mason-lspconfig').setup({
     function(server_name)
-        if server_name ~= "rust_analyzer" then
+        if starts_with(server_name, "rust") then
             lspconfig[server_name].setup({
                 on_attach = lspstatus.on_attach,
-                capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),
+                capabilities = capabilities
             })
         end
     end,

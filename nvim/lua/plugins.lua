@@ -10,13 +10,6 @@ if not vim.loop.fs_stat(lazypath) then
     })
 end
 vim.opt.rtp:prepend(lazypath)
--- require("lazy").setup(plugins, opts)
--- if fn.empty(fn.glob(install_path)) > 0 then
---     fn.system({ 'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path })
---     execute 'packadd packer.nvim'
--- end
-
--- local use = require('packer').use
 
 return require('lazy').setup({
     { "ellisonleao/glow.nvim", config = true, cmd = "Glow" },
@@ -81,6 +74,7 @@ return require('lazy').setup({
     {
         'williamboman/mason.nvim',
         cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
+        version = "^1.0.0",
         config = function()
             require("mason").setup({
                 ui = {
@@ -95,6 +89,7 @@ return require('lazy').setup({
     },
     {
         "williamboman/mason-lspconfig.nvim",
+        version = "^1.0.0",
         config = function()
             require("mason-lspconfig").setup({
                 ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "terraformls" },
@@ -204,13 +199,17 @@ return require('lazy').setup({
         ft = "d2",
     },
     {
-        'ms-jpq/coq_nvim',
-        ft = { "rust", "toml", "lua" },
-        dependencies = { 'ms-jpq/coq.artifacts', 'ms-jpq/coq.thirdparty' },
-        build = ':COQdeps',
-        config = function()
-            vim.g.coq_settings.keymap = { jump_to_mark = "<c-j>" }
-        end
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            "hrsh7th/cmp-cmdline",
+            "L3MON4D3/LuaSnip",            -- Snippet engine
+            "saadparwaiz1/cmp_luasnip",    -- Snippet completions
+            "rafamadriz/friendly-snippets" -- Optional snippet collection
+        },
+        config = require("setup.cmp")
     },
     {
         'akinsho/bufferline.nvim',
@@ -306,7 +305,8 @@ return require('lazy').setup({
     },
     {
         'nvim-treesitter/nvim-treesitter-context',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' }
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        branch = "master"
     },
     {
         'mrcjkb/rustaceanvim',
