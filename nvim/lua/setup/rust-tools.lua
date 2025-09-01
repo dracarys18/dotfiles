@@ -5,7 +5,7 @@
 local rt = require('rustaceanvim')
 local lspstatus = require('lsp-status')
 local lsp_signature = require('lsp_signature')
-local coq = require('coq')
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local opts = {
     tools = {
@@ -240,7 +240,7 @@ local opts = {
             lsp_signature.on_attach(client, bufnr)
             lspstatus.on_attach(client)
         end,
-        capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),
+        capabilities = capabilities,
     }, -- rust-analyer options
     -- debugging stuff
 

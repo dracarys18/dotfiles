@@ -72,7 +72,6 @@ vim.g.python_highlight_all = 1
 
 
 vim.o.completeopt = 'menuone,noselect'
-
 -- vim.g.rooter_manual_only = 1
 
 require('keymaps')

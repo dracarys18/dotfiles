@@ -92,7 +92,7 @@ return require('lazy').setup({
         version = "^1.0.0",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "rust_analyzer", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "terraformls" },
+                ensure_installed = { "lua_ls", "pylsp", "gopls", "bashls", "clangd", "ts_ls", "zls", "terraformls", "rust_analyzer" },
                 automatic_installation = true,
             })
         end,
@@ -229,23 +229,6 @@ return require('lazy').setup({
         lazy = false,
         config = function() require('oil').setup() end
     },
-    {
-        'ms-jpq/coq.thirdparty',
-        config = function()
-            require("coq_3p")({
-                {
-                    src = "repl",
-                    sh = "sh",
-                    shell = { p = "perl", n = "node" },
-                    max_lines = 99,
-                    deadline = 500,
-                    unsafe = { "rm", "poweroff", "mv" }
-                },
-                { src = "bc", short_name = "MATH", precision = 6 },
-                { src = "dap" }
-            })
-        end
-    },
     -- use 'airblade/vim-rooter'
     -- use({
     --     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
@@ -301,17 +284,39 @@ return require('lazy').setup({
 
     {
         'nvim-treesitter/nvim-treesitter',
+        branch = "master",
         build = ':TSUpdate'
     },
     {
         'nvim-treesitter/nvim-treesitter-context',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        branch = "master"
     },
     {
         'mrcjkb/rustaceanvim',
-        version = '^5', -- Recommended
+        version = '^6', -- Recommended
         ft = { 'rust' },
+    },
+    {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        config = function()
+            require("copilot").setup({
+                suggestion = { enabled = false },
+                panel = { enabled = false },
+                filetypes = {
+                    rust = true,   -- allow specific filetype
+                    ["*"] = false, -- disable for all other filetypes and ignore default `filetypes`
+                }
+            })
+        end,
+    },
+    {
+        "zbirenbaum/copilot-cmp",
+        lazy = false,
+        config = function()
+            require("copilot_cmp").setup()
+        end
     },
     {
         "rcarriga/nvim-dap-ui",

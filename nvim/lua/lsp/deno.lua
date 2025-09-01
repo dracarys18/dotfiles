@@ -1,9 +1,11 @@
-local lspconfig = require'lspconfig'
-local lspstatus = require'lsp-status'
-local coq = require'coq'
+local lspconfig = require 'lspconfig'
+local lspstatus = require 'lsp-status'
 
-lspconfig.denols.setup{
-    on_attach=function(client) lspstatus.on_attach(client)  return end,
-    capabilities = coq.lsp_ensure_capabilities(lspstatus.capabilities),
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+lspconfig.denols.setup {
+    on_attach = function(client)
+        lspstatus.on_attach(client)
+        return
+    end,
+    capabilities = capabilities
 }
-
