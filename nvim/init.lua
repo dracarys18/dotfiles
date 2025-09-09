@@ -12,7 +12,7 @@ autocmd BufNewFile,BufRead *.sol set ft=solidity
 ]], false)
 
 vim.o.number = true
-vim.o.relativenumber = true
+vim.o.relativenumber = false
 vim.o.timeoutlen = 700
 vim.o.guifont = 'Hasklug Nerd Font Mono,Hack Nerd Font,NotoEmoji Nerd Font:h11'
 
