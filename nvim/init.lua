@@ -40,6 +40,10 @@ vim.o.termguicolors = true
 -- No clue why window scoped
 vim.wo.signcolumn = 'yes'
 vim.opt.list = true
+-- don't show parse errors in a separate window
+vim.g.zig_fmt_parse_errors = 0
+-- disable format-on-save from `ziglang/zig.vim`
+vim.g.zig_fmt_autosave = 0
 -- vim.o.colorcolumn = '+1'
 -- vim.o.textwidth = 120
 
@@ -86,5 +90,12 @@ require 'nvim-treesitter.configs'.setup {
         additional_vim_regex_highlighting = false,
     },
 }
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+    pattern = { "*.zig", "*.zon" },
+    callback = function(ev)
+        vim.lsp.buf.format()
+    end
+})
 vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 -- vim.notify = require 'notify'

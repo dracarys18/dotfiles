@@ -10,6 +10,13 @@ if not vim.loop.fs_stat(lazypath) then
     })
 end
 vim.opt.rtp:prepend(lazypath)
+-- require("lazy").setup(plugins, opts)
+-- if fn.empty(fn.glob(install_path)) > 0 then
+--     fn.system({ 'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path })
+--     execute 'packadd packer.nvim'
+-- end
+
+-- local use = require('packer').use
 
 return require('lazy').setup({
     { "ellisonleao/glow.nvim", config = true, cmd = "Glow" },
@@ -99,11 +106,10 @@ return require('lazy').setup({
         lazy = false
     },
     {
-        'NTBBloodbath/galaxyline.nvim',
-        branch = 'main',
-        lazy = false,
-        config = function() require('statusline') end,
-        dependencies = { 'nvim-tree/nvim-web-devicons' }
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        config = function() require("statusline") end,
+        lazy = false
     },
     {
         'nvim-telescope/telescope-fzf-native.nvim',
@@ -305,7 +311,9 @@ return require('lazy').setup({
                 suggestion = { enabled = false },
                 panel = { enabled = false },
                 filetypes = {
-                    rust = true,   -- allow specific filetype
+                    rust = true, -- allow specific filetype
+                    go = true,
+                    zig = true,
                     ["*"] = false, -- disable for all other filetypes and ignore default `filetypes`
                 }
             })
@@ -322,6 +330,9 @@ return require('lazy').setup({
         "rcarriga/nvim-dap-ui",
         dependencies = { "mfussenegger/nvim-dap" },
         config = function() require("dapui").setup() end
+    },
+    {
+        "ziglang/zig.vim"
     },
     {
         'simrat39/symbols-outline.nvim',

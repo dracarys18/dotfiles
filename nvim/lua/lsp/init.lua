@@ -8,10 +8,7 @@ local lspconfig = require 'lspconfig'
 local lspstatus = require 'lsp-status'
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-require 'lspconfig'.ts_ls.setup {}
-require 'lspconfig'.sqlls.setup {}
-require 'lspconfig'.gopls.setup {}
-require 'lspconfig'.zls.setup {}
+
 -- require'lspconfig'.jsonls.setup {
 --     settings = {
 --         json = {
@@ -48,6 +45,16 @@ require('mason-lspconfig').setup({
     end,
 })
 
+require 'lspconfig'.zls.setup {
+    on_attach = lspstatus.on_attach,
+    capabilities = capabilities,
+    settings = {
+        zls = {
+            enable_build_on_save = true,
+            semantic_tokens = "partial"
+        }
+    }
+}
 
 require("bufferline").setup {
     options = { diagnostics = "nvm_lsp" },
