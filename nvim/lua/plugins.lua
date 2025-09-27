@@ -22,7 +22,6 @@ return require('lazy').setup({
     { "ellisonleao/glow.nvim", config = true, cmd = "Glow" },
     'samoshkin/vim-mergetool',
     'mhartington/formatter.nvim',
-    -- 'christianrondeau/vim-base64',
 
     { 'tpope/vim-commentary',  lazy = false },
     {
@@ -35,22 +34,7 @@ return require('lazy').setup({
     'tpope/vim-vinegar',
     'tpope/vim-abolish',
     { 'yuttie/comfortable-motion.vim', lazy = false },
-    -- 'ruanyl/vim-gh-line',
-    -- 'b0o/SchemaStore.nvim',
-    -- 'rcarriga/nvim-notify',
     'folke/todo-comments.nvim',
-    -- 'ggandor/leap.nvim',
-    { 'shortcuts/no-neck-pain.nvim',   version = "*" },
-    -- { 'folke/zen-mode.nvim',         config = function() require('zen-mode').setup() end },
-    -- { 'folke/twilight.nvim',         config = function() require('twilight').setup() end },
-    {
-        'pwntester/octo.nvim',
-        cmd = "Octo",
-        config = function()
-            require(
-                'octo').setup()
-        end
-    },
     {
         'catppuccin/nvim',
         lazy = false,
@@ -60,7 +44,7 @@ return require('lazy').setup({
                 'colorscheme')
         end
     },
-    { 'folke/which-key.nvim',        config = function() require("which-key").setup() end },
+    { 'folke/which-key.nvim',          config = function() require("which-key").setup() end },
     {
         'nvim-telescope/telescope.nvim',
         cmd = "Telescope",
@@ -314,6 +298,7 @@ return require('lazy').setup({
                     rust = true, -- allow specific filetype
                     go = true,
                     zig = true,
+                    ml = true,
                     ["*"] = false, -- disable for all other filetypes and ignore default `filetypes`
                 }
             })

@@ -1,11 +1,13 @@
-local lspconfig = require 'lspconfig'
-local lspstatus = require 'lsp-status'
+local lspstatus = require('lsp-status')
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-lspconfig.ts_ls.setup {
+-- configure TypeScript/JavaScript LSP
+vim.lsp.config('ts_ls', {
     on_attach = function(client)
         lspstatus.on_attach(client)
-        return
     end,
-    capabilities = capabilities
-}
+    capabilities = capabilities,
+})
+
+-- enable the server
+vim.lsp.enable('ts_ls')
