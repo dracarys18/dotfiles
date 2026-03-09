@@ -1,0 +1,60 @@
+# --- Window Actions ---
+rctrl + shift - q : yabai -m window --close
+alt + shift - q   : yabai -m window --close
+
+rctrl + shift - f : yabai -m window --toggle native-fullscreen
+alt + shift - f   : yabai -m window --toggle native-fullscreen
+
+rctrl - space : yabai -m window --toggle float
+alt - space   : yabai -m window --toggle float
+
+# --- Move between spaces ---
+rctrl - 1 : yabai -m space --focus 1
+alt - 1   : yabai -m space --focus 1
+
+rctrl - 2 : yabai -m space --focus 2
+alt - 2   : yabai -m space --focus 2
+
+rctrl - 3 : yabai -m space --focus 3
+alt - 3   : yabai -m space --focus 3
+
+rctrl - 4 : yabai -m space --focus 4
+alt - 4   : yabai -m space --focus 4
+
+# --- Open Apps ---
+rctrl + shift - g : open -a "Ghostty"
+alt + shift - g   : open -a "Ghostty"
+
+rctrl + shift - z : open -a "Zen"
+alt + shift - z   : open -a "Zen"
+
+rctrl + shift - c : open -a "Cinny"
+alt + shift - c   : open -a "Cinny"
+
+rctrl + shift - s : open -a "Signal"
+alt + shift - s   : open -a "Signal"
+
+rctrl + shift - d : open -a "Discord"
+alt + shift - d   : open -a "Discord"
+
+rctrl + shift - t : open -a "Telegram"
+alt + shift - t   : open -a "Telegram"
+
+rctrl + shift - p : open -a "Spotify"
+alt + shift - p   : open -a "Spotify"
+
+rctrl + shift - e : open -a "Element"
+alt + shift - e   : open -a "Element"
+
+# --- Window Focus (Vim-ish HJKL or WASD) ---
+rctrl - a : yabai -m window --focus west
+alt - a   : yabai -m window --focus west
+
+rctrl - s : yabai -m window --focus south
+alt - s   : yabai -m window --focus south
+
+rctrl - w : yabai -m window --focus north
+alt - w   : yabai -m window --focus north
+
+rctrl - d : yabai -m window --focus east
+alt - d   : yabai -m window --focus east
