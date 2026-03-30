@@ -156,7 +156,7 @@ require("copilot").setup({
     suggestion = {
         enabled = true,
         auto_trigger = true,
-        keymap = { accept = "<M-l>", next = "<M-]>", prev = "<M-[>", dismiss = "<M-e>" },
+        keymap = { accept = "<Tab>", next = "<M-]>", prev = "<M-[>", dismiss = "<M-e>" },
     },
     panel = { enabled = false },
     filetypes = {
