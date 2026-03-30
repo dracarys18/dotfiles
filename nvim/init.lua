@@ -75,18 +75,17 @@ vim.g.python_highlight_all = 1
 -- }
 
 
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menuone,noselect,popup'
 -- vim.g.rooter_manual_only = 1
 
 require('keymaps')
 require('plugins')
 
 require 'nvim-treesitter.configs'.setup {
-    -- ensure_installed = "all",
     ensure_installed = { "c", "rust", "terraform", "toml", "lua", "json", "python", "cmake", "make", "typescript", "bash", "cpp",
-        "comment", "css", "fish", "http", "html", "vim", "yaml", "go", "gomod", "gowork", "zig", "ocaml" },
+        "css", "fish", "html", "vim", "yaml", "go", "gomod", "gowork", "zig", "ocaml" },
     highlight = {
-        enable = true, -- false will disable the whole extension
+        enable = true,
         additional_vim_regex_highlighting = false,
     },
 }
@@ -98,5 +97,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
     end
 })
 
-vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
--- vim.notify = require 'notify'
+-- disable virtual_lines (the `>` after every line in 0.12)
+vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
+

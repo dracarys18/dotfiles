@@ -3,14 +3,19 @@ local lspstatus = require('lsp-status')
 require 'lsp.lua-language-server'
 require 'lsp.clangd'
 
--- capabilities for nvim-cmp
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local base_caps = vim.tbl_deep_extend('force',
+    vim.lsp.protocol.make_client_capabilities(),
+    lspstatus.capabilities
+)
+local ok, blink = pcall(require, 'blink.cmp')
+local capabilities = ok and blink.get_lsp_capabilities(base_caps) or base_caps
 
 -- global defaults for all servers
 vim.lsp.config('*', {
     capabilities = capabilities,
     on_attach = lspstatus.on_attach,
 })
+
 
 -- ocaml
 vim.lsp.config('ocamllsp', {})
@@ -49,13 +54,6 @@ require('mason-lspconfig').setup({
 -- explicitly enable the servers you want
 vim.lsp.enable({ 'ocamllsp', 'gopls', 'zls' })
 -- add 'jsonls' if you uncommented its config
-
--- completion options
-vim.o.completeopt = "menuone,noselect"
-vim.o.clipboard = "unnamedplus"
-
--- omnifunc for LSP-based completion
-vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
 -- bufferline with diagnostics
 require("bufferline").setup {

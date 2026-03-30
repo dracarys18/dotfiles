@@ -49,30 +49,22 @@ local normal_mode_maps = {
     { key = '<leader>rr',       map = [[<cmd>RustRunnables<cr>]] },
     { key = 'vff',              map = [[<cmd>vertical Gdiffsplit<cr>]] },
     { key = 'vff!',             map = [[<cmd>vertical Gdiffsplit!<cr>]] },
-    { key = 'ssr',              map = [[<cmd>lua require'rust-tools'.ssr.ssr(query)<cr>]] },
-    { key = 'mcr',              map = [[<cmd>lua require'rust-tools'.expand_macro.expand_macro()<cr>]] },
-
-    -- Session
-    { key = '<leader>ss',       map = [[<cmd>SessionSave<cr>]] },
-    { key = '<leader>sl',       map = [[<cmd>SessionLoad<cr>]] },
 
     -- lsp
     { key = 'K',                map = [[<cmd>lua vim.lsp.buf.hover()<cr>]] },
     { key = '<C-k>',            map = [[<cmd>lua vim.lsp.buf.definition()<cr>]] },
     { key = 'gi',               map = [[<cmd>lua vim.lsp.buf.implementation()<cr>]] },
     { key = 'gn',               map = [[<cmd>lua vim.lsp.buf.rename()<cr>]] },
-    { key = '<leader>o',        map = [[<cmd>TroubleToggle<cr>]] },
+    { key = '<leader>o',        map = [[<cmd>Trouble diagnostics toggle<cr>]] },
     { key = '<leader>dd',       map = [[<cmd>lua require'dapui'.toggle()<cr>]] },
 
     -- { key = '<leader>a', map = [[<cmd>lua vim.lsp.buf.document_highlight()<cr>]] },
     -- { key = '<leader>c', map = [[<cmd>lua vim.lsp.buf.clear_references()<cr>]] },
     { key = '<leader>"',        map = [["+]] },
     { key = 'F',                map = [[<cmd>lua vim.lsp.buf.format { async = true }<cr>]] },
-    { key = 'T',                map = [[<cmd>lua require'lsp_extensions'.inlay_hints()<cr>]] },
     { key = 'gt',               map = ':BufferLineMoveNext<cr>' },
     { key = 'gT',               map = ':BufferLineMovePrev<cr>' },
     { key = '<C-W>%',           map = [[<cmd>vsplit<cr>]] },
-    { key = '<C-l>',            map = [[<cmd>:SymbolsOutline<cr>]] },
 
     -- Other
     { key = '<leader>m',        map = [[<cmd>silent !mpcfzf<cr>]] },
@@ -85,11 +77,6 @@ local normal_mode_maps = {
         key = '<leader>i',
         map = [[<cmd>lua require('telescope.builtin').lsp_incoming_calls({fname_width = 40})<cr>]]
     },
-    {
-        key = '<leader>e',
-        map = [[<Plug>RestNvim<cr>]]
-    },
-
     { key = '<C-c>', map = [[<cmd>Telescope commands<cr>]] },
     -- { key = '<ScrollWheelDown>', map = [[<cmd>call comfortable_motion#flick(40)<cr>]], options = { silent = true } },
     -- { key = '<ScrollWheelUp>', map = [[<cmd>call comfortable_motion#flick(-40)<cr>]], options = { silent = true } },
@@ -120,3 +107,11 @@ for idx = 1, #insert_mode_maps do
         vim.api.nvim_set_keymap('i', insert_mode_maps[idx].key, insert_mode_maps[idx].map, options)
     end
 end
+
+-- ── Trouble ───────────────────────────────────────────────────────────────────
+vim.keymap.set('n', '<leader>xX', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', { desc = "Buffer Diagnostics (Trouble)" })
+vim.keymap.set('n', '<leader>cs', '<cmd>Trouble symbols toggle focus=false<cr>',      { desc = "Symbols (Trouble)" })
+vim.keymap.set('n', '<leader>cl', '<cmd>Trouble lsp toggle focus=false win.position=right<cr>', { desc = "LSP Definitions / references" })
+vim.keymap.set('n', '<leader>xL', '<cmd>Trouble loclist toggle<cr>',                  { desc = "Location List (Trouble)" })
+vim.keymap.set('n', '<leader>xQ', '<cmd>Trouble qflist toggle<cr>',                  { desc = "Quickfix List (Trouble)" })
+
