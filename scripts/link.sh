@@ -14,12 +14,20 @@ link() {
     # Create parent directory if needed
     mkdir -p "$(dirname "$dst")"
 
-    if [ -e "$dst" ] || [ -L "$dst" ]; then
-        echo "  skip   $dst (already exists)"
-    else
-        ln -s "$src" "$dst"
-        echo "  linked $dst -> $src"
+    # Already points to the right place — nothing to do
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+        echo "  skip   $dst (already linked)"
+        return
     fi
+
+    # Exists but is not our symlink — back it up
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+        mv "$dst" "${dst}.bak"
+        echo "  backup $dst -> ${dst}.bak"
+    fi
+
+    ln -s "$src" "$dst"
+    echo "  linked $dst -> $src"
 }
 
 echo "Linking dotfiles from $DOTFILES"
