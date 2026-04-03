@@ -5,7 +5,7 @@ install-macos:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    if [ "$(uname -s)" != "Darwin" ]; then
+    if [ "{{OS}}" != "Darwin" ]; then
         echo "  skip   macOS-only tools (not on macOS)"
         exit 0
     fi
@@ -32,14 +32,6 @@ install-macos:
     else
         echo "Installing ghostty..."
         brew install --cask ghostty
-    fi
-
-    # wezterm — terminal emulator
-    if brew list --cask wezterm &>/dev/null; then
-        echo "  skip   wezterm (already installed)"
-    else
-        echo "Installing wezterm..."
-        brew install --cask wezterm
     fi
 
     echo ""

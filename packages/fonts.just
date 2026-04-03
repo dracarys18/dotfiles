@@ -4,9 +4,8 @@
 install-fonts:
     #!/usr/bin/env bash
     set -euo pipefail
-    OS="$(uname -s)"
 
-    if [ "$OS" = "Darwin" ]; then
+    if [ "{{OS}}" = "Darwin" ]; then
         echo "Tapping homebrew/cask-fonts..."
         brew tap homebrew/cask-fonts 2>/dev/null || true
 
@@ -16,7 +15,7 @@ install-fonts:
             echo "Installing Hasklug Nerd Font..."
             brew install --cask font-hasklug-nerd-font
         fi
-    elif [ "$OS" = "Linux" ]; then
+    else
         echo ""
         echo "  [NOTICE] Hasklug Nerd Font is not in the official Arch repos."
         echo "  Install it manually via AUR:"
