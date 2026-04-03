@@ -4,22 +4,25 @@ import 'packages/go.just'
 import 'packages/node.just'
 import 'packages/fonts.just'
 import 'packages/macos.just'
+import 'prerequisites/prerequisites.just'
 
 # Detect OS and distro once — used by all imported recipes
 OS     := `uname -s`
 DISTRO := `[ -f /etc/os-release ] && grep -i "^ID=" /etc/os-release | cut -d= -f2 | tr -d '"' | tr '[:upper:]' '[:lower:]' || echo ""`
 
 # Single install command passed to every recipe
-INSTALL_CMD := if OS == "Darwin"   { "brew install" } \
-          else if DISTRO == "arch" { "sudo pacman -S --noconfirm --needed" } \
-          else                     { "sudo apt-get install -y" }
+INSTALL_CMD       := if OS == "Darwin"   { "brew install" } \
+               else if DISTRO == "arch" { "sudo pacman -S --noconfirm --needed" } \
+               else                     { "sudo apt-get install -y" }
+
+CARGO_INSTALL_CMD := "cargo install"
 
 # List all available recipes
 default:
     @just --list
 
-# Full one-time setup: packages first, symlinks last (so installers can't clobber them)
-install: install-cli install-zsh install-tpm install-rust install-go install-node install-fonts install-macos link
+# Full one-time setup: prerequisites → packages → symlinks
+install: prerequisites install-rust install-cli install-zsh install-tpm install-go install-node install-fonts install-macos link
     @echo ""
     @echo "Setup complete. Restart your shell to apply changes."
 
