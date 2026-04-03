@@ -10,9 +10,7 @@ install-node:
     # Install nvm if not present
     if [ ! -d "$NVM_DIR" ]; then
         echo "Installing nvm..."
-        NVM_VERSION="$(curl -sSf https://api.github.com/repos/nvm-sh/nvm/releases/latest \
-            | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/')"
-        curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash
     else
         echo "  skip   nvm (already installed)"
     fi
