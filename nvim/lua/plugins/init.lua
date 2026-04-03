@@ -51,14 +51,14 @@ local plugins = {
     { src = 'ssh://git@ssh.github.com:443/glepnir/lspsaga.nvim' },
 
     -- completion
-    { src = 'ssh://git@ssh.github.com:443/saghen/blink.cmp', version = vim.version.range('1.*'),
+    { src = 'ssh://git@ssh.github.com/saghen/blink.cmp', version = vim.version.range('1.*'),
       build = { 'cargo', 'build', '--release', '--locked' }, check = 'target/release' },
 
     -- copilot
     { src = 'ssh://git@ssh.github.com:443/zbirenbaum/copilot.lua' },
 
     -- treesitter
-    { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter', version = 'master',
+    { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate', check = 'parser' },
     { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter-context' },
 

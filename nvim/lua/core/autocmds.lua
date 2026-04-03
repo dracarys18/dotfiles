@@ -15,6 +15,11 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
     command = 'set ft=solidity',
 })
 
+-- treesitter highlighting for all filetypes (no-op if no parser available)
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function() pcall(vim.treesitter.start) end,
+})
+
 -- zig: format on save via LSP
 vim.api.nvim_create_autocmd('BufWritePre', {
     pattern = { '*.zig', '*.zon' },
