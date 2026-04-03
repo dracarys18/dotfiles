@@ -9,8 +9,8 @@ import 'packages/macos.just'
 default:
     @just --list
 
-# Full one-time setup: symlinks + all packages
-install: link install-cli install-zsh install-tpm install-rust install-go install-node install-fonts install-macos
+# Full one-time setup: packages first, symlinks last (so installers can't clobber them)
+install: install-cli install-zsh install-tpm install-rust install-go install-node install-fonts install-macos link
     @echo ""
     @echo "Setup complete. Restart your shell to apply changes."
 

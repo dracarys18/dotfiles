@@ -45,6 +45,7 @@ jobs:
               echo "  ok  $target"
             else
               echo "  FAIL  $target is not a symlink"
+              echo "  file info: $(ls -la $target 2>&1 || echo 'does not exist')"
               exit 1
             fi
           done
