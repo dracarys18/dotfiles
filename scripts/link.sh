@@ -33,9 +33,10 @@ link() {
 echo "Linking dotfiles from $DOTFILES"
 
 # Shell
-link "$DOTFILES/shell/.zshrc"        "$HOME/.zshrc"
-link "$DOTFILES/shell/starship.toml" "$HOME/.config/starship.toml"
-link "$DOTFILES/shell/config.fish"   "$HOME/.config/fish/config.fish"
+link "$DOTFILES/shell/.zshrc"          "$HOME/.zshrc"
+link "$DOTFILES/shell/starship.toml"   "$HOME/.config/starship.toml"
+link "$DOTFILES/shell/fish/config.fish" "$HOME/.config/fish/config.fish"
+link "$DOTFILES/shell/fish/conf.d"     "$HOME/.config/fish/conf.d"
 
 # Neovim
 link "$DOTFILES/nvim" "$HOME/.config/nvim"

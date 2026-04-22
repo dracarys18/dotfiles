@@ -74,6 +74,60 @@ install-zsh:
 
     echo "zsh plugins installed."
 
+# Set up fish: register in /etc/shells, set as default shell, refresh conf.d caches
+install-fish:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    FISH_PATH="$(command -v fish || true)"
+    if [ -z "$FISH_PATH" ]; then
+        echo "fish not found — run 'just install-cli' first"
+        exit 1
+    fi
+
+    # 1. Register fish in /etc/shells (required by chsh)
+    if ! grep -qxF "$FISH_PATH" /etc/shells; then
+        echo "Adding $FISH_PATH to /etc/shells (requires sudo)..."
+        echo "$FISH_PATH" | sudo tee -a /etc/shells >/dev/null
+    else
+        echo "  skip   $FISH_PATH already in /etc/shells"
+    fi
+
+    # 2. Make fish the default login shell
+    if [ "${SHELL:-}" != "$FISH_PATH" ]; then
+        echo "Setting fish as default shell (requires your password)..."
+        chsh -s "$FISH_PATH"
+        echo "  Default shell changed. Open a new terminal to apply."
+    else
+        echo "  skip   fish already default shell"
+    fi
+
+    # 3. Refresh cached tool-init files (starship, zoxide)
+    #    These live in shell/fish/conf.d and are committed; regenerate if you
+    #    upgrade starship/zoxide.
+    echo "Refreshing fish conf.d caches..."
+    DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd 2>/dev/null || echo "$HOME/.dotfiles")"
+    CONF_D="$DOTFILES/shell/fish/conf.d"
+
+    if command -v starship &>/dev/null; then
+        starship init fish --print-full-init > "$CONF_D/starship_init.fish"
+        echo "  updated starship_init.fish"
+    fi
+
+    if command -v zoxide &>/dev/null; then
+        zoxide init fish > "$CONF_D/zoxide_init.fish"
+        echo "  updated zoxide_init.fish"
+    fi
+
+    # 4. Refresh kubectl aliases from upstream
+    echo "Refreshing kubectl aliases..."
+    curl -fsSL https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases.fish \
+        -o "$CONF_D/kubectl_aliases.fish"
+    echo "  updated kubectl_aliases.fish ($(wc -l < "$CONF_D/kubectl_aliases.fish") lines)"
+
+    echo ""
+    echo "fish setup complete. Open a new terminal (or 'exec fish') to start using it."
+
 # Bootstrap tmux plugin manager
 install-tpm:
     #!/usr/bin/env bash

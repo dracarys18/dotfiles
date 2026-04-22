@@ -22,7 +22,7 @@ default:
     @just --list
 
 # Full one-time setup: prerequisites → packages → symlinks
-install: prerequisites install-rust install-cli install-zsh install-tpm install-go install-node install-fonts install-macos link
+install: prerequisites install-rust install-cli install-zsh install-fish install-tpm install-go install-node install-fonts install-macos link
     @echo ""
     @echo "Setup complete. Restart your shell to apply changes."
 
@@ -48,6 +48,7 @@ unlink:
     remove_link "$HOME/.zshrc"
     remove_link "$HOME/.config/starship.toml"
     remove_link "$HOME/.config/fish/config.fish"
+    remove_link "$HOME/.config/fish/conf.d"
     remove_link "$HOME/.config/nvim"
     remove_link "$HOME/.tmux.conf"
     remove_link "$HOME/.config/wezterm/wezterm.lua"

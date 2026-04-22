@@ -149,7 +149,8 @@
     },
     "nvim-treesitter": {
       "rev": "cf12346a3414fa1b06af75c79faebe7f76df080a",
-      "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter"
+      "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter",
+      "version": "'master'"
     },
     "nvim-treesitter-context": {
       "rev": "adf4b6b0420b7be6c717ef0ac7993183d6c201b1",
@@ -162,6 +163,10 @@
     "oil.nvim": {
       "rev": "0fcc83805ad11cf714a949c98c605ed717e0b83e",
       "src": "ssh://git@ssh.github.com:443/stevearc/oil.nvim"
+    },
+    "opencode.nvim": {
+      "rev": "eb1be3208251a61d4a61fdd5870301003012ce50",
+      "src": "ssh://git@ssh.github.com:443/nickjvandyke/opencode.nvim.git"
     },
     "pets.nvim": {
       "rev": "8a443e2eae804e5abe21b5d00ceaef4041f882e4",
