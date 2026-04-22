@@ -86,8 +86,10 @@ install-fish:
         exit 1
     fi
 
-    DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd 2>/dev/null || echo "$HOME/.dotfiles")"
-    CONF_D="$DOTFILES/shell/fish/conf.d"
+    # {{justfile_directory()}} resolves to the repo root (works across OSes and
+    # in CI where BASH_SOURCE points to a just-created temp file).
+    CONF_D="{{justfile_directory()}}/shell/fish/conf.d"
+    mkdir -p "$CONF_D"
 
     # Refresh cached starship init
     if command -v starship &>/dev/null; then
