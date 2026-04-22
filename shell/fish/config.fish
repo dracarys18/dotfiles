@@ -7,6 +7,9 @@ if not status is-interactive
     exit
 end
 
+# Theme catppuccin-mocha
+fish_config theme choose catppuccin-mocha
+
 # -------------------------------------------------------------------
 # Environment variables
 # -------------------------------------------------------------------
