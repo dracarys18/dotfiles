@@ -32,10 +32,12 @@ fish_add_path -g $HOME/.orbstack/bin
 
 # -------------------------------------------------------------------
 # Aliases — guarded so they only apply if the tool is installed
+# Note: zoxide's `z` is a fish function (defined in conf.d/zoxide_init.fish),
+# not a binary — so we check for `zoxide` itself.
 # -------------------------------------------------------------------
-command -q z;         and alias cd='z'
-command -q exa;       and alias ls='exa'
-command -q eza;       and alias ls='eza'        # eza is the maintained fork of exa
+command -q zoxide;    and alias cd='z'
+command -q eza;       and alias ls='eza'
+command -q exa;       and not command -q eza; and alias ls='exa'  # fallback if eza missing
 command -q bat;       and alias cat='bat'
 command -q nvim;      and alias vim='nvim';     and alias vi='nvim'
 command -q terraform; and alias tf='terraform'
