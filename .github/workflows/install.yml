@@ -22,7 +22,7 @@ jobs:
 
       - name: Smoke test binaries
         run: |
-          for cmd in nvim starship bat eza zoxide tmux fzf jq; do
+          for cmd in nvim starship bat eza zoxide tmux fzf jq fish; do
             if command -v "$cmd" &>/dev/null; then
               echo "  ok  $cmd ($(command -v $cmd))"
             else
@@ -69,7 +69,7 @@ jobs:
         run: |
           # Add paths where tools may have been installed
           export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$(go env GOPATH 2>/dev/null)/bin"
-          for cmd in nvim starship bat eza zoxide tmux fzf jq; do
+          for cmd in nvim starship bat eza zoxide tmux fzf jq fish; do
             if command -v "$cmd" &>/dev/null; then
               echo "  ok  $cmd ($(command -v $cmd))"
             else
