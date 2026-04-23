@@ -54,7 +54,6 @@ local plugins = {
     { src = 'ssh://git@ssh.github.com:443/glepnir/lspsaga.nvim' },
 
     -- completion
-    { src = 'git@github.com:fang2hou/blink-copilot.git' },
     {
         src = 'ssh://git@ssh.github.com/saghen/blink.cmp',
         version = vim.version.range('1.*'),
@@ -99,6 +98,5 @@ require('plugins.lsp')
 require('plugins.completion')
 require('plugins.copilot')
 require('plugins.treesitter')
-require('plugins.dap')
 require('plugins.lang')
 vim.pack.add(plugins)
