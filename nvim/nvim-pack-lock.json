@@ -4,9 +4,13 @@
       "rev": "642b0c595e11608b4c18219e93b88d7637af27bc",
       "src": "https://github.com/L3MON4D3/LuaSnip"
     },
+    "blink-copilot": {
+      "rev": "7ad8209b2f880a2840c94cdcd80ab4dc511d4f39",
+      "src": "git@github.com:fang2hou/blink-copilot.git"
+    },
     "blink.cmp": {
       "rev": "451168851e8e2466bc97ee3e026c3dcb9141ce07",
-      "src": "ssh://git@ssh.github.com/saghen/blink.cmp",
+      "src": "ssh://git@ssh.github.com:443/saghen/blink.cmp",
       "version": "1.0.0 - 2.0.0"
     },
     "bufferline.nvim": {
@@ -40,10 +44,6 @@
     "comfortable-motion.vim": {
       "rev": "e20aeafb07c6184727b29f7674530150f7ab2036",
       "src": "https://github.com/yuttie/comfortable-motion.vim"
-    },
-    "copilot-cmp": {
-      "rev": "15fc12af3d0109fa76b60b5cffa1373697e261d1",
-      "src": "https://github.com/zbirenbaum/copilot-cmp"
     },
     "copilot.lua": {
       "rev": "0a3e09122cfd21e62a1e9d183c61aa1cacdd7da6",
@@ -149,8 +149,7 @@
     },
     "nvim-treesitter": {
       "rev": "cf12346a3414fa1b06af75c79faebe7f76df080a",
-      "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter",
-      "version": "'master'"
+      "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter"
     },
     "nvim-treesitter-context": {
       "rev": "adf4b6b0420b7be6c717ef0ac7993183d6c201b1",

@@ -13,7 +13,7 @@ local plugins = {
     { src = 'ssh://git@ssh.github.com:443/nvim-tree/nvim-web-devicons' },
 
     -- ui
-    { src = 'ssh://git@ssh.github.com:443/catppuccin/nvim',             name = 'catppuccin' },
+    { src = 'ssh://git@ssh.github.com:443/catppuccin/nvim',              name = 'catppuccin' },
     { src = 'ssh://git@ssh.github.com:443/nvim-lualine/lualine.nvim' },
     { src = 'ssh://git@ssh.github.com:443/akinsho/bufferline.nvim' },
     { src = 'ssh://git@ssh.github.com:443/j-hui/fidget.nvim' },
@@ -39,34 +39,47 @@ local plugins = {
 
     -- telescope
     { src = 'ssh://git@ssh.github.com:443/nvim-telescope/telescope.nvim' },
-    { src = 'ssh://git@ssh.github.com:443/nvim-telescope/telescope-fzf-native.nvim',
-      build = { 'make' }, check = 'build' },
+    {
+        src = 'ssh://git@ssh.github.com:443/nvim-telescope/telescope-fzf-native.nvim',
+        build = { 'make' },
+        check = 'build'
+    },
     { src = 'ssh://git@ssh.github.com:443/nvim-telescope/telescope-ui-select.nvim' },
 
     -- lsp
     { src = 'ssh://git@ssh.github.com:443/neovim/nvim-lspconfig' },
     { src = 'ssh://git@ssh.github.com:443/nvim-lua/lsp-status.nvim' },
-    { src = 'ssh://git@ssh.github.com:443/williamboman/mason.nvim',           version = vim.version.range('^1.0.0') },
-    { src = 'ssh://git@ssh.github.com:443/williamboman/mason-lspconfig.nvim', version = vim.version.range('^1.0.0') },
+    { src = 'ssh://git@ssh.github.com:443/williamboman/mason.nvim',                version = vim.version.range('^1.0.0') },
+    { src = 'ssh://git@ssh.github.com:443/williamboman/mason-lspconfig.nvim',      version = vim.version.range('^1.0.0') },
     { src = 'ssh://git@ssh.github.com:443/glepnir/lspsaga.nvim' },
 
     -- completion
-    { src = 'ssh://git@ssh.github.com/saghen/blink.cmp', version = vim.version.range('1.*'),
-      build = { 'cargo', 'build', '--release', '--locked' }, check = 'target/release' },
+    { src = 'git@github.com:fang2hou/blink-copilot.git' },
+    {
+        src = 'ssh://git@ssh.github.com/saghen/blink.cmp',
+        version = vim.version.range('1.*'),
+        build = { 'cargo', 'build', '--release', '--locked' },
+        check = 'target/release'
+    },
 
     -- copilot
     { src = 'ssh://git@ssh.github.com:443/zbirenbaum/copilot.lua' },
 
     -- treesitter
-    { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter',
-      build = ':TSUpdate', check = 'parser' },
+    {
+        src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter',
+        build = ':TSUpdate',
+        check = 'parser'
+    },
     { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter-context' },
 
     -- language support
-    { src = 'ssh://git@ssh.github.com:443/mrcjkb/rustaceanvim',  version = vim.version.range('^6') },
-    { src = 'ssh://git@ssh.github.com:443/ray-x/go.nvim',
-      build = function() require('go.install').update_all_sync() end,
-      check = function() return vim.fn.expand('~') .. '/go/bin/gofumpt' end },
+    { src = 'ssh://git@ssh.github.com:443/mrcjkb/rustaceanvim',                    version = vim.version.range('^6') },
+    {
+        src = 'ssh://git@ssh.github.com:443/ray-x/go.nvim',
+        build = function() require('go.install').update_all_sync() end,
+        check = function() return vim.fn.expand('~') .. '/go/bin/gofumpt' end
+    },
     { src = 'ssh://git@ssh.github.com:443/ray-x/guihua.lua' },
     { src = 'ssh://git@ssh.github.com:443/ziglang/zig.vim' },
     { src = 'ssh://git@ssh.github.com:443/terrastruct/d2-vim' },
@@ -82,10 +95,10 @@ vim.pack.add(plugins)
 require('plugins.build')(plugins)
 require('plugins.ui')
 require('plugins.editor')
-require('plugins.telescope')
 require('plugins.lsp')
 require('plugins.completion')
 require('plugins.copilot')
 require('plugins.treesitter')
 require('plugins.dap')
 require('plugins.lang')
+vim.pack.add(plugins)
