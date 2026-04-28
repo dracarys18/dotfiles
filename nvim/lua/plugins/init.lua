@@ -55,7 +55,7 @@ local plugins = {
 
     -- completion
     {
-        src = 'ssh://git@ssh.github.com/saghen/blink.cmp',
+        src = 'ssh://git@ssh.github.com:443/saghen/blink.cmp',
         version = vim.version.range('1.*'),
         build = { 'cargo', 'build', '--release', '--locked' },
         check = 'target/release'
@@ -70,8 +70,6 @@ local plugins = {
         build = ':TSUpdate',
         check = 'parser'
     },
-    { src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter-context' },
-
     -- language support
     { src = 'ssh://git@ssh.github.com:443/mrcjkb/rustaceanvim',                    version = vim.version.range('^6') },
     {

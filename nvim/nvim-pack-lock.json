@@ -10,7 +10,7 @@
     },
     "blink.cmp": {
       "rev": "451168851e8e2466bc97ee3e026c3dcb9141ce07",
-      "src": "ssh://git@ssh.github.com/saghen/blink.cmp",
+      "src": "ssh://git@ssh.github.com:443/saghen/blink.cmp",
       "version": "1.0.0 - 2.0.0"
     },
     "bufferline.nvim": {
