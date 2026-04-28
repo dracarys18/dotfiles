@@ -45,6 +45,7 @@ command -q bat;       and alias cat='bat'
 command -q nvim;      and alias vim='nvim';     and alias vi='nvim'
 command -q terraform; and alias tf='terraform'
 command -q opencode;  and alias clanker='opencode'
+command -q pdf; and alias pdf='mupdf-gl -I'
 
 alias sshat='ssh arch -t "fish"'
 alias helmfile='helmfile --enable-live-output -b werf'
