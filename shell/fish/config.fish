@@ -76,6 +76,6 @@ end
 # Key bindings — up/down arrow history search
 # -------------------------------------------------------------------
 function fish_user_key_bindings
-    bind \e\[A history-token-search-backward
-    bind \e\[B history-token-search-forward
+    bind \e\[A history-prefix-search-backward
+    bind \e\[B history-prefix-search-forward
 end
