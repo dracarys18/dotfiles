@@ -45,3 +45,6 @@ vim.g.zig_fmt_autosave     = 0
 
 -- python
 vim.g.python_highlight_all = 1
+
+-- Autoread after buffer refreshed
+vim.o.autoread = true

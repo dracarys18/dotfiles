@@ -1,5 +1,5 @@
 # Colour and Opacity stuff
-background-opacity = 0.6
+background-opacity = 0.5
 font-family = Hasklug Nerd Font
 font-size = 25
 theme = catpuccin-mocha.conf

@@ -61,9 +61,6 @@ local plugins = {
         check = 'target/release'
     },
 
-    -- copilot
-    { src = 'ssh://git@ssh.github.com:443/zbirenbaum/copilot.lua' },
-
     -- treesitter
     {
         src = 'ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter',
@@ -71,7 +68,7 @@ local plugins = {
         check = 'parser'
     },
     -- language support
-    { src = 'ssh://git@ssh.github.com:443/mrcjkb/rustaceanvim',                    version = vim.version.range('^6') },
+    { src = 'ssh://git@ssh.github.com:443/mrcjkb/rustaceanvim',  version = vim.version.range('^6') },
     {
         src = 'ssh://git@ssh.github.com:443/ray-x/go.nvim',
         build = function() require('go.install').update_all_sync() end,
@@ -94,7 +91,6 @@ require('plugins.ui')
 require('plugins.editor')
 require('plugins.lsp')
 require('plugins.completion')
-require('plugins.copilot')
 require('plugins.treesitter')
 require('plugins.lang')
 vim.pack.add(plugins)

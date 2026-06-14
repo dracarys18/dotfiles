@@ -119,6 +119,10 @@
       "src": "ssh://git@ssh.github.com:443/williamboman/mason.nvim",
       "version": "1.0.0 - 2.0.0"
     },
+    "minuet-ai.nvim": {
+      "rev": "d29dec4c36be2b41aa10e70938b7b09a03f0bdba",
+      "src": "ssh://git@ssh.github.com:443/milanglacier/minuet-ai.nvim.git"
+    },
     "nui.nvim": {
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
       "src": "https://github.com/MunifTanjim/nui.nvim"
