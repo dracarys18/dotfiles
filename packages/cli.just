@@ -10,6 +10,12 @@ install-cli:
 
     if [ "$OS" = "Darwin" ] || [ "$DISTRO" = "arch" ]; then
         echo "Installing CLI tools via: {{INSTALL_CMD}}"
+        # terraform lives in hashicorp/tap (dropped from core); new Homebrew
+        # refuses untrusted third-party taps, so tap + trust it first.
+        if [ "$OS" = "Darwin" ]; then
+            brew tap hashicorp/tap
+            brew trust hashicorp/tap
+        fi
         {{INSTALL_CMD}} starship eza bat zoxide fzf jq tmux neovim fish kubectl terraform
     else
         # Ubuntu: apt handles what it has, cargo handles the rest

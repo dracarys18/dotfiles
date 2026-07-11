@@ -10,6 +10,11 @@ install-macos:
         exit 0
     fi
 
+    # yabai/skhd live in koekeishiya/formulae; new Homebrew refuses untrusted
+    # third-party taps, so tap + trust it first.
+    brew tap koekeishiya/formulae
+    brew trust koekeishiya/formulae
+
     # yabai — tiling window manager
     if brew list yabai &>/dev/null; then
         echo "  skip   yabai (already installed)"
