@@ -46,6 +46,7 @@ command -q nvim;      and alias vim='nvim';     and alias vi='nvim'
 command -q terraform; and alias tf='terraform'
 command -q opencode;  and alias clanker='opencode'
 command -q pdf; and alias pdf='mupdf-gl -I'
+command -q loc; and alias loc='tokei'
 
 alias sshat='ssh arch -t "fish"'
 alias helmfile='helmfile --enable-live-output -b werf'
@@ -77,3 +78,6 @@ end
 # -------------------------------------------------------------------
 bind up history-prefix-search-backward
 bind down history-prefix-search-forward
+
+# direnv — per-directory environments
+direnv hook fish | source
