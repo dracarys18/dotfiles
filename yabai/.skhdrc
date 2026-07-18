@@ -72,6 +72,19 @@ alt + cmd - w   : yabai -m window --swap north
 rctrl + cmd - d : yabai -m window --swap east
 alt + cmd - d   : yabai -m window --swap east
 
+# --- Warp window in direction (reflow into tree, HJKL) ---
+rctrl + cmd - h : yabai -m window --warp west
+alt + cmd - h   : yabai -m window --warp west
+
+rctrl + cmd - j : yabai -m window --warp south
+alt + cmd - j   : yabai -m window --warp south
+
+rctrl + cmd - k : yabai -m window --warp north
+alt + cmd - k   : yabai -m window --warp north
+
+rctrl + cmd - l : yabai -m window --warp east
+alt + cmd - l   : yabai -m window --warp east
+
 # --- Resize (grow/shrink east edge, WASD-ish) ---
 rctrl + shift - h : yabai -m window --resize left:-40:0
 alt + shift - h   : yabai -m window --resize left:-40:0

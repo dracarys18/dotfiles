@@ -17,6 +17,9 @@ yabai -m config layout bsp
 yabai -m config window_placement second_child
 yabai -m config window_gap 0
 
+yabai -m config split_ratio  0.50
+yabai -m config auto_balance off
+yabai -m config window_animation_duration 0.0
 yabai -m config mouse_follows_focus off
 yabai -m config focus_follows_mouse off
 yabai -m config mouse_modifier      fn
@@ -35,20 +38,3 @@ yabai -m rule --add label=telegram app="^Telegram$" space=3
 yabai -m rule --add label=slack    app="^Slack$"    space=4
 
 yabai -m rule --apply
-
-# Force-place already-open windows (rule --apply is unreliable on existing windows)
-place_app() {
-    app="$1"; target="$2"
-    yabai -m query --windows | jq -r ".[] | select(.app==\"$app\") | .id" | while read -r wid; do
-        yabai -m window "$wid" --space "$target" 2>/dev/null
-    done
-}
-
-sleep 1
-place_app "Ghostty"  1
-place_app "Zen"      2
-place_app "Cinny"    3
-place_app "Signal"   3
-place_app "Discord"  3
-place_app "Telegram" 3
-place_app "Slack"    4
