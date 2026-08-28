@@ -34,8 +34,8 @@ alt + shift - c   : open -a "Cinny"
 rctrl + shift - s : open -a "Signal"
 alt + shift - s   : open -a "Signal"
 
-rctrl + shift - d : open -a "Discord"
-alt + shift - d   : open -a "Discord"
+rctrl + shift - d : open -a "Vesktop"
+alt + shift - d   : open -a "Vesktop"
 
 rctrl + shift - t : open -a "Telegram"
 alt + shift - t   : open -a "Telegram"
