@@ -62,6 +62,8 @@ unlink:
     remove_link "$HOME/.pi/agent/extensions/plan-mode"
     remove_link "$HOME/.pi/agent/extensions/subagent"
     remove_link "$HOME/.pi/agent/extensions/todo.ts"
+    remove_link "$HOME/.pi/agent/extensions/permission-gate.ts"
+    remove_link "$HOME/.pi/agent/extensions/protected-paths.ts"
     remove_link "$HOME/.pi/agent/agents/planner.md"
     remove_link "$HOME/.pi/agent/agents/reviewer.md"
     remove_link "$HOME/.pi/agent/agents/scout.md"
