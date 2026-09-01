@@ -72,7 +72,7 @@
       "src": "ssh://git@ssh.github.com:443/rcarriga/nvim-dap-ui"
     },
     "nvim-lspconfig": {
-      "rev": "3928e638fdedf195b23ae5a18f024afa487982bc",
+      "rev": "16286347bdba1333c7d124d9de9fe6630731b2b2",
       "src": "ssh://git@ssh.github.com:443/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -80,11 +80,11 @@
       "src": "ssh://git@ssh.github.com:443/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "8b98b4470eb326f1c7b50dae79f8c963568e5720",
+      "rev": "19071296d3d643b48615ee574a20e8a03ac40872",
       "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter"
     },
     "nvim-web-devicons": {
-      "rev": "2ae6958df7ced50baac5035cec0c15799eedfbf7",
+      "rev": "5f032a85be210cd1c6ac98861eb3b187ff3bd5eb",
       "src": "ssh://git@ssh.github.com:443/nvim-tree/nvim-web-devicons"
     },
     "oil.nvim": {

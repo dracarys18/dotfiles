@@ -30,6 +30,10 @@ install: prerequisites install-rust install-cli install-zsh install-fish install
 link:
     @bash scripts/link.sh
 
+# Create only the pi coding-agent symlinks (extensions, agents, prompts)
+pi-link:
+    @bash scripts/pilink.sh
+
 # Remove all symlinks created by this repo
 unlink:
     #!/usr/bin/env bash
@@ -53,6 +57,28 @@ unlink:
     remove_link "$HOME/.tmux.conf"
     remove_link "$HOME/.config/wezterm/wezterm.lua"
     remove_link "$HOME/.config/wezterm/colors"
+
+    # pi coding agent
+    remove_link "$HOME/.pi/agent/extensions/plan-mode"
+    remove_link "$HOME/.pi/agent/extensions/subagent"
+    remove_link "$HOME/.pi/agent/extensions/todo.ts"
+    remove_link "$HOME/.pi/agent/agents/planner.md"
+    remove_link "$HOME/.pi/agent/agents/reviewer.md"
+    remove_link "$HOME/.pi/agent/agents/scout.md"
+    remove_link "$HOME/.pi/agent/agents/worker.md"
+    remove_link "$HOME/.pi/agent/prompts/implement.md"
+    remove_link "$HOME/.pi/agent/prompts/implement-and-review.md"
+    remove_link "$HOME/.pi/agent/prompts/scout-and-plan.md"
+
+    # pi skills (dynamic: iterate over pi/skills/*, skipping README)
+    if [ -d "pi/skills" ]; then
+        for entry in pi/skills/*; do
+            [ -e "$entry" ] || continue
+            name="$(basename "$entry")"
+            case "$name" in README.md|readme.md) continue ;; esac
+            remove_link "$HOME/.pi/agent/skills/$name"
+        done
+    fi
 
     if [ "$OS" = "Darwin" ]; then
         remove_link "$HOME/.config/ghostty"

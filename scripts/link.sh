@@ -48,6 +48,9 @@ link "$DOTFILES/tmux/.tmux.conf" "$HOME/.tmux.conf"
 link "$DOTFILES/wezterm/wezterm.lua"   "$HOME/.config/wezterm/wezterm.lua"
 link "$DOTFILES/wezterm/colors"        "$HOME/.config/wezterm/colors"
 
+# Pi coding agent (extensions, agents, prompts)
+bash "$DOTFILES/scripts/pilink.sh"
+
 # macOS-only
 if [ "$OS" = "Darwin" ]; then
     link "$DOTFILES/ghostty"      "$HOME/.config/ghostty"

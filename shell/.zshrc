@@ -117,7 +117,7 @@ fi
 
 [ -f "/Users/karthikey.hegde/.ghcup/env" ] && source "/Users/karthikey.hegde/.ghcup/env" # ghcup-env
 
-export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+export PATH="/opt/homebrew/opt/node/bin:$PATH"
 
 
 # BEGIN opam configuration
