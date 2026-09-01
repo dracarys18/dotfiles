@@ -99,4 +99,10 @@ if [ -f "$PI_SRC/settings.json" ]; then
     merge_pi_settings "$PI_SRC/settings.json" "$PI_DST/settings.json"
 fi
 
+# Keybindings: pi reads this statically (does not rewrite), so a plain symlink
+# is safe.
+if [ -f "$PI_SRC/keybindings.json" ]; then
+    link "$PI_SRC/keybindings.json" "$PI_DST/keybindings.json"
+fi
+
 echo "Done."

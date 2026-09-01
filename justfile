@@ -71,6 +71,7 @@ unlink:
     remove_link "$HOME/.pi/agent/prompts/implement.md"
     remove_link "$HOME/.pi/agent/prompts/implement-and-review.md"
     remove_link "$HOME/.pi/agent/prompts/scout-and-plan.md"
+    remove_link "$HOME/.pi/agent/keybindings.json"
 
     # pi skills (dynamic: iterate over pi/skills/*, skipping README)
     if [ -d "pi/skills" ]; then
