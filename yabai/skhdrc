@@ -58,8 +58,8 @@ alt + shift - t   : open -a "Telegram"
 rctrl + shift - p : open -a "Spotify"
 alt + shift - p   : open -a "Spotify"
 
-rctrl + shift - e : open -a "Element"
-alt + shift - e   : open -a "Element"
+rctrl + shift - o : open -a "OBS"
+alt + shift - o   : open -a "OBS"
 
 # --- Send focused window to space and follow (creates the space if missing) ---
 rctrl + shift - 1 : ~/dotfiles/yabai/scripts/space.sh 1 send
