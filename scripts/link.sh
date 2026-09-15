@@ -41,6 +41,9 @@ link "$DOTFILES/shell/fish/conf.d"     "$HOME/.config/fish/conf.d"
 # Neovim
 link "$DOTFILES/nvim" "$HOME/.config/nvim"
 
+# uji coding agent
+link "$DOTFILES/uji" "$HOME/.config/uji"
+
 # Tmux
 link "$DOTFILES/tmux/.tmux.conf" "$HOME/.tmux.conf"
 

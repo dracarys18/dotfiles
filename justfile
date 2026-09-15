@@ -54,6 +54,7 @@ unlink:
     remove_link "$HOME/.config/fish/config.fish"
     remove_link "$HOME/.config/fish/conf.d"
     remove_link "$HOME/.config/nvim"
+    remove_link "$HOME/.config/uji"
     remove_link "$HOME/.tmux.conf"
     remove_link "$HOME/.config/wezterm/wezterm.lua"
     remove_link "$HOME/.config/wezterm/colors"

@@ -4,11 +4,11 @@ sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
 space_count=$(yabai -m query --spaces | jq '. | length')
-while [ "$space_count" -lt 4 ]; do
+while [ "$space_count" -lt 6 ]; do
     yabai -m space --create
     space_count=$((space_count + 1))
 done
-while [ "$space_count" -gt 4 ]; do
+while [ "$space_count" -gt 6 ]; do
     yabai -m space --destroy "$space_count"
     space_count=$((space_count - 1))
 done
