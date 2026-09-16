@@ -88,12 +88,6 @@ local function defaults()
     }
   end, { priority = 27 })
 
-  uji.status.add("queue", function()
-    local queued = uji.status.queue()
-    if #queued == 0 then return nil end
-    return { text = #queued .. " queued", color = "yellow" }
-  end, { priority = 28 })
-
   uji.status.add("turns", function()
     local turns = 0
     for _, message in ipairs(uji.session.messages()) do
@@ -117,7 +111,6 @@ function M.setup(opts)
     defaults()
   end
   uji.on("status_changed", M.render)
-  uji.on("queue_changed", M.render)
   uji.on("MessageAppended", M.render)
   M.render()
 end
