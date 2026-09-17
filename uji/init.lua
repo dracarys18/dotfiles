@@ -98,6 +98,10 @@ uji.on("tick", render_activity)
 
 uji.keymap.set("normal", "<C-e>", { command = "effort" })
 
+uji.pack.add({ { dir = "~/Projects/uji-plugins" } })
+
 require("statusline").setup({})
 require("planmode").setup({})
 require("telescope").setup({ editor = "nvim" })
+require("websearch").setup({})
+require("skills").setup({ roots = { "~/Projects/uji-skills" } })

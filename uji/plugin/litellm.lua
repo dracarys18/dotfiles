@@ -4,6 +4,16 @@ uji.provider.add({
   wire = "openai-chat",
   base_url = os.getenv("LITELLM_BASE_URL") or "http://localhost:4000",
   auth_env = { "LITELLM_API_KEY" },
+  -- These are the values uji would infer from the base url anyway; spelled out
+  -- so a quirk can be corrected here without a rebuild.
+  --   max_tokens_field = "max_tokens" | "max_completion_tokens" | "none"
+  --   thinking         = "openai" | "openrouter" | "deepseek" | "zai" | "qwen" | "none"
+  compat = {
+    max_tokens_field = "max_tokens",
+    thinking = "openai",
+    tool_result_name = false,
+    finish_reason = true,
+  },
   models = {
     -- Claude
     { id = "claude-fable-5", context = 1000000, output = 128000, reasoning = true },
