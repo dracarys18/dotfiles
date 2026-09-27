@@ -20,7 +20,7 @@
 --   uji.pack.list()                     -- every root being searched
 --
 -- /sync updates installed packs and reloads. Versions are pinned in
--- ~/.local/share/uji/uji-lock.json.
+-- ~/.config/uji/uji-lock.json.
 --
 -- SECURITY: a pack is arbitrary code from the internet, executed on the next
 -- start. Read what you install.
@@ -42,14 +42,14 @@ uji.ui.configure({
     waiting = {
         loader = {
             frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-            interval_ms = 80,
+            interval = 0.08,
         },
     },
 })
 
 -- Handlers run lowest-priority first and the first non-nil answer wins.
 -- Pass { priority = n } to rule on a tool call before this one (default 50).
-uji.on("tool_call", function(event)
+uji.on("before_tool", function(event)
     if event.name == "run_command" then
         local cmd = event.arguments.command or ""
         if string.match(cmd, "^rm %-rf") then
@@ -79,11 +79,11 @@ local function render_activity()
 end
 
 uji.on("status_changed", render_activity)
-uji.on("tick", render_activity)
+uji.on("loader_ticked", render_activity)
 
 -- Keybindings. Every key is remappable per mode: normal, suggest, select,
 -- prompt, confirm. A binding is either a builtin action name, a slash command
--- via { command = "models" }, or nil to unbind the key entirely.
+-- via { command = "models" }, or a function. uji.keymap.remove unbinds a key.
 --
 -- Actions: quit, interrupt, submit, clear_input, backspace, cursor_left,
 -- cursor_right, cursor_start, cursor_end, scroll_up, scroll_down, page_up,
@@ -91,12 +91,12 @@ uji.on("tick", render_activity)
 -- modal_cancel, suggest_complete, confirm_allow, confirm_deny, confirm_toggle,
 -- nothing.
 --
--- uji.keymap.set("normal", "<C-p>", { command = "models" })
--- uji.keymap.set("normal", "<C-u>", "clear_input")
--- uji.keymap.set("normal", "<C-c>", nil)
+-- uji.keymap.add("normal", "<C-p>", { command = "models" })
+-- uji.keymap.add("normal", "<C-u>", "clear_input")
+-- uji.keymap.remove("normal", "<C-c>")
 -- uji.keymap.list()
 
-uji.keymap.set("normal", "<C-e>", { command = "effort" })
+uji.keymap.add("normal", "<C-e>", { command = "effort" })
 
 uji.pack.add({ { dir = "~/Projects/uji-plugins" } })
 

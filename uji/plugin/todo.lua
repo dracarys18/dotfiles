@@ -1,7 +1,7 @@
 -- Durable task list.
 --
 -- The list lives in this module, not in the message stream, so compaction
--- cannot lose it. uji.agent.context re-injects it into the system prompt on
+-- cannot lose it. uji.context.add re-injects it into the system prompt on
 -- every turn, which means the model still sees its remaining work after the
 -- transcript it was written in has been summarised away.
 --
@@ -33,7 +33,7 @@ local function counts()
     return done, total
 end
 
-uji.tool.register("todo", {
+uji.tool.add("todo", {
     description = "Record and update the task list for the current piece of work. "
         .. "Send the complete list every time; it replaces the previous one. "
         .. "Use it for multi-step work so nothing is dropped, and mark items done as you finish them.",
@@ -85,7 +85,7 @@ uji.tool.register("todo", {
 
 -- Unknown tools default to "ask". This one only rewrites the list above, so
 -- confirming every update would be pure friction.
-uji.on("tool_call", function(event)
+uji.on("before_tool", function(event)
     if event.name == "todo" then
         return { allow = true }
     end
@@ -93,7 +93,7 @@ uji.on("tool_call", function(event)
 end, { priority = 10 })
 
 -- Survives compaction: rebuilt into the system prompt every turn.
-uji.agent.context("todo", function()
+uji.context.add("todo", function()
     if #items == 0 then
         return nil
     end
@@ -106,7 +106,7 @@ uji.agent.context("todo", function()
     )
 end)
 
-uji.command("todos", {
+uji.command.add("todos", {
     desc = "show the current task list",
     handler = function()
         if #items == 0 then

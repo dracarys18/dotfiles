@@ -22,15 +22,15 @@
       "src": "ssh://git@ssh.github.com:443/sindrets/diffview.nvim"
     },
     "fidget.nvim": {
-      "rev": "6f793b2bcd2d35e201c09520f698bb763220908a",
+      "rev": "9e0201673e08e997e7cf52afca5565c70bd117f3",
       "src": "ssh://git@ssh.github.com:443/j-hui/fidget.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "5be654f2232c10ddcad19c1607a67b6b4b78fc29",
+      "rev": "070a5d7b985546cc57e1fc61e5bc507fecac6045",
       "src": "ssh://git@ssh.github.com:443/lewis6991/gitsigns.nvim"
     },
     "go.nvim": {
-      "rev": "0768d79bbebdb1a112a845f9cd6293bfbd544dab",
+      "rev": "f5d1f11d4f616efbe2339286310bb89c4853d769",
       "src": "ssh://git@ssh.github.com:443/ray-x/go.nvim"
     },
     "guihua.lua": {
@@ -64,7 +64,7 @@
       "src": "ssh://git@ssh.github.com:443/norcalli/nvim-colorizer.lua"
     },
     "nvim-dap": {
-      "rev": "9e848e09a697ee95302a3ef2dd43fd6eb709e570",
+      "rev": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264",
       "src": "ssh://git@ssh.github.com:443/mfussenegger/nvim-dap"
     },
     "nvim-dap-ui": {
@@ -72,7 +72,7 @@
       "src": "ssh://git@ssh.github.com:443/rcarriga/nvim-dap-ui"
     },
     "nvim-lspconfig": {
-      "rev": "16286347bdba1333c7d124d9de9fe6630731b2b2",
+      "rev": "a9bb4d5f4276aa5cddc015faa3ecc5a7b5a26b14",
       "src": "ssh://git@ssh.github.com:443/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -80,11 +80,11 @@
       "src": "ssh://git@ssh.github.com:443/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "19071296d3d643b48615ee574a20e8a03ac40872",
+      "rev": "25a9b06a09ea4e10712bec37e7b7d9f423262b91",
       "src": "ssh://git@ssh.github.com:443/nvim-treesitter/nvim-treesitter"
     },
     "nvim-web-devicons": {
-      "rev": "5f032a85be210cd1c6ac98861eb3b187ff3bd5eb",
+      "rev": "58447c1fca354bbf184425e4a8d01deecbd6f3c4",
       "src": "ssh://git@ssh.github.com:443/nvim-tree/nvim-web-devicons"
     },
     "oil.nvim": {
