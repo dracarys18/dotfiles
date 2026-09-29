@@ -12,5 +12,14 @@
    "$schema": "https://vicinae.com/schemas/config.json",
    "global_shortcuts": {
       "toggle": "control+space"
+   },
+   "launcher_window": {
+      "compact_mode": {
+         "enabled": true
+      }
+   },
+   "favorites": [],
+   "telemetry": {
+      "system_info": false
    }
 }
