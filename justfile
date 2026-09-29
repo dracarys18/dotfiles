@@ -46,6 +46,14 @@ obs-autocam:
 obs-autocam-uninstall:
     @bash scripts/obsautocam.sh --uninstall
 
+# Turn off Siri, Apple Intelligence and telemetry services (macOS)
+debloat:
+    @bash scripts/debloat.sh
+
+# Turn the services from `debloat` back on
+debloat-undo:
+    @bash scripts/debloat.sh --undo
+
 # Remove all symlinks created by this repo
 unlink:
     #!/usr/bin/env bash
