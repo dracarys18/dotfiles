@@ -46,11 +46,11 @@ obs-autocam:
 obs-autocam-uninstall:
     @bash scripts/obsautocam.sh --uninstall
 
-# Turn off Siri, Apple Intelligence and telemetry services (macOS)
+# Turn off Siri, AI and telemetry services and keep them off at boot (macOS)
 debloat:
     @bash scripts/debloat.sh
 
-# Turn the services from `debloat` back on
+# Turn the services from `debloat` back on and remove its startup service
 debloat-undo:
     @bash scripts/debloat.sh --undo
 

@@ -86,6 +86,7 @@ DAEMONS=(
     com.apple.osanalytics.osanalyticshelper
     com.apple.SubmitDiagInfo
     com.apple.triald.system
+    com.apple.corespeechd.system
     com.apple.modelmanagerd
     com.apple.modelcatalogd
     com.apple.contextstored
@@ -108,27 +109,88 @@ if [ "$(uname -s)" != "Darwin" ]; then
     exit 0
 fi
 
-GUI="gui/$(id -u)"
+BOOT_SCRIPT=/usr/local/libexec/debloat.sh
+
+as_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+disable_all() {
+    local gui="$1"
+    if launchctl print "$gui" >/dev/null 2>&1; then
+        for label in "${AGENTS[@]}"; do
+            launchctl disable "$gui/$label"
+            launchctl bootout "$gui/$label" 2>/dev/null || true
+        done
+    fi
+    for label in "${DAEMONS[@]}"; do
+        as_root launchctl disable "system/$label"
+        as_root launchctl bootout "system/$label" 2>/dev/null || true
+    done
+}
+
+if [ "${1:-}" = "--boot" ]; then
+    disable_all "gui/$2"
+    until launchctl print "gui/$2" >/dev/null 2>&1; do
+        sleep 5
+    done
+    sleep 60
+    disable_all "gui/$2"
+    exit 0
+fi
+
+LABEL="com.$(id -un).debloat"
+PLIST="/Library/LaunchDaemons/$LABEL.plist"
+
+unload() {
+    as_root launchctl bootout "system/$LABEL" 2>/dev/null || true
+    for _ in $(seq 1 25); do
+        as_root launchctl print "system/$LABEL" >/dev/null 2>&1 || return 0
+        sleep 0.2
+    done
+}
 
 if [ "${1:-}" = "--undo" ]; then
+    unload
+    as_root rm -f "$PLIST" "$BOOT_SCRIPT"
     for label in "${AGENTS[@]}"; do
-        launchctl enable "$GUI/$label"
+        launchctl enable "gui/$(id -u)/$label"
     done
     for label in "${DAEMONS[@]}"; do
-        sudo launchctl enable "system/$label"
+        as_root launchctl enable "system/$label"
     done
     echo "  enabled ${#AGENTS[@]} agents and ${#DAEMONS[@]} daemons, restart to bring them back"
     exit 0
 fi
 
-for label in "${AGENTS[@]}"; do
-    launchctl disable "$GUI/$label"
-    launchctl bootout "$GUI/$label" 2>/dev/null || true
-done
-echo "  disabled ${#AGENTS[@]} agents"
+disable_all "gui/$(id -u)"
+echo "  disabled ${#AGENTS[@]} agents and ${#DAEMONS[@]} daemons"
 
-for label in "${DAEMONS[@]}"; do
-    sudo launchctl disable "system/$label"
-    sudo launchctl bootout "system/$label" 2>/dev/null || true
-done
-echo "  disabled ${#DAEMONS[@]} daemons"
+as_root mkdir -p "$(dirname "$BOOT_SCRIPT")"
+as_root install -m 755 -o root -g wheel "${BASH_SOURCE[0]}" "$BOOT_SCRIPT"
+as_root tee "$PLIST" >/dev/null <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>$LABEL</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>$BOOT_SCRIPT</string>
+        <string>--boot</string>
+        <string>$(id -u)</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>
+PLIST
+unload
+as_root launchctl bootstrap system "$PLIST"
+echo "  loaded $LABEL, reapplies at boot and after login"
