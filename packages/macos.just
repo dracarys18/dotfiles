@@ -1,4 +1,4 @@
-# packages/macos.just — macOS-only tools (yabai, skhd, ghostty, raycast)
+# packages/macos.just — macOS-only tools (yabai, skhd, ghostty, vicinae)
 
 # Install macOS window manager and terminal tools
 install-macos:
@@ -39,16 +39,15 @@ install-macos:
         brew install --cask ghostty
     fi
 
-    if brew list --cask raycast &>/dev/null; then
-        echo "  skip   raycast (already installed)"
+    if brew list --cask vicinae &>/dev/null; then
+        echo "  skip   vicinae (already installed)"
     else
-        echo "Installing raycast..."
-        brew install --cask raycast
+        echo "Installing vicinae..."
+        brew install --cask vicinae
     fi
     defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
         "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>"
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-    defaults write com.raycast.macos raycastGlobalHotkey -string "Command-49"
 
     echo ""
     echo "  [MANUAL] yabai scripting addition requires SIP to be partially disabled."

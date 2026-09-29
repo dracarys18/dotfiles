@@ -57,6 +57,7 @@ bash "$DOTFILES/scripts/pilink.sh"
 # macOS-only
 if [ "$OS" = "Darwin" ]; then
     link "$DOTFILES/ghostty"      "$HOME/.config/ghostty"
+    link "$DOTFILES/vicinae"      "$HOME/.config/vicinae"
     link "$DOTFILES/yabai/yabairc" "$HOME/.yabairc"
     link "$DOTFILES/yabai/skhdrc"  "$HOME/.skhdrc"
 fi

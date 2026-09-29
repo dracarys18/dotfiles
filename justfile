@@ -106,6 +106,7 @@ unlink:
 
     if [ "$OS" = "Darwin" ]; then
         remove_link "$HOME/.config/ghostty"
+        remove_link "$HOME/.config/vicinae"
         remove_link "$HOME/.yabairc"
         remove_link "$HOME/.skhdrc"
     fi
