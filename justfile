@@ -22,7 +22,7 @@ default:
     @just --list
 
 # Full one-time setup: prerequisites → packages → symlinks
-install: prerequisites install-rust install-cli install-zsh install-fish install-tpm install-go install-node install-fonts install-macos link uji-link
+install: prerequisites install-rust install-cli install-zsh install-fish install-tpm install-go install-node install-fonts install-macos link uji-link obs-autocam
     @echo ""
     @echo "Setup complete. Restart your shell to apply changes."
 
@@ -37,6 +37,14 @@ pi-link:
 # Set up the uji coding agent: link config, clone skills, build the binary
 uji-link:
     @bash scripts/ujilink.sh
+
+# Run OBS and its virtual camera only while an app uses the camera (macOS)
+obs-autocam:
+    @bash scripts/obsautocam.sh
+
+# Remove the OBS virtual camera watcher and its launch agent
+obs-autocam-uninstall:
+    @bash scripts/obsautocam.sh --uninstall
 
 # Remove all symlinks created by this repo
 unlink:
