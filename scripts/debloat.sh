@@ -53,7 +53,7 @@ AGENTS=(
     com.apple.diagnosticspushd
     com.apple.DiagnosticsReporter
     com.apple.diagnosticextensionsd
-    com.apple.symptomsd-diag
+    com.apple.symptomsd-diag.agent
     com.apple.symptomsd.distributed-agent
     com.apple.securityuploadd
     com.apple.metrickitd
@@ -86,7 +86,7 @@ DAEMONS=(
     com.apple.osanalytics.osanalyticshelper
     com.apple.SubmitDiagInfo
     com.apple.triald.system
-    com.apple.corespeechd.system
+    com.apple.corespeechd_system
     com.apple.modelmanagerd
     com.apple.modelcatalogd
     com.apple.contextstored
