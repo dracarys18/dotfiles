@@ -5,6 +5,7 @@
   key.addEventListener("command", () => {
     gURLBar.setAttribute("uc-newtab", "");
     gURLBar.value = "";
+    gURLBar.userTypedValue = "";
     gURLBar.focus();
     gURLBar.startQuery();
   });
@@ -15,7 +16,19 @@
   const whereToOpen = gURLBar.controller.whereToOpen.bind(gURLBar.controller);
   gURLBar.controller.whereToOpen = (event) => (gURLBar.hasAttribute("uc-newtab") ? "tab" : whereToOpen(event));
 
-  gURLBar.addEventListener("blur", () => {
+  gURLBar.inputField.addEventListener("input", () => {
+    if (gURLBar.hasAttribute("uc-newtab")) gURLBar.setAttribute("uc-newtab", "typed");
+  });
+
+  gBrowser.addProgressListener({
+    onLocationChange() {
+      if (gURLBar.getAttribute("uc-newtab") !== "") return;
+      gURLBar.value = "";
+      gURLBar.userTypedValue = "";
+    },
+  });
+
+  gURLBar.inputField.addEventListener("blur", () => {
     if (!gURLBar.hasAttribute("uc-newtab")) return;
     gURLBar.removeAttribute("uc-newtab");
     gURLBar.handleRevert();
