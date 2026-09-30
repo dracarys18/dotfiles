@@ -1,6 +1,6 @@
 :root {
   --uc-sidebar-width: 260px;
-  --uc-toolbox-height: 92px;
+  --uc-toolbox-height: 122px;
   --uc-tile-radius: 12px;
 }
 
@@ -8,8 +8,16 @@
   min-width: 4px !important;
   width: 4px !important;
   max-width: 4px !important;
+  margin-inline-end: -4px !important;
+  position: relative;
+  z-index: 3;
   overflow: hidden !important;
   opacity: 0;
+}
+
+.browserContainer {
+  border: none !important;
+  border-radius: 0 !important;
 }
 
 #sidebar-container[sidebar-launcher-expanded] {
@@ -44,19 +52,38 @@
 }
 
 #nav-bar {
+  --toolbarbutton-padding-inner: 5px;
+  --toolbarbutton-padding-outer: 1px;
   flex-wrap: wrap !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 6px 8px !important;
-  row-gap: 8px;
+  row-gap: 6px;
+
+  &::before {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+  }
 }
 
 #nav-bar-customization-target {
   display: contents !important;
 }
 
+#nav-bar-customization-target > :is(.unified-extensions-item, #unified-extensions-button, #downloads-button) {
+  position: sticky !important;
+  order: 5 !important;
+}
+
+#nav-bar-customization-target > #unified-extensions-button {
+  order: 6 !important;
+  margin-inline-start: auto !important;
+}
+
 #urlbar-container {
+  position: sticky !important;
   order: 10 !important;
   flex: 1 0 100% !important;
   width: 100% !important;
@@ -65,8 +92,11 @@
   margin: 0 !important;
 }
 
-#nav-bar-overflow-button,
-#unified-extensions-button,
+#fxa-toolbar-menu-button,
+#alltabs-button,
+#smartwindow-group-tabs-button,
+#ai-window-toggle,
+#reset-pbm-toolbar-button,
 #stop-reload-button,
 #sidebar-button,
 #vertical-spacer,
