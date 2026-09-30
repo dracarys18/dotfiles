@@ -54,6 +54,25 @@ link "$DOTFILES/wezterm/colors"        "$HOME/.config/wezterm/colors"
 # Pi coding agent (extensions, agents, prompts)
 bash "$DOTFILES/scripts/pilink.sh"
 
+# Firefox (the default-release profile)
+if [ "$OS" = "Darwin" ]; then
+    FIREFOX_DIR="$HOME/Library/Application Support/Firefox"
+else
+    FIREFOX_DIR="$HOME/.mozilla/firefox"
+fi
+FIREFOX_PROFILE=$(awk -F= '
+    /^\[/ { if (name == "default-release") print path; name = ""; path = "" }
+    $1 == "Name" { name = $2 }
+    $1 == "Path" { path = $2 }
+    END { if (name == "default-release") print path }
+' "$FIREFOX_DIR/profiles.ini" 2>/dev/null | head -1)
+if [ -n "$FIREFOX_PROFILE" ]; then
+    link "$DOTFILES/firefox/chrome"  "$FIREFOX_DIR/$FIREFOX_PROFILE/chrome"
+    link "$DOTFILES/firefox/user.js" "$FIREFOX_DIR/$FIREFOX_PROFILE/user.js"
+else
+    echo "  skip   firefox (no default-release profile yet, open Firefox once and rerun)"
+fi
+
 # macOS-only
 if [ "$OS" = "Darwin" ]; then
     link "$DOTFILES/ghostty"      "$HOME/.config/ghostty"

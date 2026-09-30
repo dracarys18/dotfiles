@@ -18,6 +18,7 @@
          "enabled": true
       }
    },
+   "search_files_in_root": true,
    "favorites": [],
    "telemetry": {
       "system_info": false

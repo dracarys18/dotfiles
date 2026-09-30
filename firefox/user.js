@@ -1,0 +1,8 @@
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+user_pref("sidebar.revamp", true);
+user_pref("sidebar.verticalTabs", true);
+user_pref("sidebar.visibility", "expand-on-hover");
+user_pref("sidebar.animation.expand-on-hover.delay-duration-ms", 0);
+user_pref("browser.toolbars.bookmarks.visibility", "never");
+user_pref("browser.newtabpage.enabled", false);
+user_pref("sidebar.main.tools", "history,bookmarks");

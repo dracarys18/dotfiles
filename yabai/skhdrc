@@ -40,8 +40,8 @@ alt - 9   : yabai -m space --focus 9
 rctrl + shift - g : open -a "Ghostty"
 alt + shift - g   : open -a "Ghostty"
 
-rctrl + shift - z : open -a "Zen"
-alt + shift - z   : open -a "Zen"
+rctrl + shift - z : open -a "Firefox"
+alt + shift - z   : open -a "Firefox"
 
 rctrl + shift - c : open -a "Cinny"
 alt + shift - c   : open -a "Cinny"
