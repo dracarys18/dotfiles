@@ -75,6 +75,10 @@ AGENTS=(
     com.apple.progressd
     com.apple.shazamd
     com.apple.helpd
+
+    com.apple.email.maild
+    com.apple.icloudmailagent
+    com.apple.mdworker.mail
 )
 
 DAEMONS=(
