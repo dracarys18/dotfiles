@@ -25,6 +25,7 @@
 }
 
 #sidebar-container > sidebar-main {
+  --sidebar-expanded-launcher-width: 100%;
   padding-top: var(--uc-toolbox-height) !important;
 }
 
@@ -41,7 +42,7 @@
 }
 
 :root:has(#sidebar-container[sidebar-launcher-expanded]) #navigator-toolbox,
-#navigator-toolbox:hover,
+#navigator-toolbox:hover:not(:has(#urlbar[focused])),
 #navigator-toolbox:has([open="true"], [panelopen="true"]) {
   margin-left: 0 !important;
 }
@@ -123,6 +124,7 @@
   --uc-tile-height: 52px;
   --uc-tile-gap: 6px;
   --uc-tile-columns: 3;
+  --tab-icon-end-margin: 0px;
   padding: 4px 8px 8px !important;
 
   &:not(:has(> .tabbrowser-tab:nth-child(2))) {
@@ -208,13 +210,4 @@
 
 #vertical-pinned-tabs-splitter {
   display: none !important;
-}
-
-#tabbrowser-arrowscrollbox[orient="vertical"]::before {
-  content: "Space";
-  display: block;
-  padding: 10px 14px 6px;
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.6;
 }

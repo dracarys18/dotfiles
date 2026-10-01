@@ -2,6 +2,7 @@
   const key = document.createXULElement("key");
   key.setAttribute("key", ";");
   key.setAttribute("modifiers", "accel");
+  key.setAttribute("reserved", "true");
   key.addEventListener("command", () => {
     gURLBar.setAttribute("uc-newtab", "");
     gURLBar.value = "";

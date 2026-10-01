@@ -55,7 +55,7 @@ uji.on("before_tool", function(event)
         if string.match(cmd, "^rm %-rf") then
             return { deny = "Refusing to run rm -rf" }
         end
-        return { ask = true }
+        return { allow = true }
     end
     -- reads and writes fall through to the default policy (allow / ask)
     return nil
@@ -69,7 +69,7 @@ local function render_activity()
         local elapsed = math.floor(uji.status.elapsed() or 0)
         uji.ui.set_lines(activity, {
             {
-                { text = uji.status.loader_frame() .. " ", color = "cyan", bold = true },
+                { text = uji.status.loader_frame() .. " ",        color = "cyan",   bold = true },
                 { text = waiting_text .. " (" .. elapsed .. "s)", color = "#808080" },
             },
         })

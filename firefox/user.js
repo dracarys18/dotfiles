@@ -6,3 +6,5 @@ user_pref("sidebar.animation.expand-on-hover.delay-duration-ms", 0);
 user_pref("browser.toolbars.bookmarks.visibility", "never");
 user_pref("browser.newtabpage.enabled", false);
 user_pref("sidebar.main.tools", "history,bookmarks");
+user_pref("privacy.clearOnShutdown_v2.browsingHistoryAndDownloads", false);
+user_pref("browser.startup.page", 3);
