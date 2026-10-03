@@ -1,19 +1,23 @@
+local BASE_URL = os.getenv("LITELLM_BASE_URL") or "http://localhost:4000"
+
+local OpenAI = uji.api.openai
+
+local LiteLLM = uji.class(OpenAI)
+
+function LiteLLM:assistant(item, request)
+  local out = OpenAI.assistant(self, item, request)
+  if request.model:match("^deepseek") then
+    out.reasoning_content = item.reasoning or ""
+  end
+  return out
+end
+
 uji.provider.add({
   id = "litellm",
   name = "LiteLLM",
-  wire = "openai-chat",
-  base_url = os.getenv("LITELLM_BASE_URL") or "http://localhost:4000",
+  api = LiteLLM(),
+  base_url = BASE_URL,
   auth_env = { "LITELLM_API_KEY" },
-  -- These are the values uji would infer from the base url anyway; spelled out
-  -- so a quirk can be corrected here without a rebuild.
-  --   max_tokens_field = "max_tokens" | "max_completion_tokens" | "none"
-  --   thinking         = "openai" | "openrouter" | "deepseek" | "zai" | "qwen" | "none"
-  compat = {
-    max_tokens_field = "max_tokens",
-    thinking = "openai",
-    tool_result_name = false,
-    finish_reason = true,
-  },
   models = {
     -- Claude
     { id = "claude-fable-5", context = 1000000, output = 128000, reasoning = true },
@@ -53,3 +57,43 @@ uji.provider.add({
     { id = "deepseek-v4-pro", context = 1000000, output = 384000, reasoning = true },
   },
 })
+
+local function listed()
+  for _, provider in ipairs(uji.provider.list()) do
+    if provider.id == "litellm" then
+      local models = {}
+      for _, model in ipairs(provider.models) do
+        models[model.id] = model
+      end
+      return models
+    end
+  end
+  return {}
+end
+
+uji.http.request({
+  url = BASE_URL .. "/model/info",
+  headers = { Authorization = "Bearer " .. (os.getenv("LITELLM_API_KEY") or "") },
+}, function(response)
+  if not response or response.status ~= 200 then
+    return
+  end
+  local ok, info = pcall(uji.json.decode, response.body, { nulls = false })
+  if not ok or type(info) ~= "table" or type(info.data) ~= "table" then
+    return
+  end
+  local known, changed = listed(), {}
+  for _, entry in ipairs(info.data) do
+    local model = known[entry.model_name]
+    local limits = entry.model_info or {}
+    if model and (limits.max_input_tokens or limits.max_output_tokens) then
+      model.context = limits.max_input_tokens or model.context
+      model.output = limits.max_output_tokens or model.output
+      changed[#changed + 1] = model
+    end
+  end
+  if #changed > 0 then
+    uji.provider.add({ id = "litellm", models = changed })
+    uji.emit("status_changed", {})
+  end
+end)
