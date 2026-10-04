@@ -1,9 +1,0 @@
-{
-  "theme": "dark",
-  "defaultProvider": "deepseek",
-  "defaultModel": "deepseek-v4-pro",
-  "packages": [
-    "npm:pi-web-access",
-    "npm:pi-mcp-adapter"
-  ]
-}
