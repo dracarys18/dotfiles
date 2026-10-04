@@ -35,8 +35,8 @@
   outputs =
     { nix-darwin, home-manager, ... }@inputs:
     {
-      # `darwin-rebuild switch --flake ~/dotfiles` picks this by hostname
-      darwinConfigurations."KARTHIKEYAs-MacBook-Pro" = nix-darwin.lib.darwinSystem {
+      # named `mac`, not by hostname, so any Mac can switch to it: `just switch`
+      darwinConfigurations.mac = nix-darwin.lib.darwinSystem {
         specialArgs = { inherit inputs; };
         modules = [
           ./darwin.nix
