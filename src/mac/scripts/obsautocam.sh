@@ -3,12 +3,12 @@
 # Idempotent: rebuilds the watcher, turns on obs-websocket and reloads the launch agent.
 # Pass --uninstall to remove the watcher and its launch agent.
 #
-# The watcher source lives in <dotfiles>/obs/autocam.swift. yabai places the OBS
-# window on the labelled "obs" desktop (see config/yabai/yabairc).
+# The watcher source lives in <dotfiles>/src/mac/obs/autocam.swift. yabai places
+# the OBS window on the labelled "obs" desktop (see src/mac/config/yabai/yabairc).
 
 set -euo pipefail
 
-DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MAC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LABEL="com.$(id -un).obs-autocam"
 DOMAIN="gui/$(id -u)"
 BIN="$HOME/.local/bin/obs-autocam"
@@ -49,7 +49,7 @@ echo "  found  swiftc, OBS"
 
 echo "Building the watcher"
 mkdir -p "$(dirname "$BIN")"
-swiftc -O -swift-version 6 "$DOTFILES/obs/autocam.swift" -o "$BIN"
+swiftc -O -swift-version 6 "$MAC/obs/autocam.swift" -o "$BIN"
 echo "  built  $BIN"
 
 echo "Turning on obs-websocket"

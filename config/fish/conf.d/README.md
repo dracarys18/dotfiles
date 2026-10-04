@@ -6,9 +6,6 @@ Keeping tool-init output cached as files — rather than running
 
 ## Files
 
-- **`dotfiles.fish`** — sets `$DOTFILES`, wraps brew, cargo, go, npm and uv so
-  installs and removals update the Brewfile, and prints a notice when the
-  drift launch agent found packages that don't match it.
 - **`kubectl_aliases.fish`** — 766 kubectl abbreviations from
   [ahmetb/kubectl-aliases](https://github.com/ahmetb/kubectl-aliases).
   These are fish `abbr` expansions: type `k` + space to get `kubectl`.

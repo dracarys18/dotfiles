@@ -16,6 +16,20 @@
       url = "github:tmux-plugins/tpm";
       flake = false;
     };
+    # tmux plugins, pinned to the commits tpm had installed; linked into
+    # ~/.tmux/plugins so tpm finds them and never has to clone anything
+    tmux-catppuccin = {
+      url = "github:catppuccin/tmux/1612a23174a6771ac466312eb156f83b8b89d907";
+      flake = false;
+    };
+    tmux-battery = {
+      url = "github:tmux-plugins/tmux-battery/48fae59ba4503cf345d25e4e66d79685aa3ceb75";
+      flake = false;
+    };
+    tmux-cpu = {
+      url = "github:tmux-plugins/tmux-cpu/98d787191bc3e8f19c3de54b96ba1caf61385861";
+      flake = false;
+    };
   };
 
   outputs =

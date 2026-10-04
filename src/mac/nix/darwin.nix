@@ -73,20 +73,28 @@ in
       "firefoxpwa"
     ];
     casks = [
+      "1password"
       "1password-cli"
       "adobe-acrobat-reader"
       "android-platform-tools"
       "claude-code@latest"
       "firefox"
       "ghostty"
-      "jellyfin-media-player"
-      "karabiner-elements"
+      "kde-connect"
       "maccy"
+      "obs"
       "signal"
       "spotify"
+      "tailscale-app"
+      "telegram"
       "vesktop"
       "vicinae"
     ];
+    # Mac App Store apps (needs you signed in to the App Store)
+    masApps = {
+      Developer = 640199958;
+      TestFlight = 899247664;
+    };
   };
 
   # Settings changed from the macOS defaults, read off this Mac on 2026-10-05
@@ -156,7 +164,7 @@ in
   launchd.daemons.debloat.serviceConfig = {
     ProgramArguments = [
       "/bin/bash"
-      "${./scripts/debloat.sh}"
+      "${../scripts/debloat.sh}"
       "--boot"
       uid
     ];
@@ -189,6 +197,6 @@ in
     fi
 
     echo "debloating..."
-    PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/bash ${./scripts/debloat.sh} ${uid}
+    PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/bash ${../scripts/debloat.sh} ${uid}
   '';
 }

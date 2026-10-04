@@ -1,0 +1,35 @@
+{
+    "audio_configs": [],
+    "targets": [
+        {
+            "id": "1332291701",
+            "name": "",
+            "output-param": null,
+            "protocol": "",
+            "service-param": null,
+            "sync-start": false,
+            "sync-stop": false
+        },
+        {
+            "audio-config": "<OBS_STREAMING_ENCODER>",
+            "id": "2593231166",
+            "name": "Youtube",
+            "output-param": {
+                "bind_ip": "default",
+                "drop_threshold_ms": 700,
+                "max_shutdown_time_sec": 30,
+                "pframe_drop_threshold_ms": 900
+            },
+            "protocol": "RTMP",
+            "service-param": {
+                "key": "",
+                "server": "rtmp://a.rtmp.youtube.com/live2",
+                "use_auth": false
+            },
+            "sync-start": false,
+            "sync-stop": false,
+            "video-config": "<OBS_STREAMING_ENCODER>"
+        }
+    ],
+    "video_configs": []
+}

@@ -63,7 +63,61 @@
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs",
+        "tmux-battery": "tmux-battery",
+        "tmux-catppuccin": "tmux-catppuccin",
+        "tmux-cpu": "tmux-cpu",
         "tpm": "tpm"
+      }
+    },
+    "tmux-battery": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701419842,
+        "narHash": "sha256-yKMTuRiNnGC3tAbZeWzMEudzhBSJhji8sZh96rFxpb8=",
+        "owner": "tmux-plugins",
+        "repo": "tmux-battery",
+        "rev": "48fae59ba4503cf345d25e4e66d79685aa3ceb75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tmux-plugins",
+        "repo": "tmux-battery",
+        "rev": "48fae59ba4503cf345d25e4e66d79685aa3ceb75",
+        "type": "github"
+      }
+    },
+    "tmux-catppuccin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1726556021,
+        "narHash": "sha256-jTxUrA0vA8JnQE1K6rZQcSg4woHtPiKg0yz4rNVMMlc=",
+        "owner": "catppuccin",
+        "repo": "tmux",
+        "rev": "1612a23174a6771ac466312eb156f83b8b89d907",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "tmux",
+        "rev": "1612a23174a6771ac466312eb156f83b8b89d907",
+        "type": "github"
+      }
+    },
+    "tmux-cpu": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1672976369,
+        "narHash": "sha256-ymmCI6VYvf94Ot7h2GAboTRBXPIREP+EB33+px5aaJk=",
+        "owner": "tmux-plugins",
+        "repo": "tmux-cpu",
+        "rev": "98d787191bc3e8f19c3de54b96ba1caf61385861",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tmux-plugins",
+        "repo": "tmux-cpu",
+        "rev": "98d787191bc3e8f19c3de54b96ba1caf61385861",
+        "type": "github"
       }
     },
     "tpm": {

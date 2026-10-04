@@ -30,11 +30,9 @@ set -gx WERF_HELM3_MODE 1
 # Homebrew only holds GUI apps and a few macOS tools now; nix paths come first
 fish_add_path -g --append /opt/homebrew/bin
 fish_add_path -g --append /opt/homebrew/sbin
-fish_add_path -g /opt/homebrew/opt/postgresql@16/bin
 fish_add_path -g $HOME/.cargo/bin
 fish_add_path -g $HOME/.local/bin
 fish_add_path -g $HOME/.devstack/bin
-fish_add_path -g $HOME/.orbstack/bin
 
 # -------------------------------------------------------------------
 # Aliases — guarded so they only apply if the tool is installed
@@ -71,10 +69,6 @@ if test -r $HOME/.opam/opam-init/init.fish
     source $HOME/.opam/opam-init/init.fish >/dev/null 2>&1
 end
 
-# Orbstack — uses init2.fish (not init.fish)
-if test -f $HOME/.orbstack/shell/init2.fish
-    source $HOME/.orbstack/shell/init2.fish 2>/dev/null
-end
 
 # -------------------------------------------------------------------
 # Key bindings — up/down arrow history search
