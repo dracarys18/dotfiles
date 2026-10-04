@@ -10,6 +10,9 @@ end
 # Theme catppuccin-mocha
 fish_config theme choose catppuccin-mocha
 
+# No greeting when a new shell opens
+set -g fish_greeting
+
 # -------------------------------------------------------------------
 # Environment variables
 # -------------------------------------------------------------------
@@ -24,9 +27,9 @@ set -gx WERF_HELM3_MODE 1
 # -------------------------------------------------------------------
 # PATH setup — fish_add_path is idempotent and handles deduping
 # -------------------------------------------------------------------
-fish_add_path -g /opt/homebrew/bin
-fish_add_path -g /opt/homebrew/sbin
-fish_add_path -g /opt/homebrew/opt/node@20/bin
+# Homebrew only holds GUI apps and a few macOS tools now; nix paths come first
+fish_add_path -g --append /opt/homebrew/bin
+fish_add_path -g --append /opt/homebrew/sbin
 fish_add_path -g /opt/homebrew/opt/postgresql@16/bin
 fish_add_path -g $HOME/.cargo/bin
 fish_add_path -g $HOME/.local/bin

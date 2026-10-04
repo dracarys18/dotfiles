@@ -4,7 +4,7 @@
 # Pass --uninstall to remove the watcher and its launch agent.
 #
 # The watcher source lives in <dotfiles>/obs/autocam.swift. yabai places the OBS
-# window on the labelled "obs" desktop (see yabai/yabairc).
+# window on the labelled "obs" desktop (see config/yabai/yabairc).
 
 set -euo pipefail
 

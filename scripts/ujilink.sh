@@ -1,35 +1,19 @@
 #!/usr/bin/env bash
 # ujilink.sh — set up the uji coding agent on a fresh machine.
-# Idempotent: skips what is already in place, backs up anything in the way.
+# Idempotent: skips what is already in place.
 #
-# The tracked config lives under <dotfiles>/uji and is linked to ~/.config/uji.
+# The config in <dotfiles>/config/uji is linked to ~/.config/uji by home-manager.
 # The source checkouts are cloned under ~/Projects: uji itself, the plugin
 # collection, and the skills, which live apart so other agents can read them.
 
 set -euo pipefail
 
-DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECTS="${UJI_PROJECTS:-$HOME/Projects}"
 
 UJI_URL="${UJI_URL:-git@github.com:uji-labs/uji.git}"
 PLUGINS_URL="${UJI_PLUGINS_URL:-git@github.com:uji-labs/uji-plugins.git}"
 SKILLS_URL="${UJI_SKILLS_URL:-git@github.com:uji-labs/uji-skills.git}"
 
-link() {
-    local src="$1"
-    local dst="$2"
-    mkdir -p "$(dirname "$dst")"
-    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
-        echo "  skip   $dst (already linked)"
-        return
-    fi
-    if [ -e "$dst" ] || [ -L "$dst" ]; then
-        mv "$dst" "${dst}.bak"
-        echo "  backup $dst -> ${dst}.bak"
-    fi
-    ln -s "$src" "$dst"
-    echo "  linked $dst -> $src"
-}
 
 # Clone into <projects>/<name>, leaving an existing checkout untouched so local
 # work is never clobbered.
@@ -71,9 +55,6 @@ echo "Cloning into $PROJECTS"
 clone uji "$UJI_URL" || true
 clone uji-plugins "$PLUGINS_URL" || true
 clone uji-skills "$SKILLS_URL" || true
-
-echo "Linking uji config from $DOTFILES/uji"
-link "$DOTFILES/uji" "$HOME/.config/uji"
 
 echo "Binary"
 if [ -d "$PROJECTS/uji/crates/uji" ]; then

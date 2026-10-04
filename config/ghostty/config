@@ -12,7 +12,7 @@ macos-auto-secure-input = true
 macos-secure-input-indication = true
 
 # Shell stuff
-shell-integration = zsh
+shell-integration = fish
 
 
 # Window Stuff
