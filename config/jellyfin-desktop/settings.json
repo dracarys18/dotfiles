@@ -1,0 +1,12 @@
+{
+	"serverUrl":	"https://media.karthihegde.dev",
+	"windowWidth":	2304,
+	"windowHeight":	2592,
+	"windowLogicalWidth":	1152,
+	"windowLogicalHeight":	1296,
+	"windowScale":	2,
+	"windowX":	2304,
+	"windowY":	0,
+	"windowMaximized":	true,
+	"audioChannels":	"stereo"
+}
