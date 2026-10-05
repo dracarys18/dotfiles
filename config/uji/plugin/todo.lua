@@ -125,7 +125,8 @@ uji.on("render_message", function(event)
     if event.type ~= "tool" or event.name ~= "todo" then
         return nil
     end
-    local styles = require("ito").theme().styles
+    local ito = require("ito")
+    local styles = ito.theme().styles
     local lines = {}
     for _, item in ipairs(items) do
         local mark = STATUS[item.status] or " "
@@ -139,5 +140,5 @@ uji.on("render_message", function(event)
     if #lines == 0 then
         lines[1] = { { "   task list cleared", styles.muted } }
     end
-    return lines
+    return ito.Lines(lines)
 end)
