@@ -1,5 +1,3 @@
--- Default uji UI, configured via windows + buffers (nvim-style).
---
 -- Config lives in ~/.config/uji (override with UJI_CONFIG_DIR):
 --   init.lua        entry point, this file when you have none
 --   lua/            module root; require("foo.bar") finds lua/foo/bar.lua
@@ -28,25 +26,6 @@
 -- BREAKING: lua/plugins/*.lua no longer auto-sources. Move those files to
 -- plugin/ (lua/ is for require() only).
 
--- Windows are laid out in priority order (default 50, lower first). For a
--- bottom split, lower priority sits closer to the bottom edge, so a plugin
--- can place itself without caring where its require() sits in this file.
-uji.ui.open_win({ view = "messages", split = "top", size = "fill", wrap = true })
-uji.ui.open_win({ view = "input", split = "bottom", size = "auto", border = "horizontal" })
-uji.ui.open_win({ view = "modal", split = "bottom", size = "auto" })
-local activity = uji.ui.open_win({ split = "bottom", size = 0, padding = 1 })
-
-uji.ui.configure({
-    input = { cursor_blink = true },
-    suggest = { enabled = true, max_height = 5 },
-    waiting = {
-        loader = {
-            frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-            interval = 0.08,
-        },
-    },
-})
-
 -- Handlers run lowest-priority first and the first non-nil answer wins.
 -- Pass { priority = n } to rule on a tool call before this one (default 50).
 uji.on("before_tool", function(event)
@@ -61,28 +40,8 @@ uji.on("before_tool", function(event)
     return nil
 end)
 
-local waiting_text = "Working"
-
-local function render_activity()
-    if uji.status.state() == "working" then
-        uji.ui.set_size(activity, 3)
-        local elapsed = math.floor(uji.status.elapsed() or 0)
-        uji.ui.set_lines(activity, {
-            {
-                { text = uji.status.loader_frame() .. " ",        color = "cyan",   bold = true },
-                { text = waiting_text .. " (" .. elapsed .. "s)", color = "#808080" },
-            },
-        })
-    else
-        uji.ui.set_size(activity, 0)
-    end
-end
-
-uji.on("status_changed", render_activity)
-uji.on("loader_ticked", render_activity)
-
 -- Keybindings. Every key is remappable per mode: normal, suggest, select,
--- prompt, confirm. A binding is either a builtin action name, a slash command
+-- prompt, confirm, overlay. A binding is either a builtin action name, a slash command
 -- via { command = "models" }, or a function. uji.keymap.remove unbinds a key.
 --
 -- Actions: quit, interrupt, submit, clear_input, backspace, cursor_left,
