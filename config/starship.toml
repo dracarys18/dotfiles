@@ -1,7 +1,0 @@
-[username]
-format = '[karthihegde]($style) in '
-
-[aws]
-format = 'on [(\($region\) )]($style)'
-style = 'bold blue'
-symbol = '🅰 '
