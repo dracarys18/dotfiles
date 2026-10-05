@@ -20,22 +20,26 @@ bootstrap-mac: ## Set up a fresh Mac: Nix, Homebrew, first switch
 	@sudo -v
 	@[ -x $(NIX_BIN) ] || sh <(curl --proto '=https' --tlsv1.2 -sSfL https://nixos.org/nix/install) --daemon --yes
 	@[ -x /opt/homebrew/bin/brew ] || NONINTERACTIVE=1 bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# The Nix installer edits these, and nix-darwin won't overwrite /etc files it
-# doesn't recognise, so set them aside before the first switch
-	@[ -x $(REBUILD) ] || for f in bashrc zshrc shells; do if [ -e /etc/$$f ] && [ ! -L /etc/$$f ]; then sudo mv /etc/$$f /etc/$$f.before-nix-darwin; fi; done
-	@if [ -x $(REBUILD) ]; then sudo $(REBUILD) switch --flake '$(FLAKE)#mac'; else sudo $(NIX) run nix-darwin/nix-darwin-26.05#darwin-rebuild -- switch --flake '$(FLAKE)#mac'; fi
+# The Nix installer edits these (and a hand-made yabai sudoers rule may exist);
+# nix-darwin won't overwrite /etc files it doesn't recognise, so set them aside
+	@[ -x $(REBUILD) ] || for f in bashrc zshrc shells sudoers.d/yabai; do if [ -e /etc/$$f ] && [ ! -L /etc/$$f ]; then sudo mv /etc/$$f /etc/$$f.before-nix-darwin; fi; done
+	@if [ -x $(REBUILD) ]; then $(MAKE) --no-print-directory switch; else sudo $(NIX) run nix-darwin/nix-darwin-26.05#darwin-rebuild -- switch --flake '$(FLAKE)#mac-bootstrap'; fi
 	@printf '%s\n' '' 'Done. Log out and back in so every app picks up the new shell. Then by hand:' \
+	  '  - sign in to 1Password and turn on its SSH agent, then `make switch` to add uji' \
 	  '  - yabai scripting addition: Recovery Mode -> Terminal ->' \
-	  '    `csrutil enable --without debug --without fs`, reboot, `sudo yabai --load-sa`' \
+	  '    `csrutil enable --without debug --without fs`, then reboot (Nix loads it at boot)' \
 	  '  - open Firefox once, then `make switch` to link its config' \
 	  '  - optional: `make uji` once GitHub SSH keys are set up'
 
+# Fetch inputs as you first: the private uji repo needs your SSH keys, which
+# root (running the switch) can't use. Root then finds them already fetched.
 switch: ## Apply the repo to this Mac
+	@$(NIX) flake archive '$(FLAKE)' >/dev/null
 	sudo darwin-rebuild switch --flake '$(FLAKE)#mac'
 
 update: ## Update packages, nvim plugins and treesitter, then switch
 	$(NIX) flake update --flake '$(FLAKE)'
-	sudo darwin-rebuild switch --flake '$(FLAKE)#mac'
+	@$(MAKE) --no-print-directory switch
 	nvim --headless "+lua vim.pack.update(nil, { force = true })" +qa
 	nvim --headless "+lua require('nvim-treesitter').update():wait(300000)" +qa
 
@@ -49,12 +53,11 @@ clean: ## Delete old generations and free disk space
 obs-save: ## Save OBS settings into the repo (stream keys and logins blanked)
 	@bash $(ROOT)/src/mac/scripts/obs-save.sh
 
-uji: ## Clone uji, its plugins and skills into ~/Projects, then build uji
+uji: ## Clone uji, its plugins and skills into ~/Projects (Nix installs the uji binary)
 	@for r in uji uji-plugins uji-skills; do \
 	  d=$(PROJECTS)/$$r; \
 	  if [ -d $$d/.git ]; then echo "  skip   $$d (already cloned)"; \
 	  elif [ -e $$d ]; then echo "  warn   $$d exists but isn't a git checkout, leaving it"; \
 	  else mkdir -p $(PROJECTS) && git clone git@github.com:uji-labs/$$r.git $$d || echo "  failed $$r: clone it by hand, then rerun"; fi; \
 	done
-	cargo install --path $(PROJECTS)/uji/crates/uji --locked
 	@echo "Set LITELLM_BASE_URL and LITELLM_API_KEY (BRAVE_API_KEY optional) in your shell."
