@@ -16,6 +16,13 @@
       url = "github:catppuccin/tmux/1612a23174a6771ac466312eb156f83b8b89d907";
       flake = false;
     };
+    # TODO(macOS 27): temporary, see darwin/yabai.nix for when and how to remove.
+    # yabai 7.1.25 + macOS 27 scripting-addition patterns (upstream has no macOS
+    # 27 support yet: asmvik/yabai#2802), pinned to a reviewed commit.
+    yabai-macos27 = {
+      url = "github:AhsanFazal/yabai/ad0a12d63f639534a296a1d065b0d04979f1b4db";
+      flake = false;
+    };
     # kubectl abbreviations for fish
     kubectl-aliases = {
       url = "github:ahmetb/kubectl-aliases";

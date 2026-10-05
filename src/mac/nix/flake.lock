@@ -290,7 +290,8 @@
         "nixvim": "nixvim",
         "stylix": "stylix",
         "tmux-catppuccin": "tmux-catppuccin",
-        "uji": "uji"
+        "uji": "uji",
+        "yabai-macos27": "yabai-macos27"
       }
     },
     "rust-overlay": {
@@ -478,6 +479,23 @@
       "original": {
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
+      }
+    },
+    "yabai-macos27": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787164259,
+        "narHash": "sha256-CFC9KuBw7oyOjL5t8D+JIdk6/cdSh91J/K/8XA3v3aE=",
+        "owner": "AhsanFazal",
+        "repo": "yabai",
+        "rev": "ad0a12d63f639534a296a1d065b0d04979f1b4db",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AhsanFazal",
+        "repo": "yabai",
+        "rev": "ad0a12d63f639534a296a1d065b0d04979f1b4db",
+        "type": "github"
       }
     }
   },
