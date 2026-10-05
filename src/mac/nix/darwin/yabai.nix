@@ -105,8 +105,8 @@ in
     enable = true;
     skhdConfig = ''
       # --- Window Actions ---
-      rctrl + shift - q : yabai -m window --close
-      alt + shift - q   : yabai -m window --close
+      rctrl + shift - q : skhd -k "cmd - q"
+      alt + shift - q   : skhd -k "cmd - q"
 
       rctrl + shift - f : yabai -m window --toggle native-fullscreen
       alt + shift - f   : yabai -m window --toggle native-fullscreen
