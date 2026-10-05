@@ -37,11 +37,9 @@ switch: ## Apply the repo to this Mac
 	@$(NIX) flake archive '$(FLAKE)' >/dev/null
 	sudo darwin-rebuild switch --flake '$(FLAKE)#mac'
 
-update: ## Update packages, nvim plugins and treesitter, then switch
+update: ## Update everything pinned in flake.lock (packages, nvim plugins, parsers), then switch
 	$(NIX) flake update --flake '$(FLAKE)'
 	@$(MAKE) --no-print-directory switch
-	nvim --headless "+lua vim.pack.update(nil, { force = true })" +qa
-	nvim --headless "+lua require('nvim-treesitter').update():wait(300000)" +qa
 
 rollback: ## Undo the last switch
 	sudo darwin-rebuild --rollback
