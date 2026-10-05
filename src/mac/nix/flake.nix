@@ -33,9 +33,9 @@
       url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # one theme and font applied to every app
-    stylix = {
-      url = "github:nix-community/stylix/release-26.05";
+    # catppuccin's own theme for every app that has one
+    catppuccin = {
+      url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # private repo, fetched over SSH; `make switch` fetches it as you first,
@@ -55,7 +55,6 @@
           specialArgs = { inherit inputs; };
           modules = [
             ./darwin
-            inputs.stylix.darwinModules.stylix
             home-manager.darwinModules.home-manager
             {
               home-manager.useGlobalPkgs = true;

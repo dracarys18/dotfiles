@@ -7,7 +7,6 @@
     # only in interactive shells, like the old config.fish
     interactiveShellInit = ''
       set -g fish_greeting
-      fish_config theme choose catppuccin-mocha
 
       # Homebrew only holds GUI apps and a few macOS tools; Nix paths come first
       fish_add_path -g --append /opt/homebrew/bin

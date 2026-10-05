@@ -1,5 +1,5 @@
 # System level (nix-darwin): one file per concern, imported here.
-{ ... }:
+{ pkgs, ... }:
 
 let
   user = "karthihegde";
@@ -10,7 +10,6 @@ in
     ./homebrew.nix
     ./defaults.nix
     ./debloat.nix
-    ./stylix.nix
     ./yabai.nix
   ];
 
@@ -19,6 +18,8 @@ in
   system.primaryUser = user;
 
   users.users.${user}.home = "/Users/${user}";
+
+  fonts.packages = [ pkgs.nerd-fonts.hasklug ];
 
   nix.settings.experimental-features = [
     "nix-command"

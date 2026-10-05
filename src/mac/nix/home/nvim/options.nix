@@ -9,6 +9,7 @@
     number = true;
     relativenumber = false;
     timeoutlen = 700;
+    guifont = "Hasklug Nerd Font Mono,Hack Nerd Font,NotoEmoji Nerd Font:h11";
 
     # undo history in Neovim's default ~/.local/state/nvim/undo
     undofile = true;
