@@ -8,7 +8,8 @@
     enable = true;
     settings = {
       fmt_parse_errors = 0;
-      fmt_autosave = 0;
+      # zig.vim runs `zig fmt` on save (what the old LSP-format autocmd did)
+      fmt_autosave = 1;
     };
   };
 

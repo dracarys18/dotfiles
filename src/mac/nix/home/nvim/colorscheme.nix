@@ -26,16 +26,13 @@
         mantle = "#000000";
         crust = "#000000";
       };
-      highlight_overrides.mocha.__raw = ''
-        function(C)
-          return {
-            TabLineSel = { bg = C.pink },
-            CmpBorder = { fg = C.surface2 },
-            Pmenu = { bg = C.none },
-            TelescopeBorder = { link = "FloatBorder" },
-          }
-        end
-      '';
+      # mocha's pink and surface2
+      highlight_overrides.mocha = {
+        TabLineSel.bg = "#f5c2e7";
+        CmpBorder.fg = "#585b70";
+        Pmenu.bg = "NONE";
+        TelescopeBorder.link = "FloatBorder";
+      };
     };
   };
 }

@@ -26,14 +26,5 @@
       pattern = "*.sol";
       command = "set ft=solidity";
     }
-    # zig: format on save through the LSP
-    {
-      event = "BufWritePre";
-      pattern = [
-        "*.zig"
-        "*.zon"
-      ];
-      callback.__raw = "function() vim.lsp.buf.format() end";
-    }
   ];
 }

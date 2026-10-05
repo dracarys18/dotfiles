@@ -11,7 +11,7 @@
     timeoutlen = 700;
     guifont = "Hasklug Nerd Font Mono,Hack Nerd Font,NotoEmoji Nerd Font:h11";
 
-    undodir.__raw = "vim.fn.stdpath('cache') .. '/undodir'";
+    # undo history in Neovim's default ~/.local/state/nvim/undo
     undofile = true;
 
     autoread = true;
@@ -53,7 +53,7 @@
     {
       event = "FileChangedShellPost";
       group = "AutoRead";
-      callback.__raw = ''function() vim.notify("File reloaded from disk") end'';
+      command = "echomsg 'File reloaded from disk'";
     }
   ];
 }

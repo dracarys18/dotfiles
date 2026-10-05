@@ -9,7 +9,7 @@ NIX := $(NIX_BIN) --extra-experimental-features 'nix-command flakes'
 REBUILD := /run/current-system/sw/bin/darwin-rebuild
 PROJECTS ?= $(HOME)/Projects
 
-.PHONY: help bootstrap-mac switch update rollback clean obs-save uji
+.PHONY: help bootstrap-mac switch update rollback clean uji
 
 help: ## List targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -50,8 +50,6 @@ clean: ## Delete old generations and free disk space
 	sudo nix-collect-garbage -d
 	sudo nix store optimise
 
-obs-save: ## Save OBS settings into the repo (stream keys and logins blanked)
-	@bash $(ROOT)/src/mac/scripts/obs-save.sh
 
 uji: ## Clone uji, its plugins and skills into ~/Projects (Nix installs the uji binary)
 	@for r in uji uji-plugins uji-skills; do \

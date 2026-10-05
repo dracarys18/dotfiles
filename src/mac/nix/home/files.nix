@@ -21,9 +21,8 @@
     # Jellyfin Desktop itself is a hand-installed dev build; it saves window
     # size and server into settings.json, so that file stays writable
     "jellyfin-desktop/settings.json".source = writable "config/jellyfin-desktop/settings.json";
-    "jellyfin-desktop/mpv/mpv.conf".source = ../../../../config/jellyfin-desktop/mpv/mpv.conf;
+    "jellyfin-desktop/mpv/mpv.conf".text = "audio-channels=na-na-fl-fr\n";
 
-    "1Password/ssh/agent.toml".source = ../../../../config/1Password/ssh/agent.toml;
   };
 
 }

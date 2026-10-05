@@ -103,7 +103,161 @@ in
 
   services.skhd = {
     enable = true;
-    skhdConfig = builtins.readFile ../../config/yabai/skhdrc;
+    skhdConfig = ''
+      # --- Window Actions ---
+      rctrl + shift - q : yabai -m window --close
+      alt + shift - q   : yabai -m window --close
+
+      rctrl + shift - f : yabai -m window --toggle native-fullscreen
+      alt + shift - f   : yabai -m window --toggle native-fullscreen
+
+      rctrl - space : yabai -m window --toggle float
+      alt - space   : yabai -m window --toggle float
+
+      # --- Move between spaces ---
+      rctrl - 1 : yabai -m space --focus 1
+      alt - 1   : yabai -m space --focus 1
+
+      rctrl - 2 : yabai -m space --focus 2
+      alt - 2   : yabai -m space --focus 2
+
+      rctrl - 3 : yabai -m space --focus 3
+      alt - 3   : yabai -m space --focus 3
+
+      rctrl - 4 : yabai -m space --focus 4
+      alt - 4   : yabai -m space --focus 4
+
+      rctrl - 5 : yabai -m space --focus 5
+      alt - 5   : yabai -m space --focus 5
+
+      rctrl - 6 : yabai -m space --focus 6
+      alt - 6   : yabai -m space --focus 6
+
+      rctrl - 7 : yabai -m space --focus 7
+      alt - 7   : yabai -m space --focus 7
+
+      rctrl - 8 : yabai -m space --focus 8
+      alt - 8   : yabai -m space --focus 8
+
+      rctrl - 9 : yabai -m space --focus 9
+      alt - 9   : yabai -m space --focus 9
+
+      # --- Open Apps ---
+      rctrl + shift - g : open -a "Ghostty"
+      alt + shift - g   : open -a "Ghostty"
+
+      rctrl + shift - z : open -a "Firefox"
+      alt + shift - z   : open -a "Firefox"
+
+      rctrl + shift - c : open -a "Cinny"
+      alt + shift - c   : open -a "Cinny"
+
+      rctrl + shift - s : open -a "Signal"
+      alt + shift - s   : open -a "Signal"
+
+      rctrl + shift - d : open -a "Vesktop"
+      alt + shift - d   : open -a "Vesktop"
+
+      rctrl + shift - t : open -a "Telegram"
+      alt + shift - t   : open -a "Telegram"
+
+      rctrl + shift - p : open -a "Spotify"
+      alt + shift - p   : open -a "Spotify"
+
+      rctrl + shift - o : open -a "OBS"
+      alt + shift - o   : open -a "OBS"
+
+      # --- Send focused window to space (and follow) ---
+      rctrl + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
+      alt + shift - 1   : yabai -m window --space 1; yabai -m space --focus 1
+
+      rctrl + shift - 2 : yabai -m window --space 2; yabai -m space --focus 2
+      alt + shift - 2   : yabai -m window --space 2; yabai -m space --focus 2
+
+      rctrl + shift - 3 : yabai -m window --space 3; yabai -m space --focus 3
+      alt + shift - 3   : yabai -m window --space 3; yabai -m space --focus 3
+
+      rctrl + shift - 4 : yabai -m window --space 4; yabai -m space --focus 4
+      alt + shift - 4   : yabai -m window --space 4; yabai -m space --focus 4
+
+      rctrl + shift - 5 : yabai -m window --space 5; yabai -m space --focus 5
+      alt + shift - 5   : yabai -m window --space 5; yabai -m space --focus 5
+
+      rctrl + shift - 6 : yabai -m window --space 6; yabai -m space --focus 6
+      alt + shift - 6   : yabai -m window --space 6; yabai -m space --focus 6
+
+      rctrl + shift - 7 : yabai -m window --space 7; yabai -m space --focus 7
+      alt + shift - 7   : yabai -m window --space 7; yabai -m space --focus 7
+
+      rctrl + shift - 8 : yabai -m window --space 8; yabai -m space --focus 8
+      alt + shift - 8   : yabai -m window --space 8; yabai -m space --focus 8
+
+      rctrl + shift - 9 : yabai -m window --space 9; yabai -m space --focus 9
+      alt + shift - 9   : yabai -m window --space 9; yabai -m space --focus 9
+
+      # --- Swap window in direction (WASD) ---
+      rctrl + cmd - a : yabai -m window --swap west
+      alt + cmd - a   : yabai -m window --swap west
+
+      rctrl + cmd - s : yabai -m window --swap south
+      alt + cmd - s   : yabai -m window --swap south
+
+      rctrl + cmd - w : yabai -m window --swap north
+      alt + cmd - w   : yabai -m window --swap north
+
+      rctrl + cmd - d : yabai -m window --swap east
+      alt + cmd - d   : yabai -m window --swap east
+
+      # --- Warp window in direction (reflow into tree, HJKL) ---
+      rctrl + cmd - h : yabai -m window --warp west
+      alt + cmd - h   : yabai -m window --warp west
+
+      rctrl + cmd - j : yabai -m window --warp south
+      alt + cmd - j   : yabai -m window --warp south
+
+      rctrl + cmd - k : yabai -m window --warp north
+      alt + cmd - k   : yabai -m window --warp north
+
+      rctrl + cmd - l : yabai -m window --warp east
+      alt + cmd - l   : yabai -m window --warp east
+
+      # --- Resize (grow/shrink east edge, WASD-ish) ---
+      rctrl + shift - h : yabai -m window --resize left:-40:0
+      alt + shift - h   : yabai -m window --resize left:-40:0
+
+      rctrl + shift - l : yabai -m window --resize left:40:0
+      alt + shift - l   : yabai -m window --resize left:40:0
+
+      rctrl + shift - k : yabai -m window --resize bottom:0:-40
+      alt + shift - k   : yabai -m window --resize bottom:0:-40
+
+      rctrl + shift - j : yabai -m window --resize bottom:0:40
+      alt + shift - j   : yabai -m window --resize bottom:0:40
+
+      # --- Balance / rotate layout ---
+      rctrl - e : yabai -m space --balance
+      alt - e   : yabai -m space --balance
+
+      rctrl - r : yabai -m space --rotate 90
+      alt - r   : yabai -m space --rotate 90
+
+      # --- Slack ---
+      rctrl + shift - m : open -a "Slack"
+      alt + shift - m   : open -a "Slack"
+
+      # --- Window Focus (Vim-ish HJKL or WASD) ---
+      rctrl - a : yabai -m window --focus west
+      alt - a   : yabai -m window --focus west
+
+      rctrl - s : yabai -m window --focus south
+      alt - s   : yabai -m window --focus south
+
+      rctrl - w : yabai -m window --focus north
+      alt - w   : yabai -m window --focus north
+
+      rctrl - d : yabai -m window --focus east
+      alt - d   : yabai -m window --focus east
+    '';
   };
   # skhd runs every hotkey command through $SHELL; pin one that always exists
   launchd.user.agents.skhd.serviceConfig.EnvironmentVariables.SHELL = "/bin/bash";

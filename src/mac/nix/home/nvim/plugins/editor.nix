@@ -24,7 +24,6 @@
         persist_size = true;
         direction = "float";
         close_on_exit = true;
-        shell.__raw = "vim.o.shell";
         float_opts = {
           border = "single";
           width = 200;

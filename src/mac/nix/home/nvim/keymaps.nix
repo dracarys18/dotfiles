@@ -1,5 +1,5 @@
 let
-  # silent mapping; `lua` for Lua function actions
+  # silent mapping; `lua` only where a plugin has no command for the action
   map = mode: key: action: {
     inherit mode key action;
     options.silent = true;
@@ -7,6 +7,11 @@ let
   lua =
     mode: key: fn:
     map mode key { __raw = "function() ${fn} end"; };
+  map2lsp = builtins.map (km: {
+    key = builtins.elemAt km 0;
+    lspBufAction = builtins.elemAt km 1;
+    options.silent = true;
+  });
   trouble = key: cmd: desc: {
     mode = "n";
     inherit key;
@@ -15,6 +20,30 @@ let
   };
 in
 {
+  # set when a language server attaches to the buffer
+  lsp.keymaps = map2lsp [
+    [
+      "K"
+      "hover"
+    ]
+    [
+      "<C-k>"
+      "definition"
+    ]
+    [
+      "gi"
+      "implementation"
+    ]
+    [
+      "gn"
+      "rename"
+    ]
+    [
+      "F"
+      "format"
+    ]
+  ];
+
   keymaps = [
     # space is the leader
     (map [ "n" "v" ] "<Space>" "<Nop>")
@@ -23,16 +52,16 @@ in
     (map "n" "<F2>" "<cmd>set number! relativenumber!<cr>")
 
     # dap
-    (lua "n" "<F5>" "require('dap').continue()")
-    (lua "n" "<F10>" "require('dap').step_over()")
-    (lua "n" "<F11>" "require('dap').step_into()")
-    (lua "n" "<F12>" "require('dap').step_out()")
-    (lua "n" "<leader>bb" "require('dap').toggle_breakpoint()")
+    (map "n" "<F5>" "<cmd>DapContinue<cr>")
+    (map "n" "<F10>" "<cmd>DapStepOver<cr>")
+    (map "n" "<F11>" "<cmd>DapStepInto<cr>")
+    (map "n" "<F12>" "<cmd>DapStepOut<cr>")
+    (map "n" "<leader>bb" "<cmd>DapToggleBreakpoint<cr>")
     (lua "n" "<leader>B" "require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))")
     (lua "n" "<leader>lp"
       "require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))"
     )
-    (lua "n" "<leader>dr" "require('dap').repl.open()")
+    (map "n" "<leader>dr" "<cmd>DapToggleRepl<cr>")
     (lua "n" "<leader>dl" "require('dap').run_last()")
     (lua "n" "<leader>dd" "require('dapui').toggle()")
 
@@ -41,25 +70,16 @@ in
     (map "n" "<leader>n" "<cmd>bnext<cr>")
     (map "n" "<leader>p" "<cmd>bprev<cr>")
     (map "n" "<leader>q" "<cmd>bw<cr>")
-    (lua "n" "<leader>v" "require('oil').open()")
+    (map "n" "<leader>v" "<cmd>Oil<cr>")
 
     # telescope
-    (lua "n" "<leader>ff" "require('telescope.builtin').find_files()")
-    (lua "n" "<leader>gg" "require('telescope.builtin').live_grep()")
-    (lua "n" "<leader>;" "require('telescope.builtin').buffers()")
-    (lua "n" "<leader>fh" "require('telescope.builtin').help_tags()")
-    (lua "n" "<leader>l"
-      "require('telescope.builtin').lsp_references({ include_current_line = true, fname_width = 40 })"
-    )
-    (lua "n" "<leader>i" "require('telescope.builtin').lsp_incoming_calls({ fname_width = 40 })")
+    (map "n" "<leader>ff" "<cmd>Telescope find_files<cr>")
+    (map "n" "<leader>gg" "<cmd>Telescope live_grep<cr>")
+    (map "n" "<leader>;" "<cmd>Telescope buffers<cr>")
+    (map "n" "<leader>fh" "<cmd>Telescope help_tags<cr>")
+    (map "n" "<leader>l" "<cmd>Telescope lsp_references include_current_line=true fname_width=40<cr>")
+    (map "n" "<leader>i" "<cmd>Telescope lsp_incoming_calls fname_width=40<cr>")
     (map "n" "<C-c>" "<cmd>Telescope commands<cr>")
-
-    # lsp
-    (map "n" "K" "<cmd>lua vim.lsp.buf.hover()<cr>")
-    (map "n" "<C-k>" "<cmd>lua vim.lsp.buf.definition()<cr>")
-    (map "n" "gi" "<cmd>lua vim.lsp.buf.implementation()<cr>")
-    (map "n" "gn" "<cmd>lua vim.lsp.buf.rename()<cr>")
-    (map "n" "F" "<cmd>lua vim.lsp.buf.format { async = true }<cr>")
 
     # git
     (map "n" "<leader>gB" "<cmd>Git blame<cr>")
