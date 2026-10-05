@@ -5,7 +5,6 @@
     ./options.nix
     ./autocmds.nix
     ./keymaps.nix
-    ./colorscheme.nix
     ./plugins/ui.nix
     ./plugins/editor.nix
     ./plugins/telescope.nix

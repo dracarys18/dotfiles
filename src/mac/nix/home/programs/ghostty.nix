@@ -4,10 +4,11 @@
   programs.ghostty = {
     enable = true;
     package = null; # the app comes from the Homebrew cask
-    # theme, font and background opacity come from stylix
+    # theme and font come from stylix
     settings = {
       # stylix scales sizes by 4/3 for Ghostty; keep the size you had
       font-size = lib.mkForce 25;
+      background-opacity = lib.mkForce 0.5;
       fullscreen = true;
       maximize = true;
       macos-non-native-fullscreen = true;

@@ -12,8 +12,6 @@ let
   dir = "${config.home.homeDirectory}/Library/Application Support/vesktop";
 in
 {
-  stylix.targets.vesktop.enable = true;
-
   home.file."Library/Application Support/vesktop/themes/stylix.css".text =
     config.stylix.targets.vesktop.themeBody;
 

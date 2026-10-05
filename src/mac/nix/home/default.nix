@@ -6,7 +6,6 @@
     inputs.nixvim.homeModules.nixvim
     ./programs
     ./packages.nix
-    ./stylix.nix
     ./files.nix
     ./firefox.nix
     ./obs.nix
