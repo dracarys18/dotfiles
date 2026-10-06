@@ -106,6 +106,12 @@
   display: none !important;
 }
 
+/* "Customize sidebar" gear: user.js (firefox.nix) sets all of its options on
+   every start anyway, and its panel glitches under the auto-hiding sidebar */
+moz-button[view="viewCustomizeSidebar"] {
+  display: none !important;
+}
+
 #back-button {
   margin-inline-start: auto !important;
 }

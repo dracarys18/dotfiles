@@ -37,6 +37,7 @@
       "maccy"
       "obs"
       "signal"
+      "sony-ps-remote-play"
       "spotify"
       "tailscale-app"
       "telegram"
