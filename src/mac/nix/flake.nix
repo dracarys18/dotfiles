@@ -49,6 +49,11 @@
     };
     # typed options for its plugins (home/programs/uji)
     uji-plugins.url = "git+ssh://git@github.com/uji-labs/uji-plugins";
+    # native Spotify client (home/packages.nix)
+    spotifast = {
+      url = "github:crmne/spotifast";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

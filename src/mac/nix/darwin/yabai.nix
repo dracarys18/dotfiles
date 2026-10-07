@@ -163,8 +163,8 @@ in
       rctrl + shift - t : open -a "Telegram"
       alt + shift - t   : open -a "Telegram"
 
-      rctrl + shift - p : open -a "Spotify"
-      alt + shift - p   : open -a "Spotify"
+      rctrl + shift - p : open -a "Spotifast"
+      alt + shift - p   : open -a "Spotifast"
 
       rctrl + shift - o : open -a "OBS"
       alt + shift - o   : open -a "OBS"
