@@ -26,19 +26,11 @@
 -- BREAKING: lua/plugins/*.lua no longer auto-sources. Move those files to
 -- plugin/ (lua/ is for require() only).
 
--- Handlers run lowest-priority first and the first non-nil answer wins.
--- Pass { priority = n } to rule on a tool call before this one (default 50).
-uji.on("before_tool", function(event)
-    if event.name == "run_command" then
-        local cmd = event.arguments.command or ""
-        if string.match(cmd, "^rm %-rf") then
-            return { deny = "Refusing to run rm -rf" }
-        end
-        return { allow = true }
-    end
-    -- reads and writes fall through to the default policy (allow / ask)
-    return nil
-end)
+uji.tool.policy({
+    default = "allow",
+    run_command = { deny = { "/^\\s*rm\\s+-rf/" } },
+    Bash = { deny = { "/^\\s*rm\\s+-rf/" } },
+})
 
 -- Keybindings. Every key is remappable per mode: normal, suggest, select,
 -- prompt, confirm, overlay. A binding is either a builtin action name, a slash command
