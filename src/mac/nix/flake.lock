@@ -184,6 +184,7 @@
         "pared": "pared",
         "tmux-catppuccin": "tmux-catppuccin",
         "uji": "uji",
+        "uji-plugins": "uji-plugins",
         "yabai-macos27": "yabai-macos27"
       }
     },
@@ -248,17 +249,32 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1791358719,
-        "narHash": "sha256-eS8HTD8+CzKnYwuKLPQwowZ4MtsF7BAf8bHpRqZdAEA=",
+        "lastModified": 1791386684,
+        "narHash": "sha256-w4NjPdI41bJUrAE4mj5HFfc7egq8wDz53eqr3UJSuIM=",
         "ref": "refs/heads/main",
-        "rev": "e7182fde5a6fee94543560f75bd6d3338f3141f1",
-        "revCount": 122,
+        "rev": "bf01ee5466b1067a96e958382225ec20735f2e8b",
+        "revCount": 125,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
       },
       "original": {
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
+      }
+    },
+    "uji-plugins": {
+      "locked": {
+        "lastModified": 1791386766,
+        "narHash": "sha256-dJx11pVcFA6z0duFWjA7KgfL96vCto4dDvn+uBy/fG0=",
+        "ref": "refs/heads/main",
+        "rev": "5ddc009216d3d21d4d099d33ff1d37d1d614be9f",
+        "revCount": 21,
+        "type": "git",
+        "url": "ssh://git@github.com/uji-labs/uji-plugins"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/uji-labs/uji-plugins"
       }
     },
     "yabai-macos27": {
