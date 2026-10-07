@@ -108,8 +108,10 @@ in
       rctrl + shift - q : skhd -k "cmd - q"
       alt + shift - q   : skhd -k "cmd - q"
 
-      rctrl + shift - f : yabai -m window --toggle native-fullscreen
-      alt + shift - f   : yabai -m window --toggle native-fullscreen
+      # yabai's fullscreen, not macOS's: native fullscreen breaks hover and
+      # clicks in Firefox, and with the menu bar and Dock hidden it looks the same
+      rctrl + shift - f : yabai -m window --toggle zoom-fullscreen
+      alt + shift - f   : yabai -m window --toggle zoom-fullscreen
 
       rctrl - space : yabai -m window --toggle float
       alt - space   : yabai -m window --toggle float

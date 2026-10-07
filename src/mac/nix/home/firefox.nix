@@ -12,6 +12,10 @@ let
     "browser.newtabpage.enabled" = false;
     "sidebar.main.tools" = "history,bookmarks";
     "privacy.clearOnShutdown_v2.browsingHistoryAndDownloads" = false;
+    # Auto-opening the downloads panel while the toolbar is hidden off-screen
+    # (userChrome.css) leaves it stuck half-open, pinning the toolbar on top of
+    # the page; the downloads button still shows progress
+    "browser.download.alwaysOpenPanel" = false;
     "browser.startup.page" = 3;
   };
   userJs = pkgs.writeText "user.js" (
