@@ -11,10 +11,6 @@
 {
   xdg.configFile = {
 
-    "uji" = {
-      source = ../../../../config/uji;
-      recursive = true;
-    };
     # vicinae saves GUI changes into this file
     "vicinae/settings.json".source = writable "config/vicinae/settings.json";
 

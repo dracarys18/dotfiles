@@ -38,12 +38,17 @@
       url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Apple Intelligence off and its models deleted (darwin/intelligence.nix).
+    # Keeps its own nixpkgs: pared needs Swift 6.2.4, 26.05 has 5.10.
+    pared.url = "github:4evy/pared";
     # private repo, fetched over SSH; `make switch` fetches it as you first,
     # because root (which runs the switch) can't use your 1Password SSH agent
     uji = {
       url = "git+ssh://git@github.com/uji-labs/uji";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # typed options for its plugins (home/programs/uji)
+    uji-plugins.url = "git+ssh://git@github.com/uji-labs/uji-plugins";
   };
 
   outputs =

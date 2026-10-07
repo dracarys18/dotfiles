@@ -17,10 +17,13 @@ in
       NSAutomaticPeriodSubstitutionEnabled = false;
       NSAutomaticQuoteSubstitutionEnabled = false;
       NSAutomaticSpellingCorrectionEnabled = false;
+      ApplePressAndHoldEnabled = false; # held keys repeat, no accent menu
+      NSDocumentSaveNewDocumentsToCloud = false; # save to this Mac, not iCloud
       "com.apple.sound.beep.volume" = 0.4345982;
     };
     dock = {
       autohide = true;
+      autohide-delay = 0.0;
       orientation = "right";
       tilesize = 16;
       largesize = 16;
@@ -38,13 +41,18 @@ in
     finder = {
       FXPreferredViewStyle = "Nlsv"; # list view
       FXRemoveOldTrashItems = true; # empty Trash after 30 days
+      ShowPathbar = true;
+      _FXSortFoldersFirst = true;
     };
     WindowManager = {
       GloballyEnabled = false; # Stage Manager off
       EnableTiledWindowMargins = false;
+      EnableStandardClickToShowDesktop = false; # clicking the wallpaper hides nothing
       HideDesktop = true;
+      StandardHideWidgets = true;
       StageManagerHideWidgets = true;
     };
+    screencapture.disable-shadow = true;
     hitoolbox.AppleFnUsageType = "Do Nothing";
     # settings nix-darwin has no option for
     CustomUserPreferences = {
@@ -61,6 +69,16 @@ in
         StatusMenuVisible = false;
         VoiceTriggerUserEnabled = false;
       };
+      # no .DS_Store files on network drives
+      "com.apple.desktopservices".DSDontWriteNetworkStores = true;
+      # Privacy: no personalized ads, Improve Siri, Improve Search or Look Up
+      # suggestions (2 = opted out)
+      "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
+      "com.apple.assistant.support" = {
+        "Siri Data Sharing Opt-In Status" = 2;
+        "Search Queries Data Sharing Status" = 2;
+      };
+      "com.apple.lookup.shared".LookupSuggestionsDisabled = true;
     };
   };
 

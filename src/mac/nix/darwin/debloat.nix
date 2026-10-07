@@ -87,6 +87,7 @@ let
         com.apple.progressd
         com.apple.shazamd
         com.apple.helpd
+        com.apple.rcd
 
         com.apple.email.maild
         com.apple.icloudmailagent

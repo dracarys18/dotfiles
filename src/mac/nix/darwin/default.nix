@@ -10,6 +10,7 @@ in
     ./homebrew.nix
     ./defaults.nix
     ./debloat.nix
+    ./intelligence.nix
     ./yabai.nix
   ];
 
