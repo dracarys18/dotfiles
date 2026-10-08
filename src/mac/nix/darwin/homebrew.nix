@@ -23,7 +23,6 @@
         name = "tsirysndr/tap/fin";
         trusted = true;
       }
-      "firefoxpwa"
     ];
     casks = [
       "1password"
@@ -38,6 +37,7 @@
       "obs"
       "signal"
       "sony-ps-remote-play"
+      "spotify"
       "tailscale-app"
       "telegram"
       "vesktop"

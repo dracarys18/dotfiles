@@ -1,5 +1,5 @@
 # CLI tools from nixpkgs (uji comes from its own flake, in programs/uji)
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
   home.packages = with pkgs; [
@@ -49,8 +49,6 @@
 
     # apps
     chatterino2
-    # native Spotify client, from its own flake
-    inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # network and misc
     gh

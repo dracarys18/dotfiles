@@ -86,7 +86,6 @@ in
 
       yabai -m rule --add label=terminal app="^Ghostty$" space=1
       yabai -m rule --add label=browser  app="^Firefox$" space=2
-      yabai -m rule --add label=cinny    app="^Cinny$"    space=3
       yabai -m rule --add label=signal   app="^Signal$"   space=3
       yabai -m rule --add label=discord  app="^Vesktop$"  space=3
       yabai -m rule --add label=telegram app="^Telegram$" space=3
@@ -108,10 +107,8 @@ in
       rctrl + shift - q : skhd -k "cmd - q"
       alt + shift - q   : skhd -k "cmd - q"
 
-      # yabai's fullscreen, not macOS's: native fullscreen breaks hover and
-      # clicks in Firefox, and with the menu bar and Dock hidden it looks the same
-      rctrl + shift - f : yabai -m window --toggle zoom-fullscreen
-      alt + shift - f   : yabai -m window --toggle zoom-fullscreen
+      rctrl + shift - f : yabai -m window --toggle native-fullscreen
+      alt + shift - f   : yabai -m window --toggle native-fullscreen
 
       rctrl - space : yabai -m window --toggle float
       alt - space   : yabai -m window --toggle float
@@ -151,9 +148,6 @@ in
       rctrl + shift - z : open -a "Firefox"
       alt + shift - z   : open -a "Firefox"
 
-      rctrl + shift - c : open -a "Cinny"
-      alt + shift - c   : open -a "Cinny"
-
       rctrl + shift - s : open -a "Signal"
       alt + shift - s   : open -a "Signal"
 
@@ -163,8 +157,8 @@ in
       rctrl + shift - t : open -a "Telegram"
       alt + shift - t   : open -a "Telegram"
 
-      rctrl + shift - p : open -a "Spotifast"
-      alt + shift - p   : open -a "Spotifast"
+      rctrl + shift - p : open -a "Spotify"
+      alt + shift - p   : open -a "Spotify"
 
       rctrl + shift - o : open -a "OBS"
       alt + shift - o   : open -a "OBS"
@@ -242,10 +236,6 @@ in
 
       rctrl - r : yabai -m space --rotate 90
       alt - r   : yabai -m space --rotate 90
-
-      # --- Slack ---
-      rctrl + shift - m : open -a "Slack"
-      alt + shift - m   : open -a "Slack"
 
       # --- Window Focus (Vim-ish HJKL or WASD) ---
       rctrl - a : yabai -m window --focus west
