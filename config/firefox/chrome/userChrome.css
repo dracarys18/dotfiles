@@ -55,11 +55,20 @@
 #nav-bar {
   --toolbarbutton-padding-inner: 5px;
   --toolbarbutton-padding-outer: 1px;
-  flex-wrap: wrap !important;
+  position: relative;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 6px 8px !important;
+}
+
+/* The buttons wrap into rows inside their own box. Flattening it into
+   #nav-bar with display: contents stops Firefox opening panels anchored to
+   them (Downloads): the button stays [open] with no panel, pinning the
+   toolbox over the page */
+#nav-bar-customization-target {
+  flex: 1 1 100% !important;
+  flex-wrap: wrap !important;
   row-gap: 6px;
 
   &::before {
@@ -69,8 +78,22 @@
   }
 }
 
-#nav-bar-customization-target {
-  display: contents !important;
+/* the two buttons outside that box go on its first row */
+#nav-bar > .titlebar-buttonbox-container {
+  position: absolute !important;
+  top: 6px;
+  left: 8px;
+  height: 26px;
+}
+
+#PanelUI-button {
+  position: absolute !important;
+  top: 6px;
+  right: 8px;
+}
+
+#forward-button {
+  margin-inline-end: 33px !important;
 }
 
 #nav-bar-customization-target > :is(.unified-extensions-item, #unified-extensions-button, #downloads-button) {

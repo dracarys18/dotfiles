@@ -11,6 +11,10 @@
     flavor = "mocha";
     # tmux keeps its pinned catppuccin plugin (programs/tmux.nix)
     tmux.enable = false;
+    # Firefox is styled by its own userChrome.css (firefox.nix); catppuccin's
+    # theme needs the Firefox Color extension and turns off extension storage
+    # in IndexedDB, which would hide every extension's saved settings
+    firefox.enable = false;
   };
 
   programs.nixvim.colorschemes.catppuccin = {

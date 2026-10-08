@@ -23,65 +23,72 @@ let
 
   # obs-save: copy OBS settings into the repo with stream keys and logins
   # blanked. OBS replaces its files on every save, so they can't be links.
-  obsSave = pkgs.writeShellScriptBin "obs-save" ''
-    set -euo pipefail
+  obsSave = pkgs.writeShellApplication {
+    name = "obs-save";
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gnused
+      jq
+    ];
+    text = ''
+      SRC="$HOME/Library/Application Support/obs-studio"
+      DST="$HOME/dotfiles/src/mac/config/obs"
 
-    SRC="$HOME/Library/Application Support/obs-studio"
-    DST="$HOME/dotfiles/src/mac/config/obs"
+      rm -rf "$DST"
+      mkdir -p "$DST"
+      cp "$SRC/global.ini" "$SRC/user.ini" "$DST/"
+      # profiles and scene collections, without OBS's own .bak copies
+      (cd "$SRC" && find basic -type f \( -name '*.ini' -o -name '*.json' \) -print0) |
+          while IFS= read -r -d ''' f; do
+              mkdir -p "$DST/$(dirname "$f")"
+              cp "$SRC/$f" "$DST/$f"
+          done
 
-    rm -rf "$DST"
-    mkdir -p "$DST"
-    cp "$SRC/global.ini" "$SRC/user.ini" "$DST/"
-    # profiles and scene collections, without OBS's own .bak copies
-    (cd "$SRC" && find basic -type f \( -name '*.ini' -o -name '*.json' \) -print0) |
-        while IFS= read -r -d ''' f; do
-            mkdir -p "$DST/$(dirname "$f")"
-            cp "$SRC/$f" "$DST/$f"
-        done
+      # Blank the secrets: stream keys and tokens in JSON, and the Token=,
+      # RefreshToken= and *Password= lines (account logins) in INI files.
+      # OBS may start a file with a byte order mark; drop it.
+      find "$DST" -type f -name '*.json' -print0 | while IFS= read -r -d ''' f; do
+          sed '1s/^\xEF\xBB\xBF//' "$f" | jq --indent 4 --ascii-output '
+              walk(if type == "object" then with_entries(
+                  if (.value | type) == "string"
+                      and (.key | ascii_downcase | IN("key", "password", "token", "bearer_token", "refresh_token", "stream_key"))
+                  then .value = "" else . end
+              ) else . end)' > "$f.tmp"
+          mv "$f.tmp" "$f"
+      done
+      find "$DST" -type f -name '*.ini' -exec \
+          sed -i -E '1s/^\xEF\xBB\xBF//; s/^((Refresh)?Token|[[:alnum:]_]*Password)=.*$/\1=/' {} +
 
-    ${pkgs.python3}/bin/python3 - "$DST" <<'PY'
-    import configparser, json, pathlib, re, sys
+      echo "  saved OBS settings to $DST (secrets blanked)"
+    '';
+  };
 
-    SECRET_JSON_KEYS = {"key", "password", "token", "bearer_token", "refresh_token", "stream_key"}
-
-    def blank(o):
-        if isinstance(o, dict):
-            return {k: "" if k.lower() in SECRET_JSON_KEYS and isinstance(v, str) else blank(v) for k, v in o.items()}
-        if isinstance(o, list):
-            return [blank(v) for v in o]
-        return o
-
-    for p in pathlib.Path(sys.argv[1]).rglob("*"):
-        if p.suffix == ".json":
-            raw = p.read_text(encoding="utf-8-sig")
-            p.write_text(json.dumps(blank(json.loads(raw)), indent=4) + "\n")
-        elif p.suffix == ".ini":
-            # Token=, RefreshToken= and *Password= lines carry account logins
-            text = re.sub(r"(?m)^((?:Refresh)?Token|\w*Password)=.*$", r"\1=", p.read_text(encoding="utf-8-sig"))
-            p.write_text(text)
-    PY
-
-    echo "  saved OBS settings to $DST (secrets blanked)"
-  '';
-
-  # the watcher talks to OBS over obs-websocket, so make sure it's on
-  enableWebsocket = pkgs.writeText "obs-websocket.py" ''
-    import json, os, secrets, sys
-
-    path = sys.argv[1]
-    config = json.load(open(path)) if os.path.exists(path) else {}
-    before = dict(config)
-    config["server_enabled"] = True
-    config["first_load"] = False
-    config.setdefault("server_port", 4455)
-    if not config.get("auth_required") or not config.get("server_password"):
-        config["auth_required"] = True
-        config["server_password"] = secrets.token_urlsafe(24)
-    if config != before:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
-            json.dump(config, f, indent=4)
-  '';
+  # the watcher talks to OBS over obs-websocket, so make sure it's on, with a
+  # password (24 random bytes, URL-safe base64)
+  enableWebsocket = pkgs.writeShellApplication {
+    name = "obs-websocket-enable";
+    runtimeInputs = with pkgs; [
+      coreutils
+      jq
+    ];
+    text = ''
+      config="$1"
+      current=$(cat "$config" 2>/dev/null || echo '{}')
+      password=$(head -c 24 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=')
+      new=$(jq --indent 4 --arg password "$password" '
+          .server_enabled = true
+          | .first_load = false
+          | if has("server_port") then . else .server_port = 4455 end
+          | if (.auth_required | not) or ((.server_password // "") == "")
+            then .auth_required = true | .server_password = $password
+            else . end' <<<"$current")
+      if [ "$new" != "$(jq --indent 4 . <<<"$current")" ]; then
+          mkdir -p "$(dirname "$config")"
+          printf '%s\n' "$new" > "$config"
+      fi
+    '';
+  };
 in
 {
   home.packages = [ obsSave ];
@@ -112,7 +119,7 @@ in
       done
     )
     if ! /usr/bin/pgrep -xq OBS; then
-      run ${pkgs.python3}/bin/python3 ${enableWebsocket} "$obsDir/plugin_config/obs-websocket/config.json"
+      run ${lib.getExe enableWebsocket} "$obsDir/plugin_config/obs-websocket/config.json"
     fi
   '';
 }

@@ -1,6 +1,15 @@
-{ pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
+  # The profile Firefox.app (Homebrew) is locked to in installs.ini; a fresh
+  # Mac gets it created at this path from the profiles.ini below.
+  profilePath = "714unkms.default-release-1790774533806";
+
   # about:config settings, written to the profile's user.js
   prefs = {
     "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -18,15 +27,9 @@ let
     "browser.download.alwaysOpenPanel" = false;
     "browser.startup.page" = 3;
   };
-  userJs = pkgs.writeText "user.js" (
-    lib.concatStrings (
-      lib.mapAttrsToList (k: v: "user_pref(${builtins.toJSON k}, ${builtins.toJSON v});\n") prefs
-    )
-  );
 
-  # Lets Firefox run userChrome .uc.js scripts (like newtab-popup.uc.js):
-  # autoconfig points Firefox at config.js, which loads them. Both live inside
-  # the app, so a Firefox update wipes them; every switch puts them back.
+  # autoconfig points Firefox at config.js, which loads the profile's .uc.js
+  # scripts (like newtab-popup.uc.js)
   autoconfigJs = pkgs.writeText "autoconfig.js" ''
     pref("general.config.filename", "config.js");
     pref("general.config.obscure_value", 0);
@@ -48,32 +51,40 @@ let
       }
     }, "browser-delayed-startup-finished");
   '';
+  inherit (config.programs.firefox) configPath profilesPath;
 in
 {
-  # Firefox's profile folder has a random name, so it can't be a home.file
-  # target. Link chrome/ and user.js into the default-release profile once
-  # it exists, and install the autoconfig loader into the app.
-  home.activation.firefoxProfile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    firefoxDir="$HOME/Library/Application Support/Firefox"
-    profile=$(${pkgs.gawk}/bin/awk -F= '
-      /^\[/ { if (name == "default-release") print path; name = ""; path = "" }
-      $1 == "Name" { name = $2 }
-      $1 == "Path" { path = $2 }
-      END { if (name == "default-release") print path }
-    ' "$firefoxDir/profiles.ini" 2>/dev/null | head -1 || true)
+  # Firefox itself is the Homebrew cask; home-manager writes profiles.ini and
+  # the profile's user.js. No enterprise policies, so it leaves Firefox's
+  # macOS defaults alone.
+  programs.firefox = {
+    enable = true;
+    package = null;
+    darwinDefaultsId = null;
+    profiles.default-release = {
+      id = 0;
+      isDefault = true;
+      path = profilePath;
+      settings = prefs;
+    };
+  };
 
-    linkFirefox() {
-      if [ -e "$2" ] && [ ! -L "$2" ]; then
-        run mv "$2" "$2.before-nix"
-      fi
-      run ln -sfn "$1" "$2"
-    }
+  # `force` replaces what's there without a backup: Firefox rewrites
+  # profiles.ini when its install records change, so home-manager's goes back
+  # on every switch; chrome and user.js were links into the Nix store
+  home.file = {
+    # userChrome.css and the .uc.js scripts the autoconfig below loads
+    "${profilesPath}/${profilePath}/chrome" = {
+      source = ../../../../config/firefox/chrome;
+      force = true;
+    };
+    "${profilesPath}/${profilePath}/user.js".force = true;
+    "${configPath}/profiles.ini".force = true;
+  };
 
-    if [ -n "$profile" ]; then
-      linkFirefox ${../../../../config/firefox/chrome} "$firefoxDir/$profile/chrome"
-      linkFirefox ${userJs} "$firefoxDir/$profile/user.js"
-    fi
-
+  # Lets userChrome .uc.js scripts run. Autoconfig lives inside the app, so a
+  # Firefox update wipes it; every switch puts it back.
+  home.activation.firefoxAutoconfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     app=/Applications/Firefox.app/Contents/Resources
     if [ -d "$app" ]; then
       cmp -s ${autoconfigJs} "$app/defaults/pref/autoconfig.js" || run install -m 644 ${autoconfigJs} "$app/defaults/pref/autoconfig.js"

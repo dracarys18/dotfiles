@@ -4,13 +4,14 @@ let
   user = "karthihegde";
 in
 {
-  # fish from nixpkgs, registered in /etc/shells; the login shell is set below
+  # fish from nixpkgs as the login shell, registered in /etc/shells.
+  # nix-darwin only sets the shell of users it knows; uid and primary group
+  # (gid 20, staff) match the existing account, so nothing else changes.
   programs.fish.enable = true;
   environment.shells = [ pkgs.fish ];
-
-  # Activation runs as root, so dscl sets the shell without a password (unlike chsh)
-  system.activationScripts.postActivation.text = ''
-    echo "setting login shell to nix fish..."
-    dscl . -create /Users/${user} UserShell /run/current-system/sw/bin/fish
-  '';
+  users.knownUsers = [ user ];
+  users.users.${user} = {
+    uid = 501;
+    shell = pkgs.fish;
+  };
 }

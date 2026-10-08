@@ -90,9 +90,9 @@ in
       '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>'
     launchctl asuser "$(id -u -- ${user})" sudo --user=${user} -- \
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-
-    # Never start the screen saver (a per-host setting, which nix-darwin can't set)
-    launchctl asuser "$(id -u -- ${user})" sudo --user=${user} -- \
-      defaults -currentHost write com.apple.screensaver idleTime -int 0
   '';
+
+  # Never start the screen saver. It's a per-host setting, which nix-darwin
+  # can't write but home-manager can.
+  home-manager.users.${user}.targets.darwin.currentHostDefaults."com.apple.screensaver".idleTime = 0;
 }
