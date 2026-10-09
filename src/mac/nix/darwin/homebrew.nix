@@ -1,6 +1,6 @@
 {
-  # GUI apps and the few tools nixpkgs doesn't have for macOS. Anything not
-  # listed here is uninstalled on every switch ("zap" also removes its app data).
+  # GUI apps only; every command-line tool comes from Nix. Anything not listed
+  # here is uninstalled on every switch ("zap" also removes its app data).
   #
   # Keep cargo out of Homebrew and environment.systemPackages: if `brew bundle`
   # can see cargo during activation, its cleanup also runs `cargo uninstall` on
@@ -12,18 +12,6 @@
       autoUpdate = false;
       upgrade = false;
     };
-    taps = [
-      {
-        name = "tsirysndr/tap";
-        trusted = true;
-      }
-    ];
-    brews = [
-      {
-        name = "tsirysndr/tap/fin";
-        trusted = true;
-      }
-    ];
     casks = [
       "1password"
       "1password-cli"
