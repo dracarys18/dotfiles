@@ -249,11 +249,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1791484262,
-        "narHash": "sha256-Vxw5rCAS9Zab3r2Gt0t6w56OYUQy03X+hphsPuzeAUo=",
+        "lastModified": 1791486959,
+        "narHash": "sha256-O4cBa79BAXs9azpF7QWA/PthADGP4OBOU0XUWTntxdA=",
         "ref": "refs/heads/main",
-        "rev": "320114d6ada3188e75175a036458cb7c19aeff85",
-        "revCount": 129,
+        "rev": "180810defeead7a31a336f514f6b6ac868623944",
+        "revCount": 130,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
       },

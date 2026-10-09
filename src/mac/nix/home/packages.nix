@@ -11,6 +11,7 @@
     tokei
     witr
     glow
+    vhs
 
     # editors and languages (neovim comes from programs.nixvim)
     go

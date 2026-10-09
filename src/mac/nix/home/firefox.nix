@@ -55,12 +55,24 @@ let
 in
 {
   # Firefox itself is the Homebrew cask; home-manager writes profiles.ini and
-  # the profile's user.js. No enterprise policies, so it leaves Firefox's
-  # macOS defaults alone.
+  # the profile's user.js, and puts policies in Firefox's macOS defaults
+  # (home-manager's own default domain name has a stray ".plist")
   programs.firefox = {
     enable = true;
     package = null;
-    darwinDefaultsId = null;
+    darwinDefaultsId = "org.mozilla.firefox";
+    # email links go to Gmail; only mailto changes, every other handler stays
+    # as set in Firefox
+    policies.Handlers.schemes.mailto = {
+      action = "useHelperApp";
+      ask = false;
+      handlers = [
+        {
+          name = "Gmail";
+          uriTemplate = "https://mail.google.com/mail/?extsrc=mailto&url=%s";
+        }
+      ];
+    };
     profiles.default-release = {
       id = 0;
       isDefault = true;
@@ -90,5 +102,10 @@ in
       cmp -s ${autoconfigJs} "$app/defaults/pref/autoconfig.js" || run install -m 644 ${autoconfigJs} "$app/defaults/pref/autoconfig.js"
       cmp -s ${configJs} "$app/config.js" || run install -m 644 ${configJs} "$app/config.js"
     fi
+  '';
+
+  # Email links open Firefox (which sends them to Gmail) instead of Apple Mail
+  home.activation.firefoxMailto = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run ${lib.getExe pkgs.duti} -s org.mozilla.firefox mailto
   '';
 }
