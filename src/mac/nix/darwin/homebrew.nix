@@ -12,23 +12,17 @@
       autoUpdate = false;
       upgrade = false;
     };
+    # Everything here is missing from nixpkgs (1Password, Sony, Telegram's
+    # native Mac app) or not available for macOS in nixpkgs
+    # (ghostty, kde-connect, obs, vicinae). Command-line tools, Firefox,
+    # Signal, Spotify, Vesktop, Maccy and Jellyfin come from Nix.
     casks = [
       "1password"
-      "1password-cli"
-      "adobe-acrobat-reader"
-      "android-platform-tools"
-      "claude-code@latest"
-      "firefox"
       "ghostty"
       "kde-connect"
-      "maccy"
       "obs"
-      "signal"
       "sony-ps-remote-play"
-      "spotify"
-      "tailscale-app"
       "telegram"
-      "vesktop"
       "vicinae"
     ];
     # Mac App Store apps (needs you signed in to the App Store)

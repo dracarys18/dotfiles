@@ -48,11 +48,19 @@
     docker-credential-helpers
     kubectl
 
-    # apps
+    # apps (moved out of Homebrew)
     chatterino2
+    android-tools # adb and fastboot
+    maccy
+    signal-desktop
+    spotify
+    vesktop
+    # jellyfin-desktop stays a hand build: nixpkgs' qtwebengine fails to
+    # compile on aarch64-darwin (Chromium's abseil vs libc++ headers)
 
     # network and misc
     gh
+    _1password-cli
     gnupg
     gnused
     wget

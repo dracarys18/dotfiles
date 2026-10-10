@@ -6,8 +6,7 @@
 }:
 
 let
-  # The profile Firefox.app (Homebrew) is locked to in installs.ini; a fresh
-  # Mac gets it created at this path from the profiles.ini below.
+  # The profile in profiles.ini below; an existing Mac already has it
   profilePath = "714unkms.default-release-1790774533806";
 
   # about:config settings, written to the profile's user.js
@@ -28,38 +27,40 @@ let
     "browser.startup.page" = 3;
   };
 
-  # autoconfig points Firefox at config.js, which loads the profile's .uc.js
-  # scripts (like newtab-popup.uc.js)
-  autoconfigJs = pkgs.writeText "autoconfig.js" ''
-    pref("general.config.filename", "config.js");
-    pref("general.config.obscure_value", 0);
-    pref("general.config.sandbox_enabled", false);
-  '';
-  configJs = pkgs.writeText "config.js" ''
-    //
-    const manifest = Services.dirsvc.get("UChrm", Ci.nsIFile);
-    manifest.append("chrome.manifest");
-    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).autoRegister(manifest);
+  # Firefox with the autoconfig baked in: it loads the profile's .uc.js scripts
+  # (like newtab-popup.uc.js) at startup. nixpkgs' wrapper writes these into
+  # the app in the store, so the loader survives Firefox updates, unlike the
+  # copy the old /Applications install needed on every switch.
+  firefox = pkgs.firefox.override {
+    # plain string concatenation: the wrapper writes mozilla.cfg through an
+    # unquoted shell heredoc, which eats backticks and $ in template literals
+    extraPrefs = ''
+      const manifest = Services.dirsvc.get("UChrm", Ci.nsIFile);
+      manifest.append("chrome.manifest");
+      Components.manager.QueryInterface(Ci.nsIComponentRegistrar).autoRegister(manifest);
 
-    Services.obs.addObserver((window) => {
-      const entries = Services.dirsvc.get("UChrm", Ci.nsIFile).directoryEntries;
-      while (entries.hasMoreElements()) {
-        const name = entries.nextFile.leafName;
-        if (name.endsWith(".uc.js")) {
-          Services.scriptloader.loadSubScript(`chrome://userchromejs/content/''${name}`, window);
+      Services.obs.addObserver((window) => {
+        const entries = Services.dirsvc.get("UChrm", Ci.nsIFile).directoryEntries;
+        while (entries.hasMoreElements()) {
+          const name = entries.nextFile.leafName;
+          if (name.endsWith(".uc.js")) {
+            Services.scriptloader.loadSubScript("chrome://userchromejs/content/" + name, window);
+          }
         }
-      }
-    }, "browser-delayed-startup-finished");
-  '';
+      }, "browser-delayed-startup-finished");
+    '';
+    # autoconfig runs in a sandbox by default; the script above uses Services
+    extraAutoConfig = ''pref("general.config.sandbox_enabled", false);'';
+  };
+
   inherit (config.programs.firefox) configPath profilesPath;
 in
 {
-  # Firefox itself is the Homebrew cask; home-manager writes profiles.ini and
-  # the profile's user.js, and puts policies in Firefox's macOS defaults
-  # (home-manager's own default domain name has a stray ".plist")
   programs.firefox = {
     enable = true;
-    package = null;
+    package = firefox;
+    # policies land in Firefox's macOS defaults too (home-manager's own
+    # default domain name has a stray ".plist"), so `about:policies` shows them
     darwinDefaultsId = "org.mozilla.firefox";
     # email links go to Gmail; only mailto changes, every other handler stays
     # as set in Firefox
@@ -85,7 +86,7 @@ in
   # profiles.ini when its install records change, so home-manager's goes back
   # on every switch; chrome and user.js were links into the Nix store
   home.file = {
-    # userChrome.css and the .uc.js scripts the autoconfig below loads
+    # userChrome.css and the .uc.js scripts the autoconfig above loads
     "${profilesPath}/${profilePath}/chrome" = {
       source = ../../../../config/firefox/chrome;
       force = true;
@@ -93,16 +94,6 @@ in
     "${profilesPath}/${profilePath}/user.js".force = true;
     "${configPath}/profiles.ini".force = true;
   };
-
-  # Lets userChrome .uc.js scripts run. Autoconfig lives inside the app, so a
-  # Firefox update wipes it; every switch puts it back.
-  home.activation.firefoxAutoconfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    app=/Applications/Firefox.app/Contents/Resources
-    if [ -d "$app" ]; then
-      cmp -s ${autoconfigJs} "$app/defaults/pref/autoconfig.js" || run install -m 644 ${autoconfigJs} "$app/defaults/pref/autoconfig.js"
-      cmp -s ${configJs} "$app/config.js" || run install -m 644 ${configJs} "$app/config.js"
-    fi
-  '';
 
   # Email links open Firefox (which sends them to Gmail) instead of Apple Mail
   home.activation.firefoxMailto = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
