@@ -40,7 +40,9 @@
     };
     # Apple Intelligence off and its models deleted (darwin/intelligence.nix).
     # Keeps its own nixpkgs: pared needs Swift 6.2.4, 26.05 has 5.10.
-    pared.url = "github:4evy/pared";
+    # Pinned: 2.2.0 doesn't compile (Swift can't type-check an expression in
+    # Sources/Pared/gui/runner.swift); move to a newer tag once that's fixed.
+    pared.url = "github:4evy/pared/2.1.0";
     # private repo, fetched over SSH; `make switch` fetches it as you first,
     # because root (which runs the switch) can't use your 1Password SSH agent
     uji = {

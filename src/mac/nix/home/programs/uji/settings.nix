@@ -23,7 +23,14 @@
         enable = true;
         settings.editor = "nvim";
       };
-      websearch.enable = true;
+      websearch = {
+        enable = true;
+        # my own SearXNG, on the tailnet
+        settings = {
+          backend = "searxng";
+          url = "https://search.karthihegde.dev";
+        };
+      };
       mcp.enable = true;
       skills = {
         enable = true;

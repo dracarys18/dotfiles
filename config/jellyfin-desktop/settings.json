@@ -7,6 +7,6 @@
 	"windowScale":	2,
 	"windowX":	2304,
 	"windowY":	0,
-	"windowMaximized":	true,
+	"windowMaximized":	false,
 	"audioChannels":	"stereo"
 }
