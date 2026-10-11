@@ -16,6 +16,13 @@
   home.homeDirectory = "/Users/karthihegde";
   home.stateVersion = "26.05";
 
+  # Symlink apps into ~/Applications instead of home-manager's default, which
+  # copies 1.4 GB of app bundles there on every switch. The copies also made
+  # every app exist twice (store + copy), so LaunchServices had two Firefoxes
+  # and Firefox treated each path as its own installation.
+  targets.darwin.copyApps.enable = false;
+  targets.darwin.linkApps.enable = true;
+
   programs.nixvim = {
     enable = true;
     defaultEditor = true;
