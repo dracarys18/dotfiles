@@ -52,9 +52,11 @@
     chatterino2
     android-tools # adb and fastboot
     maccy
-    signal-desktop
     spotify
     vesktop
+    # signal-desktop stays a cask for now: nixpkgs ships 8.29.0, which can't
+    # read a database migrated by 8.30.0 (schema 1830 vs its 1800). Its own
+    # updater keeps the cask current; move it back to Nix once nixpkgs >= 8.30
     # jellyfin-desktop stays a hand build: nixpkgs' qtwebengine fails to
     # compile on aarch64-darwin (Chromium's abseil vs libc++ headers)
 

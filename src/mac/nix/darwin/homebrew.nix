@@ -21,6 +21,9 @@
       "ghostty"
       "kde-connect"
       "obs"
+      # 8.30.0: nixpkgs' 8.29.0 can't open a DB its schema 1830 migration
+      # produced (see home/packages.nix). Self-updating, so it stays current.
+      "signal"
       "sony-ps-remote-play"
       "telegram"
       "vicinae"
