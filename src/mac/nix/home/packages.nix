@@ -52,6 +52,7 @@
     chatterino2
     android-tools # adb and fastboot
     maccy
+    obsidian
     spotify
     vesktop
     # signal-desktop stays a cask for now: nixpkgs ships 8.29.0, which can't
@@ -63,6 +64,8 @@
     # network and misc
     gh
     _1password-cli
+    sops
+    age
     gnupg
     gnused
     wget

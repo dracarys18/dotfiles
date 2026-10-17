@@ -183,6 +183,7 @@
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
         "pared": "pared",
+        "sops-nix": "sops-nix",
         "tmux-catppuccin": "tmux-catppuccin",
         "uji": "uji",
         "uji-plugins": "uji-plugins",
@@ -207,6 +208,26 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792056300,
+        "narHash": "sha256-YU1LjDe1o2Ymg5zEiCHbmMXLkDCtxHQRiVqZ3nC5GGk=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "44931708c62937c2b1bf7953902989fa5bb9ee1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
         "type": "github"
       }
     },
@@ -250,11 +271,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1791922357,
-        "narHash": "sha256-VkBI4icKjKWjPxds2oO1fis7bLJaY9P6ooIDwL4y8os=",
+        "lastModified": 1792240664,
+        "narHash": "sha256-znoceG2KrlLhqSQ7p4a18F/75ny1R5yO4jACIMeseZ0=",
         "ref": "refs/heads/main",
-        "rev": "b4ad0e0e0b3d13102cc71312da4bae2b3b9dd992",
-        "revCount": 151,
+        "rev": "bab4e7eff04774e327efe1d7f3f95fcb569db188",
+        "revCount": 162,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
       },

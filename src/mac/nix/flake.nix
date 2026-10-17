@@ -51,6 +51,11 @@
     };
     # typed options for its plugins (home/programs/uji)
     uji-plugins.url = "git+ssh://git@github.com/uji-labs/uji-plugins";
+    # SOPS-encrypted secrets, age key on this Mac (darwin/secrets.nix)
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

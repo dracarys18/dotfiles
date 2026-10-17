@@ -9,6 +9,7 @@
     ./catppuccin.nix
     ./files.nix
     ./firefox.nix
+    ./llama-cpp.nix
     ./obs.nix
   ];
 

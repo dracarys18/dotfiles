@@ -21,6 +21,15 @@
       # up/down search history by the prefix already typed
       bind up history-prefix-search-backward
       bind down history-prefix-search-forward
+
+      # Secrets from sops-nix (darwin/secrets.nix), decrypted into /run/secrets
+      # at switch and at boot; only export the ones that are there
+      for secret in litellm/api_key:LITELLM_API_KEY litellm/base_url:LITELLM_BASE_URL
+          set -l parts (string split : $secret)
+          if test -r /run/secrets/$parts[1]
+              set -gx $parts[2] (cat /run/secrets/$parts[1])
+          end
+      end
     '';
 
     # Homebrew is managed by Nix (darwin/homebrew.nix); anything installed by

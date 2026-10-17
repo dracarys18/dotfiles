@@ -11,6 +11,7 @@ in
     ./defaults.nix
     ./debloat.nix
     ./intelligence.nix
+    ./secrets.nix
     ./yabai.nix
   ];
 

@@ -25,6 +25,17 @@ let
     # the page; the downloads button still shows progress
     "browser.download.alwaysOpenPanel" = false;
     "browser.startup.page" = 3;
+
+    # Memory: with defaults this session had 26 processes and 6.4 GB resident.
+    # Fewer content processes (8 -> 4), fewer back/forward pages kept alive,
+    # and smaller disk/media caches. Needs a Firefox restart to take effect.
+    "dom.ipc.processCount" = 4;
+    "browser.sessionhistory.max_total_viewers" = 2;
+    "browser.cache.memory.capacity" = 65536; # KB, 64 MB
+    "media.cache_size" = 131072; # KB, 128 MB (default 512 MB)
+    # macOS memory pressure still unloads tabs, but sooner than 10 minutes
+    "browser.tabs.unloadOnLowMemory" = true;
+    "browser.tabs.min_inactive_duration_before_unload" = 300000;
   };
 
   # Firefox with the autoconfig baked in: it loads the profile's .uc.js scripts
