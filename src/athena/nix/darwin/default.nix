@@ -33,6 +33,13 @@ in
     overrideLocalDns = true;
   };
 
+  # The name this Mac answers to: hostname, Bonjour name and the UI name
+  networking = {
+    hostName = "athena";
+    localHostName = "athena";
+    computerName = "athena";
+  };
+
   # DNS override applies to the services listed here; with the list empty
   # nix-darwin warns and changes nothing
   networking.knownNetworkServices = [

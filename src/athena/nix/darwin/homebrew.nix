@@ -13,12 +13,12 @@
       upgrade = false;
     };
     # Everything here is missing from nixpkgs (1Password, Sony, Telegram's
-    # native Mac app) or not available for macOS in nixpkgs
-    # (ghostty, kde-connect, obs, vicinae). Command-line tools, Firefox,
-    # Signal, Spotify, Vesktop, Maccy and Jellyfin come from Nix.
+    # native Mac app) or not available for macOS in nixpkgs (kde-connect, obs,
+    # vicinae — the source ghostty is Linux-only, ghostty-bin comes from Nix).
+    # Command-line tools, Firefox, Signal, Spotify, Vesktop, Maccy, Ghostty and
+    # Jellyfin come from Nix.
     casks = [
       "1password"
-      "ghostty"
       "kde-connect"
       "obs"
       # 8.30.0: nixpkgs' 8.29.0 can't open a DB its schema 1830 migration

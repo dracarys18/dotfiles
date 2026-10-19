@@ -17,6 +17,8 @@
     go
     nodejs
     bun
+    # no python3 from nixpkgs on purpose: uv owns the interpreter and
+    # `uv python install 3.13 --default` shims ~/.local/bin/python3 at it
     uv
     zig
     opam

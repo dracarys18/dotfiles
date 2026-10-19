@@ -1,7 +1,14 @@
+{ pkgs, ... }:
+
 {
+  # nixpkgs' source build of ghostty is Linux-only; ghostty-bin is the macOS
+  # bundle, and setting package here both installs it and links it into
+  # ~/Applications/Home Manager Apps (see darwin/defaults.nix for the Dock entry)
   programs.ghostty = {
     enable = true;
-    package = null; # the app comes from the Homebrew cask
+    package = pkgs.ghostty-bin;
+    # no vim here (Neovim is nixvim), so don't pull ghostty's vim plugin in
+    installVimSyntax = false;
     # theme comes from catppuccin/nix (../catppuccin.nix)
     settings = {
       font-family = "Hasklug Nerd Font";

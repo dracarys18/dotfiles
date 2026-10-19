@@ -3,7 +3,7 @@
 
 SHELL := /bin/bash
 ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-FLAKE := $(ROOT)/src/mac/nix
+FLAKE := $(ROOT)/src/athena/nix
 NIX_BIN := /nix/var/nix/profiles/default/bin/nix
 NIX := $(NIX_BIN) --extra-experimental-features 'nix-command flakes'
 REBUILD := /run/current-system/sw/bin/darwin-rebuild

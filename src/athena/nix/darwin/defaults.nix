@@ -33,9 +33,13 @@ in
       mru-spaces = false;
       show-recents = false;
       expose-animation-duration = 0.1;
+      # the Dock resolves these and stores the store path it lands on, so the
+      # entry must be a path that survives a switch: /Applications/Firefox.app
+      # is long gone (Firefox comes from Nix now), which is what left a "?" on
+      # the Dock after every rebuild
       persistent-apps = [
-        "/Applications/Ghostty.app"
-        "/Applications/Firefox.app"
+        "/Users/${user}/Applications/Home Manager Apps/Ghostty.app"
+        "/Users/${user}/Applications/Home Manager Apps/Firefox.app"
       ];
     };
     finder = {

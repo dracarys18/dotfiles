@@ -42,8 +42,8 @@
         switch "$argv[1]"
             case install reinstall uninstall remove rm upgrade tap untap link unlink pin unpin bundle services trust
                 echo "brew $argv[1]: Homebrew is managed by Nix." >&2
-                echo "  apps: homebrew.casks in ~/dotfiles/src/mac/nix/darwin/homebrew.nix" >&2
-                echo "  CLI tools: home.packages in ~/dotfiles/src/mac/nix/home/packages.nix" >&2
+                echo "  apps: homebrew.casks in ~/dotfiles/src/athena/nix/darwin/homebrew.nix" >&2
+                echo "  CLI tools: home.packages in ~/dotfiles/src/athena/nix/home/packages.nix" >&2
                 echo "then run: make switch   (or `command brew ...` to bypass)" >&2
                 return 1
         end
@@ -57,7 +57,7 @@
       description = "Explain that a tool belongs in Nix";
       body = ''
         echo "$argv[1]: installs outside Nix. Add the tool to home.packages in" >&2
-        echo "  ~/dotfiles/src/mac/nix/home/packages.nix, then run: make switch" >&2
+        echo "  ~/dotfiles/src/athena/nix/home/packages.nix, then run: make switch" >&2
         echo "  (or `command $argv[1] ...` to bypass)" >&2
         return 1
       '';
@@ -102,6 +102,24 @@
             return 1
         end
         command npm $argv
+      '';
+    };
+
+    # Apple's pip3 installs into the Xcode 3.9 user site (~/Library/Python);
+    # python is uv's alone now, so point installs at uv instead
+    functions.pip3 = {
+      wraps = "pip3";
+      description = "pip3, redirected to uv";
+      body = ''
+        if contains -- "$argv[1]" install i add download
+            echo "pip3: that pip belongs to Xcode's Python 3.9. Use uv:" >&2
+            echo "  uv add <pkg>          project dependency" >&2
+            echo "  uv pip install <pkg>  inside a uv venv" >&2
+            echo "  uv tool install <pkg> CLI tools" >&2
+            echo "  (or `command pip3 ...` to bypass)" >&2
+            return 1
+        end
+        command pip3 $argv
       '';
     };
 

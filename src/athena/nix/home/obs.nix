@@ -33,7 +33,7 @@ let
     ];
     text = ''
       SRC="$HOME/Library/Application Support/obs-studio"
-      DST="$HOME/dotfiles/src/mac/config/obs"
+      DST="$HOME/dotfiles/src/athena/config/obs"
 
       rm -rf "$DST"
       mkdir -p "$DST"
