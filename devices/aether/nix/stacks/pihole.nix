@@ -49,7 +49,7 @@ in
         # cloudflared below, at 172.27.0.3
         FTLCONF_dns_upstreams = "172.27.0.3#5054";
       };
-      # FTLCONF_webserver_api_password is a secret: src/aether/nix/secrets/pihole.env
+      # FTLCONF_webserver_api_password is a secret: devices/aether/nix/secrets/pihole.env
       environmentFiles = [ config.sops.secrets."pihole".path ];
       volumes = [ "${d}/etc-pihole:/etc/pihole" ];
       ports = [

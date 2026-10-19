@@ -22,7 +22,7 @@ in
       hash = "sha256-UPd4CWjm8Cq5EZ9OkBCglE23hD8+przFBSw8Ey6zMz8=";
     };
 
-    # CF_API_TOKEN comes from sops: src/aether/nix/secrets/caddy.env
+    # CF_API_TOKEN comes from sops: devices/aether/nix/secrets/caddy.env
     environmentFile = config.sops.secrets."caddy".path;
 
     globalConfig = ''

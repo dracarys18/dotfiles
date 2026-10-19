@@ -12,21 +12,19 @@
       autoUpdate = false;
       upgrade = false;
     };
-    # Everything here is missing from nixpkgs (1Password, Sony, Telegram's
-    # native Mac app) or not available for macOS in nixpkgs (kde-connect, obs,
-    # vicinae — the source ghostty is Linux-only, ghostty-bin comes from Nix).
-    # Command-line tools, Firefox, Signal, Spotify, Vesktop, Maccy, Ghostty and
-    # Jellyfin come from Nix.
+    # Only things nixpkgs can't provide at all: 1Password, Sony's Remote Play,
+    # Telegram's native Mac app and (until 8.30 lands) Signal. OBS, KDE Connect,
+    # Vicinae and Ghostty have no darwin build in nixpkgs, so they are packaged
+    # from their upstream DMGs in darwin/apps/ and installed by home-manager.
     casks = [
       "1password"
-      "kde-connect"
-      "obs"
       # 8.30.0: nixpkgs' 8.29.0 can't open a DB its schema 1830 migration
       # produced (see home/packages.nix). Self-updating, so it stays current.
       "signal"
+      # a .pkg installer served from an unversioned url with `sha256: no_check`
+      # upstream, so there is nothing worth pinning in Nix
       "sony-ps-remote-play"
       "telegram"
-      "vicinae"
     ];
     # Mac App Store apps (needs you signed in to the App Store)
     masApps = {

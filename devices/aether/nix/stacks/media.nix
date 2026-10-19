@@ -91,7 +91,7 @@ in
         TS_OUTBOUND_HTTP_PROXY_LISTEN = ":8118";
         TS_USERSPACE = "true";
       };
-      # TS_AUTHKEY comes from sops: src/aether/nix/secrets/media.env
+      # TS_AUTHKEY comes from sops: devices/aether/nix/secrets/media.env
       environmentFiles = [ config.sops.secrets."media".path ];
       volumes = [
         "${d}/config/tailscale:/var/lib/tailscale"

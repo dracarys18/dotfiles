@@ -56,7 +56,7 @@
   # stacks publish host ports; the firewall opens each one in its own module
   networking.firewall.enable = true;
 
-  # One SOPS-encrypted dotenv file per stack (src/aether/nix/secrets/<stack>.env),
+  # One SOPS-encrypted dotenv file per stack (devices/aether/nix/secrets/<stack>.env),
   # decrypted at activation into /run/secrets/<stack> and handed to the
   # container as an environment file. Same age key as the Mac; put it at
   # /var/lib/sops-nix/key.txt on aether.
@@ -88,7 +88,7 @@
   # here now, one directory per stack, created by that stack's module
   environment.etc."stacks/README".text = ''
     /var/lib/stacks/<stack>/  persistent data, one dir per stack
-    secrets come from sops: src/aether/nix/secrets/<stack>.env -> /run/secrets/<stack>
+    secrets come from sops: devices/aether/nix/secrets/<stack>.env -> /run/secrets/<stack>
   '';
 
   system.stateVersion = "26.05";

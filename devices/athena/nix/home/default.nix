@@ -11,6 +11,7 @@
     ./firefox.nix
     ./llama-cpp.nix
     ./obs.nix
+    ./autostart.nix
   ];
 
   home.username = "karthihegde";

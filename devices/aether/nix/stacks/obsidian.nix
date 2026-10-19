@@ -17,7 +17,7 @@ in
     image = "couchdb:3.5";
     user = "5984:5984";
     environment.COUCHDB_USER = "obsidian_admin";
-    # COUCHDB_PASSWORD is a secret: src/aether/nix/secrets/obsidian.env
+    # COUCHDB_PASSWORD is a secret: devices/aether/nix/secrets/obsidian.env
     environmentFiles = [ config.sops.secrets."obsidian".path ];
     volumes = [
       "${d}/couchdb-data:/opt/couchdb/data"

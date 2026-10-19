@@ -51,6 +51,9 @@
     kubectl
 
     # apps (moved out of Homebrew)
+    (pkgs.callPackage ../darwin/apps/obs.nix { })
+    (pkgs.callPackage ../darwin/apps/kde-connect.nix { })
+    (pkgs.callPackage ../darwin/apps/vicinae.nix { })
     chatterino2
     android-tools # adb and fastboot
     maccy

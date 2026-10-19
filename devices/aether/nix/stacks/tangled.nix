@@ -39,7 +39,7 @@ in
         KNOT_SERVER_INTERNAL_LISTEN_ADDR = "127.0.0.1:5444";
         KNOT_SERVER_DB_PATH = "/home/git/database/knotserver.db";
       };
-      # KNOT_SERVER_SECRET is a secret: src/aether/nix/secrets/tangled.env
+      # KNOT_SERVER_SECRET is a secret: devices/aether/nix/secrets/tangled.env
       environmentFiles = [ config.sops.secrets."tangled".path ];
       volumes = [
         "${d}/knot-data:/knot"
@@ -51,7 +51,7 @@ in
     tangled-tunnel = {
       image = "cloudflare/cloudflared:latest";
       cmd = [ "tunnel" "run" ];
-      # TUNNEL_TOKEN is a secret: src/aether/nix/secrets/tangled.env
+      # TUNNEL_TOKEN is a secret: devices/aether/nix/secrets/tangled.env
       environmentFiles = [ config.sops.secrets."tangled".path ];
     };
   };

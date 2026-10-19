@@ -27,7 +27,7 @@ in
         "--no-autoupdate"
         "run"
       ];
-      # TUNNEL_TOKEN is a secret: src/aether/nix/secrets/opengist.env
+      # TUNNEL_TOKEN is a secret: devices/aether/nix/secrets/opengist.env
       environmentFiles = [ config.sops.secrets."opengist".path ];
     };
   };
