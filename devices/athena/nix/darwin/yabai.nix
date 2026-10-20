@@ -142,26 +142,30 @@ in
       alt - 9   : yabai -m space --focus 9
 
       # --- Open Apps ---
-      rctrl + shift - g : open -a "Ghostty"
-      alt + shift - g   : open -a "Ghostty"
+      # full paths, not names: `open -a <name>` resolves through LaunchServices,
+      # which keeps every store path an app was ever launched from registered,
+      # so the pick can be an outdated copy or another running instance that
+      # shows up as its own Dock tile
+      rctrl + shift - g : open -a "$HOME/Applications/Home Manager Apps/Ghostty.app"
+      alt + shift - g   : open -a "$HOME/Applications/Home Manager Apps/Ghostty.app"
 
-      rctrl + shift - z : open -a "Firefox"
-      alt + shift - z   : open -a "Firefox"
+      rctrl + shift - z : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"
+      alt + shift - z   : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"
 
-      rctrl + shift - s : open -a "Signal"
-      alt + shift - s   : open -a "Signal"
+      rctrl + shift - s : open -a "/Applications/Signal.app"
+      alt + shift - s   : open -a "/Applications/Signal.app"
 
-      rctrl + shift - d : open -a "Vesktop"
-      alt + shift - d   : open -a "Vesktop"
+      rctrl + shift - d : open -a "$HOME/Applications/Home Manager Apps/Vesktop.app"
+      alt + shift - d   : open -a "$HOME/Applications/Home Manager Apps/Vesktop.app"
 
-      rctrl + shift - t : open -a "Telegram"
-      alt + shift - t   : open -a "Telegram"
+      rctrl + shift - t : open -a "/Applications/Telegram.app"
+      alt + shift - t   : open -a "/Applications/Telegram.app"
 
-      rctrl + shift - p : open -a "Spotify"
-      alt + shift - p   : open -a "Spotify"
+      rctrl + shift - p : open -a "$HOME/Applications/Home Manager Apps/Spotify.app"
+      alt + shift - p   : open -a "$HOME/Applications/Home Manager Apps/Spotify.app"
 
-      rctrl + shift - o : open -a "OBS"
-      alt + shift - o   : open -a "OBS"
+      rctrl + shift - o : open -a "$HOME/Applications/Home Manager Apps/OBS.app"
+      alt + shift - o   : open -a "$HOME/Applications/Home Manager Apps/OBS.app"
 
       # --- Send focused window to space (and follow) ---
       rctrl + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1

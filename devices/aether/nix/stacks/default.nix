@@ -2,6 +2,7 @@
 # compose files so service-to-service hostnames keep resolving.
 {
   imports = [
+    ./adguardhome.nix
     ./authelia.nix
     ./caddy.nix
     ./cartero.nix
@@ -15,7 +16,6 @@
     ./media.nix
     ./obsidian.nix
     ./opengist.nix
-    ./pihole.nix
     ./portainer.nix
     ./searchxng.nix
     ./stirling.nix

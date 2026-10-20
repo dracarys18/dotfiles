@@ -33,13 +33,17 @@ in
       mru-spaces = false;
       show-recents = false;
       expose-animation-duration = 0.1;
-      # the Dock resolves these and stores the store path it lands on, so the
-      # entry must be a path that survives a switch: /Applications/Firefox.app
-      # is long gone (Firefox comes from Nix now), which is what left a "?" on
-      # the Dock after every rebuild
+      # activation rewrites this whole array, so every app pinned by hand is
+      # lost on the next switch: the list here is the Dock. Entries point at
+      # the Home Manager app dir rather than a store path, or the "?" comes
+      # back as soon as the store path behind it is collected
       persistent-apps = [
         "/Users/${user}/Applications/Home Manager Apps/Ghostty.app"
+        "/Users/${user}/Applications/Home Manager Apps/Vesktop.app"
+        "/Applications/Signal.app"
+        "/Users/${user}/Applications/Home Manager Apps/Spotify.app"
         "/Users/${user}/Applications/Home Manager Apps/Firefox.app"
+        "/Applications/Telegram.app"
       ];
     };
     finder = {

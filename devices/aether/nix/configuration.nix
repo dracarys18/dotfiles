@@ -11,7 +11,7 @@
     ./stacks
   ];
 
-  # every stack runs rootful (system-level) podman: pihole needs :53, and
+  # every stack runs rootful (system-level) podman: adguardhome needs :53, and
   # dockerSocket is what glance, homepage and portainer talk to
   virtualisation.podman = {
     enable = true;
@@ -74,7 +74,6 @@
       "obsidian"
       "opengist"
       "outline"
-      "pihole"
       "searchxng"
       "tangled"
     ] (name: {
