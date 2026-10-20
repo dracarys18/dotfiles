@@ -52,6 +52,27 @@ in
     "iPhone USB"
   ];
 
+  # Homebrew is installed and pinned by Nix (flake input), not by the upstream
+  # script: /opt/homebrew becomes a managed prefix, and the official taps come
+  # from the lockfile. `brew` still installs the casks listed in
+  # darwin/homebrew.nix; this only owns brew itself.
+  nix-homebrew = {
+    enable = true;
+    inherit user;
+    # the existing /opt/homebrew was installed by the upstream script; move it
+    # under nix-homebrew's management instead of asking for a reinstall
+    autoMigrate = true;
+    # no Rosetta: everything here is aarch64 (no Intel-only casks)
+    enableRosetta = false;
+    # declarative taps; `mutableTaps = false` means `brew tap` is rejected, so
+    # what the flake locks is what brew has
+    mutableTaps = false;
+    taps = {
+      "homebrew/homebrew-core" = inputs.homebrew-core;
+      "homebrew/homebrew-cask" = inputs.homebrew-cask;
+    };
+  };
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"

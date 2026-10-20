@@ -7,6 +7,7 @@
     ./programs
     ./packages.nix
     ./catppuccin.nix
+    ./vesktop.nix
     ./files.nix
     ./firefox.nix
     ./llama-cpp.nix

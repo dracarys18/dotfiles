@@ -12,7 +12,6 @@
     ./starship.nix
     ./tmux.nix
     ./uji
-    ./vesktop.nix
     ./zoxide.nix
   ];
 }

@@ -26,6 +26,12 @@
         owner = "karthihegde";
         mode = "0400";
       };
+      # DeepSeek API key for CodeCompanion's inline interaction
+      # (home/nvim/plugins/ai.nix reads /run/secrets/deepseek/api_key)
+      "deepseek/api_key" = {
+        owner = "karthihegde";
+        mode = "0400";
+      };
     };
   };
 }

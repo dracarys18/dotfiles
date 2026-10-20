@@ -12,6 +12,7 @@
     ./plugins/lsp.nix
     ./plugins/treesitter.nix
     ./plugins/lang.nix
+    ./plugins/ai.nix
     ./plugins/dap.nix
   ];
 }

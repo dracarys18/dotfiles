@@ -37,11 +37,13 @@ in
       # lost on the next switch: the list here is the Dock. Entries point at
       # the Home Manager app dir rather than a store path, or the "?" comes
       # back as soon as the store path behind it is collected
+      # only Ghostty and Firefox are still home-manager apps; everything else on
+      # the Dock is a cask now, so it lives in /Applications
       persistent-apps = [
         "/Users/${user}/Applications/Home Manager Apps/Ghostty.app"
-        "/Users/${user}/Applications/Home Manager Apps/Vesktop.app"
+        "/Applications/Vesktop.app"
         "/Applications/Signal.app"
-        "/Users/${user}/Applications/Home Manager Apps/Spotify.app"
+        "/Applications/Spotify.app"
         "/Users/${user}/Applications/Home Manager Apps/Firefox.app"
         "/Applications/Telegram.app"
       ];

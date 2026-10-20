@@ -3,6 +3,9 @@
 # doesn't cover, so its catppuccin colorscheme is set here too.
 { inputs, ... }:
 
+let
+  theme = import ./themes.nix;
+in
 {
   imports = [ inputs.catppuccin.homeModules.catppuccin ];
 
@@ -15,6 +18,10 @@
     # theme needs the Firefox Color extension and turns off extension storage
     # in IndexedDB, which would hide every extension's saved settings
     firefox.enable = false;
+    # Vesktop is themed by home/vesktop.nix: catppuccin's Discord theme paints
+    # real `background` properties on elements, so it beats the --background-*
+    # variables that QuickCSS sets and the result is catppuccin, not black
+    vesktop.enable = false;
   };
 
   programs.nixvim.colorschemes.catppuccin = {
@@ -38,14 +45,17 @@
         properties = [ ];
         types = [ ];
       };
-      # crust (mocha's darkest) as the background everywhere
+      # backgrounds come from home/themes.nix
       color_overrides.mocha = {
-        base = "#11111b";
-        mantle = "#11111b";
+        base = theme.bg;
+        mantle = theme.bg;
+        crust = theme.bg;
+        surface0 = theme.bgHighlight;
+        surface1 = theme.bgHighlight;
+        surface2 = theme.border;
       };
-      # mocha's pink and surface2
       highlight_overrides.mocha = {
-        TabLineSel.bg = "#f5c2e7";
+        TabLineSel.bg = theme.accentAlt;
         CmpBorder.fg = "#585b70";
         Pmenu.bg = "NONE";
         TelescopeBorder.link = "FloatBorder";

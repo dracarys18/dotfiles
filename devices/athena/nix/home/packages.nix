@@ -68,17 +68,12 @@ in
     docker-credential-helpers
     kubectl
 
-    # apps (moved out of Homebrew)
-    (pkgs.callPackage ../darwin/apps/obs.nix { })
-    (pkgs.callPackage ../darwin/apps/kde-connect.nix { })
-    (pkgs.callPackage ../darwin/apps/vicinae.nix { })
-
-    chatterino2
     android-tools # adb and fastboot
-    maccy
-    obsidian
-    spotify
-    vesktop
+    # every GUI app is a cask now (darwin/homebrew.nix): TCC permissions are
+    # granted per code identity, and a store-path bundle is a new identity on
+    # every update, so screen recording / camera / accessibility died each time.
+    # CLI tools that happen to ship an .app stay here because there is no cask:
+    # mpv, mupdf.
     # signal-desktop stays a cask for now: nixpkgs ships 8.29.0, which can't
     # read a database migrated by 8.30.0 (schema 1830 vs its 1800). Its own
     # updater keeps the cask current; move it back to Nix once nixpkgs >= 8.30

@@ -35,6 +35,9 @@ in
         "--ctx-size"
         "8192"
         "--no-ui" # this build deprecates --no-webui in favour of --no-ui
+        # tool calling: CodeCompanion's inline interaction edits the buffer
+        # through the edit_file tool, which needs the model's tool template
+        "--jinja"
         "--sleep-idle-seconds"
         "1800"
       ];

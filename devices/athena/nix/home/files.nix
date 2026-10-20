@@ -17,6 +17,7 @@
     target-dir = "${config.home.homeDirectory}/.target"
   '';
 
+
   xdg.configFile = {
 
     # vicinae saves GUI changes into this file

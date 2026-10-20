@@ -75,6 +75,18 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Homebrew itself, pinned and installed by Nix instead of whatever the
+    # upstream installer left in /opt/homebrew (darwin/homebrew.nix)
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # taps pinned as flake inputs, so `brew` can't drift from the lockfile
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
   };
 
   outputs =
@@ -86,6 +98,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             ./darwin
+            inputs.nix-homebrew.darwinModules.nix-homebrew
             home-manager.darwinModules.home-manager
             {
               home-manager.useGlobalPkgs = true;

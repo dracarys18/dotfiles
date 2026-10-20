@@ -155,17 +155,17 @@ in
       rctrl + shift - s : open -a "/Applications/Signal.app"
       alt + shift - s   : open -a "/Applications/Signal.app"
 
-      rctrl + shift - d : open -a "$HOME/Applications/Home Manager Apps/Vesktop.app"
-      alt + shift - d   : open -a "$HOME/Applications/Home Manager Apps/Vesktop.app"
+      rctrl + shift - d : open -a "/Applications/Vesktop.app"
+      alt + shift - d   : open -a "/Applications/Vesktop.app"
 
       rctrl + shift - t : open -a "/Applications/Telegram.app"
       alt + shift - t   : open -a "/Applications/Telegram.app"
 
-      rctrl + shift - p : open -a "$HOME/Applications/Home Manager Apps/Spotify.app"
-      alt + shift - p   : open -a "$HOME/Applications/Home Manager Apps/Spotify.app"
+      rctrl + shift - p : open -a "/Applications/Spotify.app"
+      alt + shift - p   : open -a "/Applications/Spotify.app"
 
-      rctrl + shift - o : open -a "$HOME/Applications/Home Manager Apps/OBS.app"
-      alt + shift - o   : open -a "$HOME/Applications/Home Manager Apps/OBS.app"
+      rctrl + shift - o : open -a "/Applications/OBS.app"
+      alt + shift - o   : open -a "/Applications/OBS.app"
 
       # --- Send focused window to space (and follow) ---
       rctrl + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
