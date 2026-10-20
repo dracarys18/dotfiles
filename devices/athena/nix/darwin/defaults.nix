@@ -37,10 +37,10 @@ in
       # lost on the next switch: the list here is the Dock. Entries point at
       # the Home Manager app dir rather than a store path, or the "?" comes
       # back as soon as the store path behind it is collected
-      # only Ghostty and Firefox are still home-manager apps; everything else on
-      # the Dock is a cask now, so it lives in /Applications
+      # only Firefox is a home-manager app (it needs the .uc.js autoconfig);
+      # every other Dock entry is a cask in /Applications
       persistent-apps = [
-        "/Users/${user}/Applications/Home Manager Apps/Ghostty.app"
+        "/Applications/Ghostty.app"
         "/Applications/Vesktop.app"
         "/Applications/Signal.app"
         "/Applications/Spotify.app"
@@ -100,6 +100,14 @@ in
       '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>'
     launchctl asuser "$(id -u -- ${user})" sudo --user=${user} -- \
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+
+    # skhd and yabai read their config once at start, so a switch that changes
+    # /etc/skhdrc or the yabairc store path otherwise leaves the old hotkeys
+    # live until the next login ("alt+shift+z does nothing" every time a path
+    # changed, because it pointed at a bundle that had moved).
+    uid="$(id -u -- ${user})"
+    launchctl asuser "$uid" launchctl kickstart -k "gui/$uid/org.nixos.skhd" || true
+    launchctl asuser "$uid" launchctl kickstart -k "gui/$uid/org.nixos.yabai" || true
   '';
 
   # Never start the screen saver. It's a per-host setting, which nix-darwin

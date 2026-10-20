@@ -22,6 +22,9 @@ in
     # real `background` properties on elements, so it beats the --background-*
     # variables that QuickCSS sets and the result is catppuccin, not black
     vesktop.enable = false;
+    # Ghostty is a cask now, so this module has nothing to write into: the
+    # theme is picked by name in programs/ghostty.nix instead
+    ghostty.enable = false;
   };
 
   programs.nixvim.colorschemes.catppuccin = {

@@ -146,8 +146,8 @@ in
       # which keeps every store path an app was ever launched from registered,
       # so the pick can be an outdated copy or another running instance that
       # shows up as its own Dock tile
-      rctrl + shift - g : open -a "$HOME/Applications/Home Manager Apps/Ghostty.app"
-      alt + shift - g   : open -a "$HOME/Applications/Home Manager Apps/Ghostty.app"
+      rctrl + shift - g : open -a "/Applications/Ghostty.app"
+      alt + shift - g   : open -a "/Applications/Ghostty.app"
 
       rctrl + shift - z : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"
       alt + shift - z   : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"

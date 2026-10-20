@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  writable,
   ...
 }:
 
@@ -26,6 +27,12 @@ let
     "browser.download.alwaysOpenPanel" = false;
     "browser.startup.page" = 3;
 
+    # Firefox 158 opens a "get started" profile picker when its Profile Groups
+    # database has no entry; it ignored profiles.ini and looked like a fresh
+    # install. Turning the feature off restores classic profiles.ini selection.
+    "browser.profiles.enabled" = false;
+    "browser.profiles.createdbrowser" = true;
+
     # Memory: with defaults this session had 26 processes and 6.4 GB resident.
     # Fewer content processes (8 -> 4), fewer back/forward pages kept alive,
     # and smaller disk/media caches. Needs a Firefox restart to take effect.
@@ -39,9 +46,12 @@ let
   };
 
   # Firefox with the autoconfig baked in: it loads the profile's .uc.js scripts
-  # (like newtab-popup.uc.js) at startup. nixpkgs' wrapper writes these into
-  # the app in the store, so the loader survives Firefox updates, unlike the
-  # copy the old /Applications install needed on every switch.
+  # (newtab-popup.uc.js binds cmd+; to "open the URL bar in a new tab") at
+  # startup. nixpkgs' wrapper writes these into the app in the store, so the
+  # loader survives Firefox updates. A cask cannot do this: injecting files into
+  # a signed bundle breaks its seal and Gatekeeper calls the app "damaged".
+  # Cost of staying on Nix: after a Firefox update, macOS asks again for
+  # microphone / camera / screen-recording.
   firefox = pkgs.firefox.override {
     # plain string concatenation: the wrapper writes mozilla.cfg through an
     # unquoted shell heredoc, which eats backticks and $ in template literals
@@ -60,8 +70,14 @@ let
         }
       }, "browser-delayed-startup-finished");
     '';
-    # autoconfig runs in a sandbox by default; the script above uses Services
-    extraAutoConfig = ''pref("general.config.sandbox_enabled", false);'';
+    # autoconfig, not user.js: Firefox 158 picks its profile before any profile
+    # prefs are read, and its Profile Groups database has no entry, so it opens
+    # a "get started" picker and ignores profiles.ini. This has to be an
+    # app-level default to be seen in time.
+    extraAutoConfig = ''
+      pref("general.config.sandbox_enabled", false);
+      pref("browser.profiles.enabled", false);
+    '';
   };
 
   inherit (config.programs.firefox) configPath profilesPath;
@@ -103,7 +119,13 @@ in
       force = true;
     };
     "${profilesPath}/${profilePath}/user.js".force = true;
-    "${configPath}/profiles.ini".force = true;
+    # writable, not a store symlink: Firefox 158 records profile groups in
+    # Profile Groups/*.sqlite and needs to write here too, otherwise it ignores
+    # this file and starts the "get started" flow with an empty profile
+    "${configPath}/profiles.ini" = {
+      source = writable "config/firefox/profiles.ini";
+      force = true;
+    };
   };
 
   # Email links open Firefox (which sends them to Gmail) instead of Apple Mail

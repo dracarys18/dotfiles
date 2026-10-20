@@ -69,11 +69,12 @@ in
     kubectl
 
     android-tools # adb and fastboot
-    # every GUI app is a cask now (darwin/homebrew.nix): TCC permissions are
-    # granted per code identity, and a store-path bundle is a new identity on
-    # every update, so screen recording / camera / accessibility died each time.
-    # CLI tools that happen to ship an .app stay here because there is no cask:
-    # mpv, mupdf.
+    # every GUI app comes from Homebrew now (darwin/homebrew.nix): TCC
+    # permissions are granted per code identity, and a store-path bundle is a
+    # new identity on every update, so screen recording / camera / accessibility
+    # died each time. mupdf and mpv stay here: brew's mupdf formula installs
+    # only mutool/mudraw (no viewer), and mpv's formula can't build against the
+    # pinned brew (see darwin/homebrew.nix).
     # signal-desktop stays a cask for now: nixpkgs ships 8.29.0, which can't
     # read a database migrated by 8.30.0 (schema 1830 vs its 1800). Its own
     # updater keeps the cask current; move it back to Nix once nixpkgs >= 8.30
@@ -90,6 +91,8 @@ in
     wget
     inetutils
     croc
+    # mupdf keeps its app bundle only in nixpkgs: the brew formula installs
+    # just mutool/mudraw, so the viewer would be lost (see darwin/homebrew.nix)
     mupdf
     ffmpeg
     mpv

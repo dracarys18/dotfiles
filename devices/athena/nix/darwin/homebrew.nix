@@ -9,14 +9,24 @@
   homebrew = {
     enable = true;
     onActivation = {
-      cleanup = "zap";
+      # NOT "zap": zap also deletes each removed cask's app data. When Firefox
+      # stopped being a cask, `brew bundle` moved ~/Library/Application
+      # Support/Firefox to the Trash and Firefox came up as a fresh install.
+      cleanup = "uninstall";
       autoUpdate = false;
       upgrade = false;
     };
-    # Only things nixpkgs can't provide at all: 1Password, Sony's Remote Play,
-    # Telegram's native Mac app and (until 8.30 lands) Signal. OBS, KDE Connect,
-    # Vicinae and Ghostty have no darwin build in nixpkgs, so they are packaged
-    # from their upstream DMGs in darwin/apps/ and installed by home-manager.
+    # Every GUI app is a cask. The reason is TCC: Nix bundles are adhoc-signed
+    # inside versioned store paths, so screen recording / camera / microphone /
+    # accessibility grants die on each update. Casks are upstream-signed at a
+    # stable /Applications path and are granted once.
+    #
+    # No formulae on purpose. nix-homebrew pins brew itself (brew-src in
+    # flake.lock), while the tap inputs move with `make update`; a formula that
+    # uses newer DSL then fails against the older brew, e.g. mpv's dav1d
+    # dependency: "undefined method 'new' for an instance of Symbol".
+    # mpv therefore stays in home/packages.nix.
+    brews = [ ];
     # the taps come from nix-homebrew's flake inputs (darwin/default.nix), so
     # brew's tap list is the lockfile's tap list
     taps = builtins.attrNames config.nix-homebrew.taps;
@@ -43,6 +53,7 @@
       "obsidian"
       "spotify"
       "kde-connect"
+      "ghostty"
     ];
     # Mac App Store apps (needs you signed in to the App Store)
     masApps = {
