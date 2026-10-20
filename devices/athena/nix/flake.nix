@@ -3,6 +3,22 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
+    # rust toolchains pinned per version (replaces rustup)
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # build any crates.io crate without hand-written hashes (replaces cargo install)
+    crates-nix.url = "github:uttarayan21/crates.nix";
+    # local workspace, built in the store so it links Nix's libraries instead of
+    # whatever Homebrew happened to have installed (that is how the old
+    # ~/.cargo/bin/hades ended up broken on libzstd)
+    # a path input, not git: the workspace is a live dev checkout with
+    # uncommitted changes, and a path input copies it (15 MB) as-is
+    hades = {
+      url = "path:/Users/karthihegde/Projects/hades";
+      flake = false;
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -11,7 +27,10 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # catppuccin for tmux, pinned to the version the config is written for
+    # catppuccin for tmux. Held at the 2024-09 revision: v2's cpu/battery
+    # modules render #{cpu_percentage}, which the nixpkgs cpu/battery plugins
+    # never interpolate, so the bar loses both. This revision embeds the
+    # plugins' script calls in status-right itself, which works.
     tmux-catppuccin = {
       url = "github:catppuccin/tmux/1612a23174a6771ac466312eb156f83b8b89d907";
       flake = false;

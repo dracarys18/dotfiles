@@ -2,9 +2,9 @@
   # GUI apps only; every command-line tool comes from Nix. Anything not listed
   # here is uninstalled on every switch ("zap" also removes its app data).
   #
-  # Keep cargo out of Homebrew and environment.systemPackages: if `brew bundle`
-  # can see cargo during activation, its cleanup also runs `cargo uninstall` on
-  # every crate not listed here, including local builds like uji.
+  # `brew bundle` cleanup runs `cargo uninstall` when it can see cargo during
+  # activation. That is harmless now — cargo comes from Nix and no crates are
+  # installed into ~/.cargo — but keep ~/.cargo empty/deleted so it stays so.
   homebrew = {
     enable = true;
     onActivation = {

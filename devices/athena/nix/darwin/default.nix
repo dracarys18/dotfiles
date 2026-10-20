@@ -1,5 +1,5 @@
 # System level (nix-darwin): one file per concern, imported here.
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 let
   user = "karthihegde";
@@ -16,6 +16,8 @@ in
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
+  # rust-bin.<channel>.<version> from rust-overlay, instead of rustup
+  nixpkgs.overlays = [ inputs.rust-overlay.overlays.default ];
   # signal-desktop, spotify and _1password-cli are unfree
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = 6;

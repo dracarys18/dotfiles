@@ -7,7 +7,7 @@ nix-darwin, NixOS and Home Manager for two machines, one repo.
 | Host | Role | Hardware | Deploy |
 |---|---|---|---|
 | athena | macOS laptop | Apple M3 Pro / 18 GB · aarch64-darwin | `make switch` |
-| aether | Linux server | x86_64 · NixOS, runs every container stack | `nixos-rebuild switch --flake .#aether` on the box |
+| aether | Linux server | x86_64 · NixOS, runs every container stack | `make switch HOST=aether` |
 
 ## Layout
 
@@ -22,23 +22,25 @@ nix-darwin, NixOS and Home Manager for two machines, one repo.
 ```sh
 xcode-select --install   # nix needs the Apple SDK; wait for it to finish
 git clone https://github.com/dracarys18/dotfiles.git ~/dotfiles && cd ~/dotfiles
-make bootstrap-mac
+make bootstrap
 ```
 
 ### aether (NixOS)
 
-```sh
-su -                      # after installing NixOS with the usual ISO
-nixos-generate-config --show-hardware-config > /etc/dotfiles/devices/aether/nix/hardware.nix
-mkdir -p /var/lib/sops-nix && cp age-keys.txt /var/lib/sops-nix/key.txt
-nixos-rebuild switch --flake /etc/dotfiles/devices/aether/nix#aether
-```
+Install NixOS with the usual ISO, then from athena — `make bootstrap HOST=aether`
+reads the disk layout back into `devices/aether/nix/hardware.nix`, copies this
+repo to `/etc/dotfiles`, installs the sops age key and makes the first switch.
+It expects `aether` in `~/.ssh/config`.
 
 ## Update
 
 ```sh
-make switch   # apply changes made in the repo to this Mac
-make update   # update packages, nvim plugins and treesitter, then switch
+make switch                    # apply changes to this Mac
+make switch HOST=aether        # rsync the repo, then nixos-rebuild on the box
+make update                    # update the Mac's flake.lock (packages, nvim
+                               # plugins, parsers), then switch
+make update HOST=aether        # same for the server's lock
+make check                     # evaluate both configs, build nothing
 ```
 
 `make` lists the rest.

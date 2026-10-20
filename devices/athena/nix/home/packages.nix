@@ -1,6 +1,21 @@
 # CLI tools from nixpkgs (uji comes from its own flake, in programs/uji)
-{ pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  ...
+}:
 
+let
+  # the toolchain uji's rust-toolchain.toml pins, with the components a dev
+  # needs; replaces rustup and everything in ~/.cargo/bin
+  rust = pkgs.rust-bin.stable."1.99.0".default.override {
+    extensions = [
+      "clippy"
+      "rustfmt"
+      "rust-analyzer"
+    ];
+  };
+in
 {
   home.packages = with pkgs; [
     # shell and terminal (starship, tmux, zoxide, fzf, eza, bat and direnv come
@@ -14,6 +29,9 @@
     vhs
 
     # editors and languages (neovim comes from programs.nixvim)
+    rust
+    # the local hades workspace, built in the store (../pkgs/hades.nix)
+    (pkgs.callPackage ../pkgs/hades.nix { src = inputs.hades; })
     go
     nodejs
     bun
@@ -54,6 +72,7 @@
     (pkgs.callPackage ../darwin/apps/obs.nix { })
     (pkgs.callPackage ../darwin/apps/kde-connect.nix { })
     (pkgs.callPackage ../darwin/apps/vicinae.nix { })
+
     chatterino2
     android-tools # adb and fastboot
     maccy

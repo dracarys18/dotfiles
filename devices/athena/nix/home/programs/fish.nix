@@ -8,10 +8,13 @@
     interactiveShellInit = ''
       set -g fish_greeting
 
+      # tmux keeps its server socket in $TMUX_TMPDIR; the default is /tmp, which
+      # gets cleared often enough to strand running sessions
+      set -gx TMUX_TMPDIR $HOME/.local/state
+
       # Homebrew only holds GUI apps and a few macOS tools; Nix paths come first
       fish_add_path -g --append /opt/homebrew/bin
       fish_add_path -g --append /opt/homebrew/sbin
-      fish_add_path -g $HOME/.cargo/bin
       fish_add_path -g $HOME/.local/bin
 
       if test -r $HOME/.opam/opam-init/init.fish

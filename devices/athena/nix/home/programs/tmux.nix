@@ -1,8 +1,9 @@
 { pkgs, inputs, ... }:
 
 let
-  # pinned to the commit tpm had installed; nixpkgs' catppuccin is a newer
-  # major version with different options
+  # pinned to the last revision whose status modules embed the battery/cpu
+  # plugin scripts; v2 moved to #{cpu_percentage}, which those plugins only
+  # interpolate inside status-right, so the bar loses both
   catppuccin = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "catppuccin";
     version = "0-unstable-pinned";
@@ -25,7 +26,8 @@ in
       {
         plugin = catppuccin;
         extraConfig = ''
-          set -g @catppuccin_flavour "mocha"
+          # `flavor`, not `flavour`: the old spelling warns on every start
+          set -g @catppuccin_flavor "mocha"
           set -g @catppuccin_status_modules_right "battery cpu date_time"
           set -g @catppuccin_pane_default_text "#W"
           set -g @catppuccin_window_current_text "#W"

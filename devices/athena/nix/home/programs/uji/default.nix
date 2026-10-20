@@ -9,6 +9,7 @@
         inputs.uji.homeModules.default
         inputs.uji-plugins.homeModules.default
         ./settings.nix
+        ./policy.nix
         ./litellm.nix
         ./todo.nix
       ]

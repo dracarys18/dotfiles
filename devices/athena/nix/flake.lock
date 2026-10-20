@@ -21,6 +21,41 @@
         "type": "github"
       }
     },
+    "crates-io-index": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763363725,
+        "narHash": "sha256-cxr5xIKZFP45yV1ZHFTB1sHo5YGiR3FA8D9vAfDizMo=",
+        "ref": "refs/heads/master",
+        "rev": "0382002e816a4cbd17d8d5b172f08b848aa22ff6",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/rust-lang/crates.io-index"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/rust-lang/crates.io-index"
+      }
+    },
+    "crates-nix": {
+      "inputs": {
+        "crates-io-index": "crates-io-index"
+      },
+      "locked": {
+        "lastModified": 1773225892,
+        "narHash": "sha256-EM//kHJ1Rlhsl6Q01gRxFozaGWlZvrnaI8Gdv0YfMgs=",
+        "owner": "uttarayan21",
+        "repo": "crates.nix",
+        "rev": "40b6736feba1aedf830b500b5d017d07ab5bd6f2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "uttarayan21",
+        "repo": "crates.nix",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -40,6 +75,19 @@
         "owner": "hercules-ci",
         "repo": "flake-parts",
         "type": "github"
+      }
+    },
+    "hades": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792474373,
+        "narHash": "sha256-iN+jESEgyT/zSpIPqsn4Thb0xPCiwRSRTUnXzxrjtKc=",
+        "path": "/Users/karthihegde/Projects/hades",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/karthihegde/Projects/hades",
+        "type": "path"
       }
     },
     "home-manager": {
@@ -177,12 +225,15 @@
     "root": {
       "inputs": {
         "catppuccin": "catppuccin",
+        "crates-nix": "crates-nix",
+        "hades": "hades",
         "home-manager": "home-manager",
         "kubectl-aliases": "kubectl-aliases",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
         "pared": "pared",
+        "rust-overlay": "rust-overlay",
         "sops-nix": "sops-nix",
         "tmux-catppuccin": "tmux-catppuccin",
         "uji": "uji",
@@ -191,6 +242,26 @@
       }
     },
     "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792395246,
+        "narHash": "sha256-SfVFE7TKuByeQRwhVbaVrvTV/lI41AYK9CYSfB+pIis=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "550547cefc67e01a6fd11a09e4096a3c844ca840",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
           "uji",
@@ -268,7 +339,7 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1792412486,
