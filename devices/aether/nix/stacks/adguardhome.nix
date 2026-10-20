@@ -1,13 +1,17 @@
 # ~/Projects/adguardhome — this box is the tailnet's resolver, so it is the
-# last stack to switch over. AdGuard Home does the filtering per client,
-# unbound does the recursion (no third-party DNS provider sees queries) and
-# is what AGH uses as its only upstream: 10.99.0.3:53. Both containers need
-# fixed addresses, which is why this module creates a network before them.
+# last stack to switch over. AdGuard Home does the filtering per client and
+# talks DoH to Cloudflare, with Quad9/Google as fallbacks. The network exists
+# so the container has a fixed address the rest of the stacks can point at.
+#
+# Planned but not wired up yet: a local recursive resolver (unbound on the
+# host at 127.0.0.1:5335) as AGH's upstream, so no third-party resolver sees
+# queries. The mvance/unbound container exit-1'd with no diagnostics, so it
+# moved out of compose; when it lands, unbound becomes a plain Arch service
+# and AGH's upstream is changed in the UI.
 #
 # The admin password is not in this repo: first start serves the setup wizard
 # on :4243, and the UI owns /var/lib/stacks/adguardhome/conf/AdGuardHome.yaml
-# from then on. Only unbound's config is declarative, because unbound never
-# writes to it.
+# from then on.
 {
   config,
   lib,
@@ -24,9 +28,6 @@ in
     "d ${d} 0755 root root -"
     "d ${d}/conf 0700 root root -"
     "d ${d}/work 0700 root root -"
-    "d ${d}/unbound 0755 root root -"
-    # copied from the repo on change; unbound does not rewrite it
-    "C ${d}/unbound/unbound.conf 0644 root root - ${./adguardhome/unbound.conf}"
   ];
 
   systemd.services =
@@ -44,7 +45,7 @@ in
         '';
       };
     }
-    // lib.genAttrs [ "podman-adguardhome" "podman-unbound" ] (_: {
+    // lib.genAttrs [ "podman-adguardhome" ] (_: {
       requires = [ "podman-network-${network}.service" ];
       after = [ "podman-network-${network}.service" ];
     });
@@ -67,15 +68,6 @@ in
       extraOptions = [
         "--network=${network}"
         "--ip=10.99.0.2"
-      ];
-    };
-
-    unbound = {
-      image = "mvance/unbound:latest";
-      volumes = [ "${d}/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf" ];
-      extraOptions = [
-        "--network=${network}"
-        "--ip=10.99.0.3"
       ];
     };
   };
