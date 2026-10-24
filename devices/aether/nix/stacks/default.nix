@@ -6,7 +6,6 @@
     ./authelia.nix
     ./caddy.nix
     ./cartero.nix
-    ./draw.nix
     ./homeassistant.nix
     ./homepage.nix
     ./immich.nix

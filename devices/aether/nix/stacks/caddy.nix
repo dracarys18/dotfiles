@@ -51,7 +51,6 @@ in
       "keep.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3069";
       "pdf.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8069";
       "feed.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8034";
-      "draw.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3035";
       "media.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8096";
       "requests.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5055";
       "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3669";
