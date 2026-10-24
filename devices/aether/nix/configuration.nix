@@ -7,12 +7,13 @@
 
 {
   imports = [
+    ./firewall.nix
     ./hardware.nix
     ./stacks
   ];
 
   # every stack runs rootful (system-level) podman: adguardhome needs :53, and
-  # dockerSocket is what glance, homepage and portainer talk to
+  # dockerSocket is what homepage talks to
   virtualisation.podman = {
     enable = true;
     dockerSocket.enable = true;
@@ -34,10 +35,7 @@
     ];
   };
 
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-  };
+  services.openssh.enable = true;
   security.sudo.wheelNeedsPassword = true;
 
   services.tailscale.enable = true;
@@ -69,11 +67,8 @@
       "cartero"
       "immich"
       "karakeep"
-      "kimai"
       "media"
       "obsidian"
-      "opengist"
-      "outline"
       "searchxng"
       "tangled"
     ] (name: {

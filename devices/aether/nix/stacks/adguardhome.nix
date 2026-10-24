@@ -1,7 +1,13 @@
 # ~/Projects/adguardhome — this box is the tailnet's resolver, so it is the
 # last stack to switch over. AdGuard Home does the filtering per client and
-# talks DoH to Cloudflare, with Quad9/Google as fallbacks. The network exists
-# so the container has a fixed address the rest of the stacks can point at.
+# talks DoH to Cloudflare, with Quad9/Google as fallbacks.
+#
+# It runs with host networking, unlike every other stack: :53 has to be
+# reachable from the LAN and the tailnet, and a published port is DNAT'd
+# straight past NixOS's firewall (which only builds an INPUT chain). On the
+# host network the queries land on INPUT, where firewall.nix decides that the
+# LAN and the tailnet may resolve and the internet may not. Nothing else needs
+# the fixed 10.99.0.2 address it used to have.
 #
 # Planned but not wired up yet: a local recursive resolver (unbound on the
 # host at 127.0.0.1:5335) as AGH's upstream, so no third-party resolver sees
@@ -9,19 +15,14 @@
 # moved out of compose; when it lands, unbound becomes a plain Arch service
 # and AGH's upstream is changed in the UI.
 #
-# The admin password is not in this repo: first start serves the setup wizard
-# on :4243, and the UI owns /var/lib/stacks/adguardhome/conf/AdGuardHome.yaml
-# from then on.
-{
-  config,
-  lib,
-  ...
-}:
+# Like every other stack here the container is declared and the config file is
+# not: AGH is a GUI app and owns /var/lib/stacks/adguardhome/conf itself.
+# Upstreams, blocklists and per-client rules are all set in the UI on :4243,
+# and the admin password is set there too — none of it is in this repo.
+{ ... }:
 
 let
   d = "/var/lib/stacks/adguardhome";
-  podman = "${config.virtualisation.podman.package}/bin/podman";
-  network = "adguardhome_net";
 in
 {
   systemd.tmpfiles.rules = [
@@ -30,29 +31,6 @@ in
     "d ${d}/work 0700 root root -"
   ];
 
-  systemd.services =
-    {
-      "podman-network-${network}" = {
-        description = "podman network ${network}";
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
-        script = ''
-          ${podman} network exists ${network} ||
-            ${podman} network create --subnet 10.99.0.0/24 ${network}
-        '';
-      };
-    }
-    // lib.genAttrs [ "podman-adguardhome" ] (_: {
-      requires = [ "podman-network-${network}.service" ];
-      after = [ "podman-network-${network}.service" ];
-    });
-
-  networking.firewall.allowedTCPPorts = [ 53 4243 ];
-  networking.firewall.allowedUDPPorts = [ 53 ];
-
   virtualisation.oci-containers.containers = {
     adguardhome = {
       image = "adguard/adguardhome:latest";
@@ -60,15 +38,7 @@ in
         "${d}/conf:/opt/adguardhome/conf"
         "${d}/work:/opt/adguardhome/work"
       ];
-      ports = [
-        "53:53/tcp"
-        "53:53/udp"
-        "4243:3000"
-      ];
-      extraOptions = [
-        "--network=${network}"
-        "--ip=10.99.0.2"
-      ];
+      extraOptions = [ "--network=host" ];
     };
   };
 }

@@ -51,7 +51,6 @@
       # hand-written DMG derivation here
       "chatterino"
       "obsidian"
-      "spotify"
       "kde-connect"
       "ghostty"
     ];

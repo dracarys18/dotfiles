@@ -6,17 +6,13 @@
     ./authelia.nix
     ./caddy.nix
     ./cartero.nix
-    ./cinny.nix
     ./draw.nix
     ./homeassistant.nix
     ./homepage.nix
     ./immich.nix
     ./karakeep.nix
-    ./kimai.nix
     ./media.nix
     ./obsidian.nix
-    ./opengist.nix
-    ./portainer.nix
     ./searchxng.nix
     ./stirling.nix
     ./tangled.nix

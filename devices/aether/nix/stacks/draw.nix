@@ -2,10 +2,8 @@
 { ... }:
 
 {
-  networking.firewall.allowedTCPPorts = [ 3035 ];
-
   virtualisation.oci-containers.containers.excalidraw = {
     image = "excalidraw/excalidraw:latest";
-    ports = [ "3035:80" ];
+    ports = [ "127.0.0.1:3035:80" ];
   };
 }

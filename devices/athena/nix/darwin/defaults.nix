@@ -43,7 +43,6 @@ in
         "/Applications/Ghostty.app"
         "/Applications/Vesktop.app"
         "/Applications/Signal.app"
-        "/Applications/Spotify.app"
         "/Users/${user}/Applications/Home Manager Apps/Firefox.app"
         "/Applications/Telegram.app"
       ];

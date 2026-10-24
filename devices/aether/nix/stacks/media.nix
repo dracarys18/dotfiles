@@ -28,17 +28,10 @@ in
     "d ${d}/data ${d}/data/media ${d}/data/downloads 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [
-    8096 # jellyfin
-    7878 # radarr
-    8989 # sonarr
-    9696 # prowlarr
-    8080 # qbittorrent webui, published by the tailscale sidecar
-    8118 # tailscale outbound proxy
-    6881 # qbittorrent
-    5055 # jellyseerr
-  ];
-  networking.firewall.allowedUDPPorts = [ 6881 ];
+  # 6881 stays on every interface (peers connect in); 8118 is only used from
+  # the podman network and the host, so it is loopback. Both are inside the
+  # tailscale sidecar's namespace; firewall.nix opens 6881 to the internet
+  # along with tailscale's own port
 
   virtualisation.oci-containers.containers = {
     jellyfin = {
@@ -49,7 +42,7 @@ in
         "${d}/data/media:/data/media"
         "/mnt/media:/tv"
       ];
-      ports = [ "8096:8096" ];
+      ports = [ "127.0.0.1:8096:8096" ];
     };
 
     radarr = {
@@ -59,7 +52,7 @@ in
         "${d}/config/radarr:/config"
         "${d}/data:/data"
       ];
-      ports = [ "7878:7878" ];
+      ports = [ "127.0.0.1:7878:7878" ];
       extraOptions = cloudflareDns;
     };
 
@@ -71,7 +64,7 @@ in
         "${d}/data/downloads:/data/downloads"
         "${d}/data/media:/media"
       ];
-      ports = [ "8989:8989" ];
+      ports = [ "127.0.0.1:8989:8989" ];
       extraOptions = cloudflareDns;
     };
 
@@ -79,7 +72,7 @@ in
       image = "lscr.io/linuxserver/prowlarr:latest";
       environment = linuxserverEnv;
       volumes = [ "${d}/config/prowlarr:/config" ];
-      ports = [ "9696:9696" ];
+      ports = [ "127.0.0.1:9696:9696" ];
       extraOptions = cloudflareDns;
     };
 
@@ -99,8 +92,8 @@ in
         "/dev/net/tun:/dev/net/tun"
       ];
       ports = [
-        "8080:8080"
-        "8118:8118"
+        "127.0.0.1:8080:8080"
+        "127.0.0.1:8118:8118"
         "6881:6881"
         "6881:6881/udp"
       ];
@@ -154,7 +147,7 @@ in
         LOG_LEVEL = "debug";
       };
       volumes = [ "${d}/config/jellyseerr:/app/config" ];
-      ports = [ "5055:5055" ];
+      ports = [ "127.0.0.1:5055:5055" ];
       extraOptions = [
         "--dns=1.1.1.1"
         "--dns=8.8.4.4"

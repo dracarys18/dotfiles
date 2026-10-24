@@ -304,6 +304,7 @@
         "nixvim": "nixvim",
         "pared": "pared",
         "rust-overlay": "rust-overlay",
+        "sonora": "sonora",
         "sops-nix": "sops-nix",
         "tmux-catppuccin": "tmux-catppuccin",
         "uji": "uji",
@@ -349,6 +350,29 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "sonora": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": [
+          "rust-overlay"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792658446,
+        "narHash": "sha256-hTnTma8lpsxKPJK6BrnOdmsqv9HR7sDSxHm0aJtDjhI=",
+        "owner": "sonorahq",
+        "repo": "sonora",
+        "rev": "e2d099c3c714f8f011ea3ac98e260c91932bbb83",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sonorahq",
+        "repo": "sonora",
         "type": "github"
       }
     },
@@ -412,11 +436,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1792497037,
-        "narHash": "sha256-AtoHHWHAprGT/659TeLSg2mmf6BY4q0P/9tpF7B+a3U=",
+        "lastModified": 1792596094,
+        "narHash": "sha256-3LXcHfmheeJffmwnbvSqY2Kgsj941lmDwKr8cOCF6jc=",
         "ref": "refs/heads/main",
-        "rev": "19e7310766562ebedee2a1bbd9c9b701a244f4ca",
-        "revCount": 170,
+        "rev": "9452204b184a853114ab2f8ee87b1fe73925645b",
+        "revCount": 172,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
       },

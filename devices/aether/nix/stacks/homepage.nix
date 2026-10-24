@@ -8,8 +8,6 @@ in
     "d ${d}/config ${d}/assets 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 3669 ];
-
   virtualisation.oci-containers.containers.homepage = {
     image = "ghcr.io/gethomepage/homepage:latest";
     environment = {
@@ -22,6 +20,6 @@ in
       "${d}/assets:/app/public/images"
       "/run/podman/podman.sock:/var/run/docker.sock:ro"
     ];
-    ports = [ "3669:3000" ];
+    ports = [ "127.0.0.1:3669:3000" ];
   };
 }

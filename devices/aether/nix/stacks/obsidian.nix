@@ -11,8 +11,6 @@ in
     "d ${d}/couchdb-etc 0755 5984 5984 -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 5984 ];
-
   virtualisation.oci-containers.containers.couchdb-for-ols = {
     image = "couchdb:3.5";
     user = "5984:5984";
@@ -23,6 +21,6 @@ in
       "${d}/couchdb-data:/opt/couchdb/data"
       "${d}/couchdb-etc:/opt/couchdb/etc/local.d"
     ];
-    ports = [ "5984:5984" ];
+    ports = [ "127.0.0.1:5984:5984" ];
   };
 }

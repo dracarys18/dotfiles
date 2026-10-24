@@ -18,7 +18,7 @@ in
   nixpkgs.hostPlatform = "aarch64-darwin";
   # rust-bin.<channel>.<version> from rust-overlay, instead of rustup
   nixpkgs.overlays = [ inputs.rust-overlay.overlays.default ];
-  # signal-desktop, spotify and _1password-cli are unfree
+  # signal-desktop and _1password-cli are unfree
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = 6;
   system.primaryUser = user;

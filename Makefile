@@ -17,12 +17,11 @@ NIX := $(NIX_BIN) --extra-experimental-features 'nix-command flakes'
 REBUILD := /run/current-system/sw/bin/darwin-rebuild
 PROJECTS ?= $(HOME)/Projects
 
-# aether builds its own config: this Mac is aarch64-darwin and can't build
-# x86_64-linux. The box needs this repo at AETHER_DIR (see the README).
+# aether is deployed over ssh with deploy-rs: this Mac is aarch64-darwin and
+# can't build x86_64-linux, so the box builds its own closure (--remote-build).
 AETHER_SSH ?= aether
-AETHER_DIR ?= /etc/dotfiles
 
-.PHONY: help check bootstrap switch sync update rollback clean uji
+.PHONY: help check bootstrap switch deploy update rollback clean uji
 
 help: ## List targets (add HOST=aether for the server)
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -54,7 +53,6 @@ else ifeq ($(HOST),aether)
 	@echo "Assuming NixOS is installed on $(AETHER_SSH) and $(AETHER_SSH) is in ~/.ssh/config."
 	@echo "Reading the disk layout from $(AETHER_SSH) into devices/aether/nix/hardware.nix"
 	@ssh -t $(AETHER_SSH) 'sudo nixos-generate-config --show-hardware-config' > '$(AETHER)/hardware.nix'
-	@$(MAKE) --no-print-directory sync HOST=aether
 	@echo "Copying the sops age key to $(AETHER_SSH):/var/lib/sops-nix/key.txt"
 	@scp -q "$(HOME)/Library/Application Support/sops/age/keys.txt" $(AETHER_SSH):/tmp/sops-age-key
 	@ssh -t $(AETHER_SSH) 'sudo install -Dm600 -o root -g root /tmp/sops-age-key /var/lib/sops-nix/key.txt && rm -f /tmp/sops-age-key'
@@ -71,11 +69,13 @@ ifeq ($(HOST),athena)
 	@$(NIX) flake archive '$(ATHENA)' >/dev/null
 	sudo darwin-rebuild switch --flake '$(ATHENA)#mac'
 else ifeq ($(HOST),aether)
-	@ $(MAKE) --no-print-directory sync HOST=aether
-	ssh $(AETHER_SSH) 'sudo nixos-rebuild switch --flake $(AETHER_DIR)/devices/aether/nix#aether'
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --interactive-sudo true
 else
 	$(error HOST must be one of: $(MACHINES))
 endif
+
+deploy: ## Deploy the aether server with deploy-rs (remote build)
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --interactive-sudo true
 
 update: ## Update HOST's flake.lock, then switch it
 ifeq ($(HOST),athena)
@@ -86,15 +86,6 @@ else ifeq ($(HOST),aether)
 	@$(MAKE) --no-print-directory switch HOST=aether
 else
 	$(error HOST must be one of: $(MACHINES))
-endif
-
-# aether evaluates the flake on the box, so the repo there has to match what
-# was just changed here
-sync: ## Copy this repo to HOST=aether:AETHER_DIR
-ifeq ($(HOST),aether)
-	rsync -a --delete --exclude .git '$(ROOT)/' $(AETHER_SSH):$(AETHER_DIR)/
-else
-	$(error sync only makes sense with HOST=aether)
 endif
 
 rollback: ## Undo the last switch on HOST

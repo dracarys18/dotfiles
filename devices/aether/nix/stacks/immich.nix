@@ -21,8 +21,6 @@ in
     "d ${d}/model-cache 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 2283 ];
-
   virtualisation.oci-containers.containers = {
     immich_server = {
       image = "ghcr.io/immich-app/immich-server:${version}";
@@ -35,7 +33,7 @@ in
         "${d}/upload:/usr/src/app/upload"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      ports = [ "2283:2283" ];
+      ports = [ "127.0.0.1:2283:2283" ];
       dependsOn = [
         "immich_redis"
         "immich_postgres"

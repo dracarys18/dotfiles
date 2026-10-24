@@ -12,17 +12,11 @@ in
     "d ${d}/redis ${d}/postgres ${d}/data ${project} 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [
-    8034 # cartero
-    5432 # postgres
-    6379 # redis
-  ];
-
   virtualisation.oci-containers.containers = {
     cartero-redis = {
       image = "redis/redis-stack:latest";
       volumes = [ "${d}/redis:/data" ];
-      ports = [ "6379:6379" ];
+      ports = [ "127.0.0.1:6379:6379" ];
     };
 
     cartero-postgres = {
@@ -33,7 +27,7 @@ in
       };
       environmentFiles = [ config.sops.secrets."cartero".path ];
       volumes = [ "${d}/postgres:/var/lib/postgresql/data" ];
-      ports = [ "5432:5432" ];
+      ports = [ "127.0.0.1:5432:5432" ];
     };
 
     cartero = {
@@ -50,7 +44,7 @@ in
         "${project}/templates:/app/templates:ro"
         "${d}/data:/app/data"
       ];
-      ports = [ "8034:8080" ];
+      ports = [ "127.0.0.1:8034:8080" ];
       cmd = [
         "-config"
         "/app/config.toml"

@@ -161,9 +161,6 @@ in
       rctrl + shift - t : open -a "/Applications/Telegram.app"
       alt + shift - t   : open -a "/Applications/Telegram.app"
 
-      rctrl + shift - p : open -a "/Applications/Spotify.app"
-      alt + shift - p   : open -a "/Applications/Spotify.app"
-
       rctrl + shift - o : open -a "/Applications/OBS.app"
       alt + shift - o   : open -a "/Applications/OBS.app"
 

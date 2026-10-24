@@ -28,6 +28,10 @@ in
     glow
     vhs
 
+    # the one GUI app from the store: there is no Homebrew cask for Sonora yet,
+    # and home-manager links Sonora.app into ~/Applications/Home Manager Apps
+    inputs.sonora.packages.${pkgs.stdenv.hostPlatform.system}.default
+
     # editors and languages (neovim comes from programs.nixvim)
     rust
     # the local hades workspace, built in the store (../pkgs/hades.nix)

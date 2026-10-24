@@ -12,8 +12,6 @@ in
     "d ${d}/core-config ${d}/core-data ${d}/valkey-data 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 6996 ];
-
   virtualisation.oci-containers.containers = {
     searxng-core = {
       image = "docker.io/searxng/searxng:latest";
@@ -22,7 +20,7 @@ in
         "${d}/core-config:/etc/searxng"
         "${d}/core-data:/var/cache/searxng"
       ];
-      ports = [ "${port}:${port}" ];
+      ports = [ "127.0.0.1:${port}:${port}" ];
     };
 
     searxng-valkey = {

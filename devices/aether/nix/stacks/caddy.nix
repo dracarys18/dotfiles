@@ -41,16 +41,11 @@ in
         reverse_proxy 127.0.0.1:2283
       '';
 
-      "portainer.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:9000
-      '';
-
       "note.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5984";
 
-      "pihole.karthihegde.dev".extraConfig = ''
+      "dns.karthihegde.dev".extraConfig = ''
         import auth
-        reverse_proxy 127.0.0.1:4242
+        reverse_proxy 127.0.0.1:3000
       '';
 
       "keep.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3069";
@@ -61,7 +56,6 @@ in
       "requests.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5055";
       "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3669";
       "auth.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:9091";
-      "lance.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8001";
       "search.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:6996";
 
       "radarr.karthihegde.dev".extraConfig = ''
@@ -85,14 +79,6 @@ in
         reverse_proxy 100.102.190.1:8080
       '';
 
-      "matrix.karthihegde.dev".extraConfig = ''
-        reverse_proxy 127.0.0.1:8689 {
-          header_up Host {upstream_hostport}
-          header_up X-Real-IP {remote_host}
-        }
-        encode gzip
-      '';
-
       "has.karthihegde.dev".extraConfig = ''
         reverse_proxy 127.0.0.1:8123 {
           header_up Host {host}
@@ -104,8 +90,9 @@ in
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
-  networking.firewall.allowedUDPPorts = [ 443 ]; # HTTP/3
+  # every stack publishes on 127.0.0.1 and caddy is the only way in from the
+  # LAN or the tailnet, so the port lists that used to live here are gone;
+  # firewall.nix holds the policy
 
   systemd.tmpfiles.rules = [
     "d /var/lib/stacks/caddy 0755 root root -"

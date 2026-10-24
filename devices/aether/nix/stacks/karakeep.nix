@@ -12,8 +12,6 @@ in
     "d ${d}/data ${d}/meili_data 0755 root root -"
   ];
 
-  networking.firewall.allowedTCPPorts = [ 3069 ];
-
   virtualisation.oci-containers.containers = {
     karakeep-web-1 = {
       image = "ghcr.io/karakeep-app/karakeep:release";
@@ -24,7 +22,7 @@ in
       };
       environmentFiles = [ config.sops.secrets."karakeep".path ];
       volumes = [ "${d}/data:/data" ];
-      ports = [ "3069:3000" ];
+      ports = [ "127.0.0.1:3069:3000" ];
       dependsOn = [
         "karakeep-meilisearch-1"
         "karakeep-chrome-1"

@@ -57,6 +57,14 @@
       url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Sonora, a native music streaming client (Rust + GPUI). No Homebrew cask
+    # for it, so it comes from upstream's flake: the release DMG is wrapped into
+    # the store and home-manager links Sonora.app into ~/Applications.
+    sonora = {
+      url = "github:sonorahq/sonora";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
+    };
     # Apple Intelligence off and its models deleted (darwin/intelligence.nix).
     # Keeps its own nixpkgs: pared needs Swift 6.2.4, 26.05 has 5.10.
     # Pinned: 2.2.0 doesn't compile (Swift can't type-check an expression in
