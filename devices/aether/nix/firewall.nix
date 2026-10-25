@@ -31,15 +31,29 @@ in
       41641 # tailscale
     ];
 
-    # everything the LAN is allowed to reach: ssh, DNS, caddy, home assistant,
-    # matter, privoxy. Listed as sources rather than ports because the LAN and
-    # the WAN share one interface, so a port list cannot tell them apart.
+    # everything the LAN is allowed to reach except ssh, which is tailnet-only:
+    # DNS, caddy, home assistant, matter. Listed as sources rather than ports
+    # because the LAN and the WAN share one interface, so a port list cannot
+    # tell them apart.
     # extraCommands (not extraInputRules) is the iptables backend's hook: it is
     # spliced into the nixos-fw chain just before the final reject
     extraCommands = ''
-      iptables -A nixos-fw -s ${lanV4} -j nixos-fw-accept
-      ip6tables -A nixos-fw -s ${lanV6} -j nixos-fw-accept
-      ip6tables -A nixos-fw -s fe80::/10 -j nixos-fw-accept
+      # ssh is tailnet-only. This must come before the DNS exceptions below,
+      # since nixos-fw is first-match. The cost is real: with tailscaled down
+      # there is no remote way into a headless box.
+      iptables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
+      ip6tables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
+
+      # the LAN gets DNS and nothing else. A blanket accept used to be here,
+      # but the only thing it was carrying was resolver traffic from two LAN
+      # devices: every *.karthihegde.dev record points at a tailnet address, so
+      # an off-tailnet client cannot reach the web services regardless, and
+      # ollama and the proxies are bound to loopback or the podman bridge.
+      iptables -A nixos-fw -s ${lanV4} -p udp --dport 53 -j nixos-fw-accept
+      iptables -A nixos-fw -s ${lanV4} -p tcp --dport 53 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s ${lanV6} -p udp --dport 53 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s ${lanV6} -p tcp --dport 53 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s fe80::/10 -p udp --dport 53 -j nixos-fw-accept
 
       # containers reach host services over the podman bridge, which no other
       # rule covers — cartero's embedder was timing out on 10.88.0.1:11434
@@ -57,7 +71,7 @@ in
 
   # the live box answered password logins from the internet for a while
   # sshd would otherwise add 22 to allowedTCPPorts, i.e. open to the world; the
-  # LAN rule above and the tailnet interface are the only ways in
+  # tailnet interface is now the only way in
   services.openssh.openFirewall = false;
 
   services.openssh.settings = {
