@@ -8,12 +8,11 @@
     ./cartero.nix
     ./homeassistant.nix
     ./homepage.nix
-    ./immich.nix
     ./karakeep.nix
     ./media.nix
     ./obsidian.nix
     ./searchxng.nix
     ./stirling.nix
-    ./tangled.nix
+    # tangled: knot is built from a source checkout that is not in this repo
   ];
 }

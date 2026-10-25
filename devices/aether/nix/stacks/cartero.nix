@@ -9,7 +9,10 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/redis ${d}/postgres ${d}/data ${project} 0755 root root -"
+    "d ${d}/redis 0755 root root -"
+    "d ${d}/postgres 0755 root root -"
+    "d ${d}/data 0755 root root -"
+    "d ${project} 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers = {
@@ -49,16 +52,15 @@ in
         "-config"
         "/app/config.toml"
       ];
+      # config.toml, myfeed.opml and templates live in ${project}
       dependsOn = [
         "cartero-postgres"
         "cartero-redis"
       ];
+      # no --dns here: overriding the resolver drops podman's internal one, so
+      # the container cannot resolve cartero-postgres/cartero-redis by name
       extraOptions = [
         "--add-host=host.docker.internal:host-gateway"
-        "--dns=1.1.1.1"
-        "--dns=8.8.8.8"
-        "--dns-opt=timeout:2"
-        "--dns-opt=attempts:3"
         "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
       ];
     };
@@ -71,7 +73,9 @@ in
         "run"
       ];
       environmentFiles = [ config.sops.secrets."cartero".path ];
-      autoStart = false;
+      # news.karthihegde.dev is this tunnel's public hostname; the ingress rule
+      # in Cloudflare targets http://cartero:8080, which podman's DNS resolves
+      autoStart = true;
     };
 
     cartero-reader = {
@@ -83,8 +87,6 @@ in
         "--shm-size=1gb"
         "--cpus=2"
         "--security-opt=seccomp=unconfined"
-        "--dns=1.1.1.1"
-        "--dns=8.8.8.8"
         "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
       ];
     };

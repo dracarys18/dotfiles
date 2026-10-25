@@ -5,7 +5,8 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/config ${d}/assets 0755 root root -"
+    "d ${d}/config 0755 root root -"
+    "d ${d}/assets 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers.homepage = {

@@ -9,7 +9,9 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/core-config ${d}/core-data ${d}/valkey-data 0755 root root -"
+    "d ${d}/core-config 0755 root root -"
+    "d ${d}/core-data 0755 root root -"
+    "d ${d}/valkey-data 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers = {
@@ -21,6 +23,8 @@ in
         "${d}/core-data:/var/cache/searxng"
       ];
       ports = [ "127.0.0.1:${port}:${port}" ];
+      # settings.yml is part of the live config on archmaestro
+      autoStart = false;
     };
 
     searxng-valkey = {

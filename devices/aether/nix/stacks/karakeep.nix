@@ -9,7 +9,8 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/data ${d}/meili_data 0755 root root -"
+    "d ${d}/data 0755 root root -"
+    "d ${d}/meili_data 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers = {
@@ -36,7 +37,7 @@ in
     };
 
     karakeep-chrome-1 = {
-      image = "gcr.io/zenika-hub/alpine-chrome:latest";
+      image = "docker.io/zenika/alpine-chrome:latest";
       cmd = [
         "--no-sandbox"
         "--disable-gpu"

@@ -36,11 +36,6 @@ in
     extraConfig = auth;
 
     virtualHosts = {
-      "immich.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:2283
-      '';
-
       "note.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5984";
 
       "dns.karthihegde.dev".extraConfig = ''
@@ -72,10 +67,11 @@ in
         reverse_proxy 127.0.0.1:9696
       '';
 
-      # qbittorrent lives in the mediastack VPN sidecar, published on the tailnet
+      # qbittorrent lives in the media stack's VPN sidecar, which publishes its
+      # webui on the host's loopback — no need to reach across the tailnet
       "torrent.karthihegde.dev".extraConfig = ''
         import auth
-        reverse_proxy 100.102.190.1:8080
+        reverse_proxy 127.0.0.1:8080
       '';
 
       "has.karthihegde.dev".extraConfig = ''
@@ -96,4 +92,9 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/stacks/caddy 0755 root root -"
   ];
+
+  # `admin off` above means there is no /load endpoint, so `caddy reload` always
+  # fails and activation reports a failed unit while the old config keeps
+  # serving; restart on change instead
+  systemd.services.caddy.reloadIfChanged = false;
 }

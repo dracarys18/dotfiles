@@ -10,12 +10,17 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/knot-docker ${d}/knot-data ${d}/knot-repos ${d}/knot-repos/database 0755 root root -"
+    "d ${d}/knot-docker 0755 root root -"
+    "d ${d}/knot-data 0755 root root -"
+    "d ${d}/knot-repos 0755 root root -"
+    "d ${d}/knot-repos/database 0755 root root -"
   ];
 
   systemd.services.podman-build-knot = {
     description = "build the knot image from /var/lib/stacks/tangled/knot-docker";
-    wantedBy = [ "multi-user.target" ];
+    # not wantedBy: the Dockerfile has to be put there by hand, so this would
+    # otherwise fail on every boot and mark the system degraded — which makes
+    # deploy-rs roll the activation back
     before = [ "podman-tangled-knot.service" ];
     requiredBy = [ "podman-tangled-knot.service" ];
     serviceConfig = {
@@ -32,6 +37,9 @@ in
   virtualisation.oci-containers.containers = {
     tangled-knot = {
       image = "knot:latest";
+      # dormant: the image has to be built from a source checkout that isn't in
+      # the repo, so starting it on a fresh box only produces a failed unit
+      autoStart = false;
       environment = {
         KNOT_SERVER_HOSTNAME = "tangled.karthihegde.dev";
         KNOT_SERVER_OWNER = "did:plc:qhjzsqj3vfzpolc7ayswl7rv";
@@ -51,6 +59,8 @@ in
     tangled-tunnel = {
       image = "cloudflare/cloudflared:latest";
       cmd = [ "tunnel" "run" ];
+      # nothing to tunnel to while knot is dormant
+      autoStart = false;
       # TUNNEL_TOKEN is a secret: devices/aether/nix/secrets/tangled.env
       environmentFiles = [ config.sops.secrets."tangled".path ];
     };

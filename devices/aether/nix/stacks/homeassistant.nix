@@ -7,7 +7,8 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/config ${d}/matter-data 0755 root root -"
+    "d ${d}/config 0755 root root -"
+    "d ${d}/matter-data 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers = {

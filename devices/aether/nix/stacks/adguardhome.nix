@@ -19,6 +19,11 @@
 # not: AGH is a GUI app and owns /var/lib/stacks/adguardhome/conf itself.
 # Upstreams, blocklists and per-client rules are all set in the UI on :4243,
 # and the admin password is set there too — none of it is in this repo.
+#
+# It cannot bind 0.0.0.0:53 any more: podman's DNS (aardvark-dns) holds
+# 10.88.0.1:53 on the host stack, and a wildcard bind fails while a specific
+# address on the same port is taken. The config therefore lists the addresses
+# it serves, which means the tailnet address has to exist before it starts.
 { ... }:
 
 let
@@ -41,4 +46,6 @@ in
       extraOptions = [ "--network=host" ];
     };
   };
+
+  systemd.services.podman-adguardhome.after = [ "tailscaled.service" ];
 }

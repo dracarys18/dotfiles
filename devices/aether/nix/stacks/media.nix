@@ -4,6 +4,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -14,18 +15,33 @@ let
     PGID = "1000";
     TZ = "Asia/Kolkata";
   };
-  cloudflareDns = [
-    "--dns=1.1.1.1"
-    "--dns=8.8.8.8"
-  ];
+  # the sidecar runs with an exit node, whose default route swallows the podman
+  # gateway (10.88.0.1), so podman's internal resolver is unreachable inside it
+  # and DNS dies. A literal resolv.conf pointing at a public resolver works,
+  # because that traffic goes through the tunnel like everything else.
+  # Generated here rather than kept in the state dir: a runtime path for a bind
+  # mount that is missing gets created as a *directory* by preStart, which is
+  # how this broke the first time.
+  resolvConf = pkgs.writeText "mediastack-resolv.conf" ''
+    nameserver 1.1.1.1
+    nameserver 9.9.9.9
+  '';
 in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
+    "d /mnt/media 0755 root root -"
     "d ${d}/config 0755 root root -"
-    "d ${d}/config/jellyfin ${d}/config/radarr ${d}/config/sonarr ${d}/config/prowlarr 0755 root root -"
-    "d ${d}/config/qbittorrent ${d}/config/jellyseerr ${d}/config/tailscale ${d}/config/privoxy 0755 root root -"
-    "d ${d}/data ${d}/data/media ${d}/data/downloads 0755 root root -"
+    "d ${d}/config/jellyfin 0755 root root -"
+    "d ${d}/config/radarr 0755 root root -"
+    "d ${d}/config/sonarr 0755 root root -"
+    "d ${d}/config/prowlarr 0755 root root -"
+    "d ${d}/config/qbittorrent 0755 root root -"
+    "d ${d}/config/jellyseerr 0755 root root -"
+    "d ${d}/config/tailscale 0755 root root -"
+    "d ${d}/data 0755 root root -"
+    "d ${d}/data/media 0755 root root -"
+    "d ${d}/data/downloads 0755 root root -"
   ];
 
   # 6881 stays on every interface (peers connect in); 8118 is only used from
@@ -53,7 +69,6 @@ in
         "${d}/data:/data"
       ];
       ports = [ "127.0.0.1:7878:7878" ];
-      extraOptions = cloudflareDns;
     };
 
     sonarr = {
@@ -65,7 +80,6 @@ in
         "${d}/data/media:/media"
       ];
       ports = [ "127.0.0.1:8989:8989" ];
-      extraOptions = cloudflareDns;
     };
 
     prowlarr = {
@@ -73,13 +87,15 @@ in
       environment = linuxserverEnv;
       volumes = [ "${d}/config/prowlarr:/config" ];
       ports = [ "127.0.0.1:9696:9696" ];
-      extraOptions = cloudflareDns;
     };
 
     tailscale = {
       image = "tailscale/tailscale:latest";
       environment = {
-        TS_EXTRA_ARGS = "--exit-node=100.110.81.102 --accept-routes --exit-node-allow-lan-access --accept-dns=false";
+        # exit node is Mullvad Hong Kong: the Singapore server this used to
+        # point at (100.110.81.102) shows as "selected but offline" in
+        # `tailscale exit-node list`
+        TS_EXTRA_ARGS = "--exit-node=100.127.156.108 --accept-routes --exit-node-allow-lan-access --accept-dns=false";
         TS_STATE_DIR = "/var/lib/tailscale";
         TS_OUTBOUND_HTTP_PROXY_LISTEN = ":8118";
         TS_USERSPACE = "true";
@@ -88,7 +104,7 @@ in
       environmentFiles = [ config.sops.secrets."media".path ];
       volumes = [
         "${d}/config/tailscale:/var/lib/tailscale"
-        "${d}/config/tailscale/resolv.conf:/etc/resolv.conf:ro"
+        "${resolvConf}:/etc/resolv.conf:ro"
         "/dev/net/tun:/dev/net/tun"
       ];
       ports = [
@@ -126,13 +142,6 @@ in
       };
     };
 
-    privoxy = {
-      image = "vimagick/privoxy";
-      volumes = [ "${d}/config/privoxy/config:/etc/privoxy/config" ];
-      dependsOn = [ "tailscale" ];
-      extraOptions = [ "--network=container:tailscale" ];
-    };
-
     flaresolverr = {
       image = "ghcr.io/flaresolverr/flaresolverr:latest";
       environment = {
@@ -148,10 +157,6 @@ in
       };
       volumes = [ "${d}/config/jellyseerr:/app/config" ];
       ports = [ "127.0.0.1:5055:5055" ];
-      extraOptions = [
-        "--dns=1.1.1.1"
-        "--dns=8.8.4.4"
-      ];
     };
   };
 }
