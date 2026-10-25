@@ -134,7 +134,13 @@
   ];
   boot.kernelParams = [ "acpi_enforce_resources=lax" ];
 
-  environment.systemPackages = [ pkgs.openrgb ];
+  environment.systemPackages = [
+    pkgs.openrgb
+    # neofetch is gone from nixpkgs (unmaintained upstream); fastfetch is the
+    # maintained successor. `neowofetch` from the hyfetch package is the
+    # faithful look-alike if that is what you want instead.
+    pkgs.fastfetch
+  ];
 
   # the box is UEFI: ESP on nvme0n1p1. This cannot live in hardware.nix because
   # `make bootstrap` regenerates that file from nixos-generate-config, which
