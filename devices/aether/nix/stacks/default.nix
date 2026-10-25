@@ -12,7 +12,7 @@
     ./media.nix
     ./obsidian.nix
     ./searchxng.nix
-    ./stirling.nix
+    ./bentopdf.nix
     # tangled: knot is built from a source checkout that is not in this repo
   ];
 }
