@@ -41,23 +41,27 @@
         program = "${deploy-rs.packages.aarch64-darwin.deploy-rs}/bin/deploy";
       };
 
-      deploy = {
-        nodes.aether = {
-          hostname = "aether";
-          profiles.system = {
-            # the box refuses root logins, so deploy-rs ssh's as this user and
-            # sudo's to root; make passes --interactive-sudo so the server's
-            # password is asked for rather than stored as a NOPASSWD rule
-            sshUser = "karthihegde";
-            user = "root";
-            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.aether;
-          };
-          remoteBuild = true;
+      deploy.nodes.aether = {
+        hostname = "aether";
+        profiles.system = {
+          # the box refuses root logins, so deploy-rs ssh's as this user and
+          # sudo's to root; make passes --interactive-sudo so the server's
+          # password is asked for rather than stored as a NOPASSWD rule
+          sshUser = "karthihegde";
+          user = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.aether;
         };
-        # evaluate every profile so a broken config fails before it is pushed
-        checks = builtins.mapAttrs (
-          _system: deployLib: deployLib.deployChecks self.deploy
-        ) deploy-rs.lib;
+        remoteBuild = true;
+        # during the migration a single failing unit (a stack whose config lives
+        # on archmaestro, a tailscale key that doesn't authenticate) would
+        # otherwise revert the whole generation, which makes this impossible to
+        # debug. Flip back to true once every stack comes up clean.
+        magicRollback = false;
       };
+
+      # deliberately no `checks` output: deploy-rs' deployChecks builds an
+      # activation derivation for the *target* platform (x86_64-linux), so on
+      # this darwin machine `nix flake check` can never build it and the deploy
+      # aborts with "platform mismatch" before it even reaches the box
     };
 }
