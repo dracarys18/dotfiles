@@ -40,6 +40,12 @@ in
       iptables -A nixos-fw -s ${lanV4} -j nixos-fw-accept
       ip6tables -A nixos-fw -s ${lanV6} -j nixos-fw-accept
       ip6tables -A nixos-fw -s fe80::/10 -j nixos-fw-accept
+
+      # containers reach host services over the podman bridge, which no other
+      # rule covers — cartero's embedder was timing out on 10.88.0.1:11434
+      # because of exactly that. Opened per service rather than by trusting
+      # podman0, so a compromised container cannot reach every host port.
+      iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -d 10.88.0.1 -p tcp --dport 11434 -j nixos-fw-accept
     '';
 
     # tailscale sends from the tailnet address over an interface that the
