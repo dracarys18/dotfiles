@@ -17,7 +17,7 @@
     packs.uji-plugins.dir = "~/Projects/uji-plugins";
 
     plugins = {
-      statusline.enable = true;
+      statusline.enable = false;
       planmode.enable = true;
       telescope = {
         enable = true;

@@ -436,11 +436,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1792835498,
-        "narHash": "sha256-XQGpJAS38UZTcBG0542v2l0Cu7Pw/dRp/BSA1RkbUh0=",
+        "lastModified": 1792907920,
+        "narHash": "sha256-7KE9xB8EAS08xTGWVHzZzcEimL3OjLHccwLMnrUo1mE=",
         "ref": "refs/heads/main",
-        "rev": "f23e112afdf366abc3f46a5bb84655ed46281d92",
-        "revCount": 173,
+        "rev": "1c09f563d194c3e95258e768aae7c9e191025018",
+        "revCount": 179,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji"
       },
@@ -451,11 +451,11 @@
     },
     "uji-plugins": {
       "locked": {
-        "lastModified": 1792439421,
-        "narHash": "sha256-a2AfjVic9GdLRWitoEnNiCBChsJvnEXrjHCOWAKrkpA=",
+        "lastModified": 1792873288,
+        "narHash": "sha256-qB7tM9H0gLgC/mDNboJEFffLTkTGCj1gmnu++yJOVb0=",
         "ref": "refs/heads/main",
-        "rev": "9d39ba25430ab611976cdaef86a8b1dd4761219b",
-        "revCount": 34,
+        "rev": "9ea73a2816a55510d22bb932553a5d630e06c28c",
+        "revCount": 36,
         "type": "git",
         "url": "ssh://git@github.com/uji-labs/uji-plugins"
       },

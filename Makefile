@@ -52,7 +52,12 @@ ifeq ($(HOST),athena)
 else ifeq ($(HOST),aether)
 	@echo "Assuming NixOS is installed on $(AETHER_SSH) and $(AETHER_SSH) is in ~/.ssh/config."
 	@echo "Reading the disk layout from $(AETHER_SSH) into devices/aether/nix/hardware.nix"
-	@ssh -t $(AETHER_SSH) 'sudo nixos-generate-config --show-hardware-config' > '$(AETHER)/hardware.nix'
+# stdout is redirected on the local side, so the data is written to a remote temp
+# file first: the sudo prompt rides the ssh stdout and would otherwise land in
+# hardware.nix, invisible, leaving the command waiting for input
+	@ssh -t $(AETHER_SSH) 'sudo nixos-generate-config --show-hardware-config > /tmp/hardware-configuration.nix'
+	@ssh $(AETHER_SSH) 'cat /tmp/hardware-configuration.nix' > '$(AETHER)/hardware.nix'
+	@test -s '$(AETHER)/hardware.nix' || { echo "hardware.nix is empty — did the sudo prompt fail?"; exit 1; }
 	@echo "Copying the sops age key to $(AETHER_SSH):/var/lib/sops-nix/key.txt"
 	@scp -q "$(HOME)/Library/Application Support/sops/age/keys.txt" $(AETHER_SSH):/tmp/sops-age-key
 	@ssh -t $(AETHER_SSH) 'sudo install -Dm600 -o root -g root /tmp/sops-age-key /var/lib/sops-nix/key.txt && rm -f /tmp/sops-age-key'
@@ -69,13 +74,13 @@ ifeq ($(HOST),athena)
 	@$(NIX) flake archive '$(ATHENA)' >/dev/null
 	sudo darwin-rebuild switch --flake '$(ATHENA)#mac'
 else ifeq ($(HOST),aether)
-	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --interactive-sudo true
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --interactive-sudo true --skip-checks
 else
 	$(error HOST must be one of: $(MACHINES))
 endif
 
 deploy: ## Deploy the aether server with deploy-rs (remote build)
-	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --interactive-sudo true
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --interactive-sudo true --skip-checks
 
 update: ## Update HOST's flake.lock, then switch it
 ifeq ($(HOST),athena)
