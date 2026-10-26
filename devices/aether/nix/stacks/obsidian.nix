@@ -20,6 +20,8 @@ in
     volumes = [
       "${d}/couchdb-data:/opt/couchdb/data"
       "${d}/couchdb-etc:/opt/couchdb/etc/local.d"
+      # mounted after the directory so local.ini and docker.ini stay writable
+      "${./obsidian-couchdb.ini}:/opt/couchdb/etc/local.d/10-obsidian.ini:ro"
     ];
     ports = [ "127.0.0.1:5984:5984" ];
   };
