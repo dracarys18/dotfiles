@@ -8,13 +8,22 @@
 # on 127.0.0.1, and why AdGuard Home and Home Assistant run with host
 # networking: their ports land on INPUT, where this policy can scope them.
 {
+  config,
+  lib,
   ...
 }:
 
 let
-  # the LAN, IPv4 and IPv6. The v6 prefix comes from the router's RA and will
-  # change if the ISP renumbers; update it here when that happens
-  lanV4 = "192.168.0.0/24";
+  # the LAN, IPv4 and IPv6. The v4 subnet is read back from the interface
+  # config, so the address is written once (configuration.nix). The v6 prefix
+  # comes from the router's RA and cannot be known at eval time; it changes if
+  # the ISP renumbers, and only this line needs updating then.
+  # iptables masks the host bits, so 192.168.0.179/24 is added as 192.168.0.0/24
+  lanV4 =
+    let
+      a = lib.head config.networking.interfaces.lan0.ipv4.addresses;
+    in
+    "${a.address}/${toString a.prefixLength}";
   lanV6 = "2406:7400:54:c7f3::/64";
 in
 {
@@ -60,6 +69,21 @@ in
       # because of exactly that. Opened per service rather than by trusting
       # podman0, so a compromised container cannot reach every host port.
       iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -d 10.88.0.1 -p tcp --dport 11434 -j nixos-fw-accept
+
+      # Homepage's site monitors run inside the homepage container and ask for
+      # *.karthihegde.dev, which resolves to whatever tailnet address this box
+      # has today. Tailscale routes that address back out tailscale0, where
+      # ts-forward drops traffic that did not come from the tailnet, so the
+      # monitors time out. Rewrite any 443 request aimed at one of this host's
+      # own addresses to the bridge instead: Caddy still sees the original Host
+      # header (and serves the matching certificate), and only 443 from podman0
+      # is opened, not the whole host. addrtype LOCAL rather than the address
+      # itself, so a new tailnet address needs no edit here.
+      # -C first: nat rules are not flushed by a firewall reload, so a plain -A
+      # would stack a new copy on every switch.
+      iptables -t nat -C PREROUTING -i podman0 -s 10.88.0.0/16 -p tcp --dport 443 -m addrtype --dst-type LOCAL -j DNAT --to-destination 10.88.0.1:443 2>/dev/null \
+        || iptables -t nat -A PREROUTING -i podman0 -s 10.88.0.0/16 -p tcp --dport 443 -m addrtype --dst-type LOCAL -j DNAT --to-destination 10.88.0.1:443
+      iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -d 10.88.0.1 -p tcp --dport 443 -j nixos-fw-accept
     '';
 
     # tailscale sends from the tailnet address over an interface that the

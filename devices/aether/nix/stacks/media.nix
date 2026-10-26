@@ -92,9 +92,12 @@ in
     tailscale = {
       image = "tailscale/tailscale:latest";
       environment = {
-        # exit node is Mullvad Hong Kong: the Singapore server this used to
-        # point at (100.110.81.102) shows as "selected but offline" in
-        # `tailscale exit-node list`
+        # Mullvad Hong Kong. This is the one tailnet address that has to stay
+        # an IP: the image runs `tailscale up` before the netmap is loaded, and
+        # the CLI refuses to resolve an exit-node name at that point ("cannot
+        # resolve exit node by hostname while Tailscale is starting up"), which
+        # leaves this unit restarting forever. The Singapore server this used
+        # to point at shows as "selected but offline".
         TS_EXTRA_ARGS = "--exit-node=100.127.156.108 --accept-routes --exit-node-allow-lan-access --accept-dns=false";
         TS_STATE_DIR = "/var/lib/tailscale";
         TS_OUTBOUND_HTTP_PROXY_LISTEN = ":8118";
