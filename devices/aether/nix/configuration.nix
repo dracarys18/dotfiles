@@ -134,6 +134,11 @@
   ];
   boot.kernelParams = [ "acpi_enforce_resources=lax" ];
 
+  # fish is the login shell, same as the Mac. The NixOS module is needed as
+  # well: it puts fish in /etc/shells and writes /etc/fish/config.fish, while
+  # home-manager only writes the user's own config.
+  programs.fish.enable = true;
+
   environment.systemPackages = [
     pkgs.openrgb
     # neofetch is gone from nixpkgs (unmaintained upstream); fastfetch is the
@@ -156,6 +161,7 @@
   # same key as the old box, so `ssh arch` style access keeps working
   users.users.karthihegde = {
     isNormalUser = true;
+    shell = pkgs.fish;
     extraGroups = [
       "wheel"
       "podman"

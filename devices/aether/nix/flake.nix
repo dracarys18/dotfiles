@@ -14,6 +14,16 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # user-level config, so the shell and CLI tools match the Mac
+    home-manager = {
+      url = "github:nix-community/home-manager/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Neovim configured in Nix, same as the Mac
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -22,14 +32,23 @@
       nixpkgs,
       sops-nix,
       deploy-rs,
-    }:
+      ...
+    }@inputs:
     {
       # named `aether`, and not by hostname, so a rebuilt box switches to the same config
       nixosConfigurations.aether = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
           sops-nix.nixosModules.sops
+          inputs.home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+            home-manager.users.karthihegde = ./home;
+          }
         ];
       };
 
