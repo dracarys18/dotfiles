@@ -1,0 +1,35 @@
+# knot2 configuration, mounted at /etc/knot/config.toml. The master key is not
+# here: it comes from KNOT_MASTER_KEY in the sops environment file.
+[server]
+hostname = "tangled.karthihegde.dev"
+admins = ["did:plc:qhjzsqj3vfzpolc7ayswl7rv"]
+# inside the container; cloudflared reaches these by container name
+listen_addr = "[::]:5555"
+ssh_listen_addr = "[::]:22"
+ssh_host_key_file = "/data/ssh_host_key"
+appview_endpoint = "https://tangled.org"
+
+[repo]
+scan_path = "/data/repos"
+
+[secrets]
+sealed_key_file = "/data/sealed-keys"
+master_key_env = "KNOT_MASTER_KEY"
+
+[atproto]
+plc_directory = "https://plc.directory"
+
+[git]
+# GitHub mirrors cannot accept sha256 repositories
+object_format = "sha1"
+
+[contact]
+email = "me@karthihegde.dev"
+
+[xrpc]
+# the tunnel is the only client; it appends the real address
+trusted_proxy_header = "x-forwarded-for"
+trusted_proxies = ["10.88.0.0/16"]
+
+[acl]
+admission = "closed"

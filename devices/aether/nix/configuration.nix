@@ -239,6 +239,8 @@
       "media"
       "obsidian"
       "searchxng"
+      "tangled"
+      "tangled-knot"
     ] (name: {
       sopsFile = ./secrets/${name}.env;
       format = "dotenv";

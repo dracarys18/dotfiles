@@ -62,6 +62,84 @@ in
         CmpBorder.fg = "#585b70";
         Pmenu.bg = "NONE";
         TelescopeBorder.link = "FloatBorder";
+        # catppuccin paints line numbers and the sign column with surface1,
+        # which the overrides above turn into #111111, so both vanish against
+        # the black background
+        LineNr.fg = theme.fgMuted;
+        CursorLineNr.fg = theme.accent;
+        SignColumn.fg = theme.fgMuted;
+        # spell the diagnostics out instead of relying on catppuccin's
+        # defaults, so an update cannot silently drop them again
+        DiagnosticError = {
+          fg = "#f38ba8";
+          bg = "NONE";
+        };
+        DiagnosticWarn = {
+          fg = "#f9e2af";
+          bg = "NONE";
+        };
+        DiagnosticInfo = {
+          fg = "#89b4fa";
+          bg = "NONE";
+        };
+        DiagnosticHint = {
+          fg = "#94e2d5";
+          bg = "NONE";
+        };
+        DiagnosticSignError = {
+          fg = "#f38ba8";
+          bg = "NONE";
+        };
+        DiagnosticSignWarn = {
+          fg = "#f9e2af";
+          bg = "NONE";
+        };
+        DiagnosticSignInfo = {
+          fg = "#89b4fa";
+          bg = "NONE";
+        };
+        DiagnosticSignHint = {
+          fg = "#94e2d5";
+          bg = "NONE";
+        };
+        DiagnosticVirtualTextError = {
+          fg = "#f38ba8";
+          bg = "NONE";
+        };
+        DiagnosticVirtualTextWarn = {
+          fg = "#f9e2af";
+          bg = "NONE";
+        };
+        DiagnosticVirtualTextInfo = {
+          fg = "#89b4fa";
+          bg = "NONE";
+        };
+        DiagnosticVirtualTextHint = {
+          fg = "#94e2d5";
+          bg = "NONE";
+        };
+        # underline as well as undercurl: terminals that cannot draw a curly
+        # underline still show a straight one
+        DiagnosticUnderlineError = {
+          undercurl = true;
+          underline = true;
+          sp = "#f38ba8";
+        };
+        DiagnosticUnderlineWarn = {
+          undercurl = true;
+          underline = true;
+          sp = "#f9e2af";
+        };
+        DiagnosticUnderlineInfo = {
+          undercurl = true;
+          underline = true;
+          sp = "#89b4fa";
+        };
+        DiagnosticUnderlineHint = {
+          undercurl = true;
+          underline = true;
+          sp = "#94e2d5";
+        };
       };
     };
   };

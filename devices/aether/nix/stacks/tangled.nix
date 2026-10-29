@@ -1,68 +1,54 @@
-# ~/Projects/tangled — `knot` is not a registry image, it is built from
-# knot-docker/Dockerfile, so a oneshot service builds it before the container
-# starts. Put the source at /var/lib/stacks/tangled/knot-docker.
+# Tangled: knot2 from the core repo, built into an image on the box. The
+# upstream atcr.io image needs an account, and the core flake's NixOS module
+# evaluates the Rust package locally, which this Mac cannot build for linux.
+# knot2 listens on 5555 and 22, and the tunnel reaches it by container name,
+# so the existing Cloudflare ingress keeps working.
 { config, ... }:
 
 let
   d = "/var/lib/stacks/tangled";
-  podman = "${config.virtualisation.podman.package}/bin/podman";
 in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d ${d}/knot-docker 0755 root root -"
-    "d ${d}/knot-data 0755 root root -"
-    "d ${d}/knot-repos 0755 root root -"
-    "d ${d}/knot-repos/database 0755 root root -"
+    "d ${d}/data 0755 root root -"
+    "d ${d}/data/repos 0750 root root -"
+    "d ${d}/src 0755 root root -"
   ];
 
-  systemd.services.podman-build-knot = {
-    description = "build the knot image from /var/lib/stacks/tangled/knot-docker";
-    # not wantedBy: the Dockerfile has to be put there by hand, so this would
-    # otherwise fail on every boot and mark the system degraded — which makes
-    # deploy-rs roll the activation back
-    before = [ "podman-tangled-knot.service" ];
-    requiredBy = [ "podman-tangled-knot.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      test -f ${d}/knot-docker/Dockerfile ||
-        { echo "missing ${d}/knot-docker/Dockerfile" >&2; exit 1; }
-      ${podman} build -t knot:latest ${d}/knot-docker
-    '';
-  };
+  # rebuild the image with: sudo /etc/tangled-build.sh
+  environment.etc."tangled-build.sh".source = ./tangled-build.sh;
 
   virtualisation.oci-containers.containers = {
     tangled-knot = {
-      image = "knot:latest";
-      # dormant: the image has to be built from a source checkout that isn't in
-      # the repo, so starting it on a fresh box only produces a failed unit
-      autoStart = false;
-      environment = {
-        KNOT_SERVER_HOSTNAME = "tangled.karthihegde.dev";
-        KNOT_SERVER_OWNER = "did:plc:qhjzsqj3vfzpolc7ayswl7rv";
-        KNOT_REPO_SCAN_PATH = "/home/git/repositories";
-        KNOT_SERVER_INTERNAL_LISTEN_ADDR = "127.0.0.1:5444";
-        KNOT_SERVER_DB_PATH = "/home/git/database/knotserver.db";
-      };
-      # KNOT_SERVER_SECRET is a secret: devices/aether/nix/secrets/tangled.env
-      environmentFiles = [ config.sops.secrets."tangled".path ];
+      image = "knot2:latest";
+      # KNOT_MASTER_KEY: devices/aether/nix/secrets/tangled-knot.env
+      environmentFiles = [ config.sops.secrets."tangled-knot".path ];
       volumes = [
-        "${d}/knot-data:/knot"
-        "${d}/knot-repos:/home/git/repositories"
-        "${d}/knot-repos/database:/home/git/database"
+        "${./tangled-config.toml}:/etc/knot/config.toml:ro"
+        "${d}/data:/data"
+      ];
+      # the image's CMD passes the path as a bare argument, which knot-server
+      # treats as a subcommand
+      cmd = [
+        "--config"
+        "/etc/knot/config.toml"
+      ];
+      ports = [
+        "127.0.0.1:5555:5555"
+        "127.0.0.1:2222:22"
       ];
     };
 
     tangled-tunnel = {
       image = "cloudflare/cloudflared:latest";
-      cmd = [ "tunnel" "run" ];
-      # nothing to tunnel to while knot is dormant
-      autoStart = false;
-      # TUNNEL_TOKEN is a secret: devices/aether/nix/secrets/tangled.env
+      cmd = [
+        "tunnel"
+        "run"
+      ];
+      # TUNNEL_TOKEN: devices/aether/nix/secrets/tangled.env
       environmentFiles = [ config.sops.secrets."tangled".path ];
+      dependsOn = [ "tangled-knot" ];
     };
   };
 }

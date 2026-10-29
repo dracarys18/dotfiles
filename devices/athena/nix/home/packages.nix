@@ -95,6 +95,9 @@ in
     wget
     inetutils
     croc
+    # SSH to the tangled knot goes through its Cloudflare tunnel; the
+    # ProxyCommand in ~/.ssh/config points at this binary
+    cloudflared
     # mupdf keeps its app bundle only in nixpkgs: the brew formula installs
     # just mutool/mudraw, so the viewer would be lost (see darwin/homebrew.nix)
     mupdf

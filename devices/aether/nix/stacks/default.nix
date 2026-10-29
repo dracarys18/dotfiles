@@ -13,6 +13,6 @@
     ./obsidian.nix
     ./searchxng.nix
     ./bentopdf.nix
-    # tangled: knot is built from a source checkout that is not in this repo
+    ./tangled.nix
   ];
 }

@@ -3,7 +3,9 @@
     enable = true;
     settings = {
       keymap = {
-        preset = "default";
+        # Tab accepts the selected suggestion (ghost text included) and falls
+        # back to snippet jumps / indentation when no menu is open
+        preset = "super-tab";
         "<CR>" = [
           "accept"
           "fallback"
