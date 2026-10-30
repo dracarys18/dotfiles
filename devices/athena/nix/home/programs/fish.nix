@@ -131,7 +131,7 @@
       tf = "terraform";
       pdf = "mupdf-gl -I";
       loc = "tokei";
-      sshat = ''ssh arch -t "fish"'';
+      sshat = "ssh aether";
       # yabai/skhd are nix-darwin services here, so their own
       # `--restart-service` looks for plists that don't exist
       yabai-restart = ''launchctl kickstart -k gui/(id -u)/org.nixos.yabai'';

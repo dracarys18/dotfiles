@@ -1,0 +1,44 @@
+{
+  "segments": [
+    {
+      "text": {{ .Title | json }}
+    },
+    {
+      "text": "\n"
+    }
+    {{- if index .Metadata "comments" }},
+    {
+      "text": "Discussion",
+      "uri": {{ index .Metadata "comments" | json }}
+    },
+    {
+      "text": " | "
+    }
+    {{- end }},
+    {
+      "text": {{ .Source | json }}
+    }
+    {{- if index .Metadata "author" }},
+    {
+      "text": " | Author: "
+    },
+    {
+      "text": {{ index .Metadata "author" | json }}
+    }
+    {{- end }}
+    {{- if .MatchedKeywords }},
+    {
+      "text": "\n\n"
+    },
+    {
+      "tag": {{ hashtag .MatchedKeywords | json }}
+    }
+    {{- end }}
+  ],
+  "embed": {
+    "uri": {{ .GetLink.String | json }},
+    "title": {{ .Title | json }},
+    "description": {{ if .TextContent }}{{ .TextContent.Description | json }}{{ else }}""{{ end }},
+    "thumbnail_url": {{ if .TextContent }}{{ .TextContent.Image | json }}{{ else }}""{{ end }}
+  }
+}

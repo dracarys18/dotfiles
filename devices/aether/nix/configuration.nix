@@ -153,9 +153,12 @@
   boot.loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
+    # memtest86+ in the boot menu: the only way to cover every cell of the 32G
+    # kit, which memtester inside the running system cannot do
+    systemd-boot.memtest86.enable = true;
     # the ESP is only 511M and every generation adds a bootloader entry, so cap
     # them rather than letting twenty pile up
-    systemd-boot.configurationLimit = 5;
+    systemd-boot.configurationLimit = 2;
   };
 
   # same key as the old box, so `ssh arch` style access keeps working

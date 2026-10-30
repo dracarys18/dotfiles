@@ -1,0 +1,41 @@
+{
+  "title": {{ .Title | json }},
+  "url": {{ .GetLink.String | json }},
+  "color": 3447003,
+  "thumbnail_url": {{ if .TextContent }}{{ .TextContent.Image | json }}{{ else }}""{{ end }},
+  "timestamp": {{ .Timestamp.Format "2006-01-02T15:04:05Z07:00" | json }},
+  "fields": [
+    {{- if index .Metadata "score" }}
+    {
+      "name": "Score",
+      "value": "{{ index .Metadata "score" }}",
+      "inline": true
+    }{{ if or (index .Metadata "author") (index .Metadata "comments") }},{{ end }}
+    {{- end }}
+    {{- if index .Metadata "author" }}
+    {
+      "name": "Author",
+      "value": {{ index .Metadata "author" | json }},
+      "inline": true
+    }{{ if index .Metadata "comments" }},{{ end }}
+    {{- end }}
+    {{- if index .Metadata "comments" }}
+    {
+      "name": "Comments",
+      "value": {{ if index .Metadata "comment_count" }}{{ printf "[Discussion (%d comments)](%s)" (index .Metadata "comment_count") (index .Metadata "comments") | json }}{{ else }}{{ printf "[Discussion](%s)" (index .Metadata "comments") | json }}{{ end }},
+      "inline": false
+    }
+    {{- if index .Metadata "summary" -}},{{- end -}}
+    {{- end }}
+    {{- if index .Metadata "summary" }}
+    {
+      "name": "Summary",
+      "value": {{ slice (index .Metadata "summary") 0 1020 | printf "%s ..." | json }},
+      "inline": false
+    }
+    {{- end }}
+  ],
+  "footer": {
+    "text": {{ printf "Source: %s" .Source | json }}
+  }
+}

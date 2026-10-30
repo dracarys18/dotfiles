@@ -1,0 +1,252 @@
+[bot]
+name = "cartero"
+interval = "30m"
+run_once = false
+
+[redis]
+addr = "cartero-redis:6379"
+password = ""
+db = 0
+
+[storage]
+type = "postgres"
+dsn = "postgres://cartero:cartero@cartero-postgres:5432/cartero?sslmode=disable"
+
+[platforms.jev]
+type = "jev"
+enabled = true
+[platforms.jev.settings]
+api_key = "@JEV_API_KEY@"
+model = "jev-latest"
+
+[platforms.discord]
+type = "discord"
+sleep = "10s"
+enabled = false
+[platforms.discord.settings]
+bot_token = "@DISCORD_BOT_TOKEN@"
+timeout = "60s"
+
+[platforms.bluesky]
+type = "bluesky"
+enabled = true
+[platforms.bluesky.settings]
+identifier = "news.karthihegde.dev"
+password = "@BLUESKY_PASSWORD@"
+
+[platforms.embedder]
+type = "ollama"
+enabled = true
+[platforms.embedder.settings]
+#base_url = "https://api.cloudflare.com/client/v4/accounts/c7c04c6c39420e26c4dfd78bba3f56f0/ai/v1"
+#embedding_model = "@cf/baai/bge-m3"
+embedding_model = "bge-m3"
+
+[platforms.reranker]
+type = "rerank"
+enabled = true
+[platforms.reranker.settings]
+rerank_url = "http://reranker:80"
+
+[platforms.telegram]
+type = "telegram"
+enabled = false
+[platforms.telegram.settings]
+tg_bot_token = "@TELEGRAM_BOT_TOKEN@"
+
+[targets.telegram_deliv]
+type = "telegram"
+enabled = true
+platform = "telegram"
+[targets.telegram_deliv.settings]
+chat_id = -1003843279436
+
+[sources.lesswrong]
+type = "lesswrong"
+enabled = true
+targets = ["feed_target", "bluesky"]
+[sources.lesswrong.settings]
+max_items = 20
+
+[sources.hackernews]
+type = "hackernews"
+enabled = true
+targets = ["feed_target", "bluesky"]
+[sources.hackernews.settings]
+story_type = "topstories"
+max_items = 100
+
+[sources.lobsters]
+type = "lobsters"
+enabled = true
+targets = ["feed_target","bluesky"]
+[sources.lobsters.settings]
+max_items = 50
+sort_by = "hot"
+include_categories = ["go","rust","c","linux", "android", "security", "devops", "scaling","performance", "compilers", "vim", "databases", "zig"]
+exclude_categories = []
+
+[sources.techcrunch]
+type = "scraper"
+enabled = true
+targets = ["feed_target", "bluesky"]
+[sources.techcrunch.settings]
+scraper_type = "internal"
+scraper_name = "techcrunch"
+max_items = 20
+[sources.techcrunch.settings.config]
+
+[processors.dedupe]
+type = "dedupe"
+enabled = true
+[processors.dedupe.settings]
+ttl = "1h"
+
+[processors.score_filter]
+type = "filter_score"
+enabled = false
+depends_on = ["dedupe"]
+[processors.score_filter.settings]
+min_score = 0
+
+[interests]
+keywords_file = "https://gist.githubusercontent.com/dracarys18/c39af1e5f138d66f14311b7b8c368a6c/raw/1affd930dd5ba5b3619bd0debc00691b6bf8a98f/keywords.json"
+off_topic_threshold = 0.8
+min_quality = 2.0
+min_quality_incomplete = 1.4
+
+[processors.extract_text]
+type = "extract_text"
+enabled = true
+depends_on = ["keyword_filter"]
+[processors.extract_text.settings]
+max_chunks = 1000
+min_content_length = 300
+reader_url = "https://r.jina.ai/"
+concurrency = 20
+
+[processors.embed]
+type = "embed_text"
+enabled = true
+[processors.embed.settings]
+concurrency = 2
+chunk_size = 1000
+max_chunks = 5
+cache_ttl = "48h"
+
+[processors.summary]
+type = "summary"
+enabled = false
+depends_on = ["extract_text"]
+[processors.summary.settings]
+model = "gemma3:1b"
+
+[targets.discord_hn]
+type = "discord"
+enabled = true
+platform = "discord"
+[targets.discord_hn.settings]
+channel_id = "1439587825619046532"
+channel_type = "forum"
+
+[targets.discord_lobsters]
+type = "discord"
+enabled = true
+platform = "discord"
+[targets.discord_lobsters.settings]
+channel_id = "1439587825619046532"
+channel_type = "forum"
+
+[targets.discord_lw]
+type = "discord"
+enabled = true
+platform = "discord"
+[targets.discord_lw.settings]
+channel_id = "1454788826709889196"
+channel_type = "forum"
+[targets.feed_target]
+type = "feed"
+enabled = true
+[targets.feed_target.settings]
+port = "8080"
+feed_size = 100
+max_items = 50
+site_url = "https://news.karthihegde.dev"
+site_name = "Cartero"
+site_description = "Cartero is all in one news about Tech, AI and Math"
+search_max_distance = 0.6
+[targets.bluesky]
+type = "bluesky"
+enabled = true
+platform = "bluesky"
+[targets.bluesky_bluesky.settings]
+languages = ["en"]
+
+[sources.tech_blogs]
+type = "rss"
+enabled = true
+targets = ["feed_target", "bluesky"]
+[sources.tech_blogs.settings]
+max_items = 10
+[sources.tech_blogs.settings.from]
+type = "opml"
+kind = "file"
+value = "/app/myfeed.opml"
+
+[processors.template_transform]
+type = "template"
+enabled = true
+depends_on = ["extract_fields"]
+[processors.template_transform.settings]
+template = "Title: {{.title}}, Author: {{.author}}"
+
+[processors.published_at_filter]
+type = "filter_published"
+enabled = true
+depends_on = ["dedupe"]
+[processors.published_at_filter.settings]
+after = "2026-07-01T00:00:00Z"
+
+[processors.embed_dedupe]
+type = "embed_dedupe"
+enabled = true
+[processors.embed_dedupe.settings]
+embed_threshold = 0.8
+embed_window = "168h"
+
+[blocklist]
+domains_file = "https://gist.githubusercontent.com/dracarys18/435d3d14814bd6077cf383a6701d5c67/raw/593561bafc6e1a2f89a63ca7483ac71e726dc1f8/spamlist.txt"
+
+[prompts.topic]
+instructions = "Which topic is this article about? Judge by its main subject, not passing mentions."
+none = "The article is unrelated to all of the other topics, such as general news, politics, lifestyle or culture."
+
+[prompts.quality]
+instructions = """
+How valuable is this to an experienced software engineer who reads for depth rather than news? \
+Judge the substance, not how popular its topic is. \
+For a software project or tool, judge how useful and technically interesting the project is, not how long its description is. \
+If content_status is incomplete, rate what the title and summary suggest instead of treating the article as empty.\
+"""
+incomplete = "incomplete: the article text could not be fully retrieved"
+levels = [
+  "Worthless: spam, marketing or a sales pitch, SEO filler, AI-generated fluff, or no real content.",
+  "Thin: a news blurb, rebrand or product announcement, link roundup, listicle, or opinion with little evidence or technical detail.",
+  "Decent: a clear article with some useful information or perspective, or a working open-source project or tool with a clear description of what it does.",
+  "Substantive: original insight, real technical depth, data, or hands-on experience an experienced engineer would learn from, or a notable project with real technical substance.",
+  "Exceptional: an in-depth investigation, definitive deep-dive, novel result, or standout project worth saving and sharing.",
+]
+
+[[prompts.flags]]
+name = "clickbait"
+question = "Is the title clickbait: does it tease, exaggerate or withhold what the article is about to bait clicks (e.g. 'You won't believe', 'This one trick', vague teasers) instead of plainly stating the subject?"
+threshold = 0.7
+
+[[prompts.flags]]
+name = "advertisement"
+question = "Is this a sales pitch: content whose main purpose is getting readers to buy, subscribe to or sign up for a commercial product or service (landing page, sponsored post, webinar or event promo, customer case study)? Announcements of new AI models, software or library releases, and open-source projects are news, not sales pitches."
+threshold = 0.7
+[[prompts.flags]]
+name = "research_slop"
+question = "Is this an unrefereed preprint (for example on arXiv) whose main contribution is a benchmark, evaluation, survey or a minor variation of existing work, rather than a new result or method worth reading?"
+threshold = 0.6

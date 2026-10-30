@@ -1,10 +1,13 @@
 # ~/Projects/cartero — compose put `tunnel` and `reader` behind profiles, so
 # they are declared with autoStart = false: present, started by hand when wanted.
+#
+# config.toml, myfeed.opml and the templates are checked in under ./cartero and
+# mounted out of the store; only postgres/redis/data are runtime state.
 { config, ... }:
 
 let
   d = "/var/lib/stacks/cartero";
-  project = "/var/lib/stacks/cartero/src";
+  cfg = ./cartero;
 in
 {
   systemd.tmpfiles.rules = [
@@ -12,8 +15,49 @@ in
     "d ${d}/redis 0755 root root -"
     "d ${d}/postgres 0755 root root -"
     "d ${d}/data 0755 root root -"
-    "d ${project} 0755 root root -"
   ];
+
+  # the checked-in config.toml carries @PLACEHOLDER@ markers; the four values it
+  # needs live in sops and are substituted into the rendered copy
+  sops.secrets = {
+    "cartero-config/jev_api_key" = {
+      sopsFile = ../secrets/cartero-config.yaml;
+      key = "jev_api_key";
+      mode = "0400";
+    };
+    "cartero-config/discord_bot_token" = {
+      sopsFile = ../secrets/cartero-config.yaml;
+      key = "discord_bot_token";
+      mode = "0400";
+    };
+    "cartero-config/bluesky_password" = {
+      sopsFile = ../secrets/cartero-config.yaml;
+      key = "bluesky_password";
+      mode = "0400";
+    };
+    "cartero-config/telegram_bot_token" = {
+      sopsFile = ../secrets/cartero-config.yaml;
+      key = "telegram_bot_token";
+      mode = "0400";
+    };
+  };
+
+  sops.templates."cartero-config.toml" = {
+    content = builtins.replaceStrings
+      [
+        "@JEV_API_KEY@"
+        "@DISCORD_BOT_TOKEN@"
+        "@BLUESKY_PASSWORD@"
+        "@TELEGRAM_BOT_TOKEN@"
+      ]
+      [
+        config.sops.placeholder."cartero-config/jev_api_key"
+        config.sops.placeholder."cartero-config/discord_bot_token"
+        config.sops.placeholder."cartero-config/bluesky_password"
+        config.sops.placeholder."cartero-config/telegram_bot_token"
+      ]
+      (builtins.readFile (cfg + "/config.toml"));
+  };
 
   virtualisation.oci-containers.containers = {
     cartero-redis = {
@@ -42,9 +86,9 @@ in
       };
       environmentFiles = [ config.sops.secrets."cartero".path ];
       volumes = [
-        "${project}/config.toml:/app/config.toml:ro"
-        "${project}/myfeed.opml:/app/myfeed.opml:ro"
-        "${project}/templates:/app/templates:ro"
+        "${config.sops.templates."cartero-config.toml".path}:/app/config.toml:ro"
+        "${cfg}/myfeed.opml:/app/myfeed.opml:ro"
+        "${cfg}/templates:/app/templates:ro"
         "${d}/data:/app/data"
       ];
       ports = [ "127.0.0.1:8034:8080" ];
@@ -52,7 +96,6 @@ in
         "-config"
         "/app/config.toml"
       ];
-      # config.toml, myfeed.opml and templates live in ${project}
       dependsOn = [
         "cartero-postgres"
         "cartero-redis"

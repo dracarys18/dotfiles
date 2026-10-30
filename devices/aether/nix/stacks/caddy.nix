@@ -25,6 +25,10 @@ in
     # CF_API_TOKEN comes from sops: devices/aether/nix/secrets/caddy.env
     environmentFile = config.sops.secrets."caddy".path;
 
+    # globalConfig turns the admin API off, so `caddy reload` has nothing to
+    # talk to and fails the whole activation. Restart on config changes instead.
+    enableReload = false;
+
     globalConfig = ''
       admin off
       acme_dns cloudflare {
@@ -45,7 +49,6 @@ in
 
       "keep.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3069";
       "pdf.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8069";
-      "feed.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8034";
       "media.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8096";
       "requests.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5055";
       "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3669";

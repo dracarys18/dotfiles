@@ -1,0 +1,91 @@
+- Tools:
+    - AdGuard Home:
+        href: https://dns.karthihegde.dev/
+        description: DNS, filtering and per-client rules
+        icon: adguard-home.png
+        siteMonitor: https://dns.karthihegde.dev/
+    - Authelia:
+        href: https://auth.karthihegde.dev/
+        description: Single sign-on in front of the rest
+        icon: authelia.png
+        siteMonitor: https://auth.karthihegde.dev/
+    - SearXNG:
+        href: https://search.karthihegde.dev/
+        description: Meta search
+        icon: searxng.png
+        siteMonitor: https://search.karthihegde.dev/
+    - BentoPDF:
+        href: https://pdf.karthihegde.dev/
+        description: PDF toolkit, runs entirely in the browser
+        icon: bentopdf.png
+        siteMonitor: https://pdf.karthihegde.dev/
+
+- News:
+    - Cartero:
+        href: https://news.karthihegde.dev/
+        description: Feed reader and Bluesky publisher
+        icon: /images/cartero.png
+        siteMonitor: https://news.karthihegde.dev/
+
+- Media:
+    - Radarr:
+        href: https://radarr.karthihegde.dev/
+        description: Films
+        icon: radarr.png
+        siteMonitor: https://radarr.karthihegde.dev/
+        widget:
+          type: radarr
+          url: http://radarr:7878
+          key: 89bbdf2a760a4a5089f6b2b5248d3d71
+    - Sonarr:
+        href: https://sonarr.karthihegde.dev/
+        description: TV
+        icon: sonarr.png
+        siteMonitor: https://sonarr.karthihegde.dev/
+        widget:
+          type: sonarr
+          url: http://sonarr:8989
+          key: 4512177946074403b0c4cb6f27ea51dd
+    - Prowlarr:
+        href: https://prowlarr.karthihegde.dev/
+        description: Indexer manager for the *arr apps
+        icon: prowlarr.png
+        siteMonitor: https://prowlarr.karthihegde.dev/
+        widget:
+          type: prowlarr
+          url: http://prowlarr:9696
+          key: 303e33d3a3e2479ba77d55e6e082b49a
+    - Jellyfin:
+        href: https://media.karthihegde.dev/
+        description: Films and TV
+        icon: jellyfin.png
+        siteMonitor: https://media.karthihegde.dev/
+    - Jellyseerr:
+        href: https://requests.karthihegde.dev/
+        description: Media requests
+        icon: jellyseerr.png
+        siteMonitor: https://requests.karthihegde.dev/
+    - qBittorrent:
+        href: https://torrent.karthihegde.dev/
+        description: Torrents, routed through Mullvad
+        icon: qbittorrent.png
+        siteMonitor: https://torrent.karthihegde.dev/
+
+- Automation:
+    - Home Assistant:
+        href: https://has.karthihegde.dev/
+        description: Smart home
+        icon: home-assistant.png
+        siteMonitor: https://has.karthihegde.dev/
+
+- Notes:
+    - Obsidian:
+        href: https://note.karthihegde.dev/
+        description: CouchDB vault sync
+        icon: obsidian.png
+        siteMonitor: https://note.karthihegde.dev/
+    - Karakeep:
+        href: https://keep.karthihegde.dev/
+        description: Bookmarks
+        icon: karakeep.png
+        siteMonitor: https://keep.karthihegde.dev/
