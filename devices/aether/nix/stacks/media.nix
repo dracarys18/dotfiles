@@ -37,7 +37,10 @@ in
     "d ${d}/config/sonarr 0755 root root -"
     "d ${d}/config/prowlarr 0755 root root -"
     "d ${d}/config/qbittorrent 0755 root root -"
-    "d ${d}/config/seerr 0755 root root -"
+    # the seerr image runs as node:node (uid 1000) with no root startup step to
+    # fix ownership, unlike the linuxserver images, so the dir must be owned
+    # correctly before it boots
+    "d ${d}/config/seerr 0775 1000 1000 -"
     "d ${d}/config/tailscale 0755 root root -"
     "d ${d}/data 0755 root root -"
     "d ${d}/data/media 0755 root root -"

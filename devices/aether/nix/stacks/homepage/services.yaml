@@ -60,10 +60,10 @@
         description: Films and TV
         icon: jellyfin.png
         siteMonitor: https://media.karthihegde.dev/
-    - Jellyseerr:
+    - Seerr:
         href: https://requests.karthihegde.dev/
         description: Media requests
-        icon: jellyseerr.png
+        icon: seerr.png
         siteMonitor: https://requests.karthihegde.dev/
     - qBittorrent:
         href: https://torrent.karthihegde.dev/
