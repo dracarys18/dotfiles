@@ -55,15 +55,19 @@ in
 
       # Home Assistant opens 18555/tcp and nothing claims it: not in its
       # config, not in its log, and it accepts a connection then says nothing.
-      # Like any unlisted port the LAN and the WAN already cannot reach it,
-      # but trustedInterfaces accepts tailscale0 whole before this chain runs,
-      # so the tailnet can. Loopback stays open in case an integration is
-      # talking to itself over it. -I 1 because the accept above comes first;
-      # -C first so a repeated run cannot stack copies.
-      iptables -C nixos-fw ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
-        || iptables -I nixos-fw 1 ! -i lo -p tcp --dport 18555 -j DROP
-      ip6tables -C nixos-fw ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
-        || ip6tables -I nixos-fw 1 ! -i lo -p tcp --dport 18555 -j DROP
+      # Like any unlisted port the LAN and the WAN already cannot reach it, but
+      # the tailnet could, and not because of trustedInterfaces as first
+      # assumed: rules added to nixos-fw are never reached from tailscale0,
+      # because tailscaled's own ts-input chain accepts that interface higher
+      # up. The raw table runs before every filter chain, so the drop lands
+      # ahead of ts-input however often tailscaled rebuilds it. Loopback is
+      # left alone in case an integration is talking to itself over it. -C
+      # first: a firewall reload does not flush the raw table, so a plain -A
+      # would stack a copy on every switch.
+      iptables -t raw -C PREROUTING ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
+        || iptables -t raw -I PREROUTING 1 ! -i lo -p tcp --dport 18555 -j DROP
+      ip6tables -t raw -C PREROUTING ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
+        || ip6tables -t raw -I PREROUTING 1 ! -i lo -p tcp --dport 18555 -j DROP
 
       # the LAN gets DNS and nothing else. A blanket accept used to be here,
       # but the only thing it was carrying was resolver traffic from two LAN
