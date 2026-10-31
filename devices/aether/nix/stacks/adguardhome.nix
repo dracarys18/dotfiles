@@ -1,7 +1,7 @@
 # ~/Projects/adguardhome — this box is the tailnet's resolver, so it is the
 # last stack to switch over. AdGuard Home does the filtering per client and
 # load-balances between Cloudflare over DoT and the host's unbound on
-# 127.0.0.1:5335, which in turn resolves over TLS and validates DNSSEC (see
+# 127.0.0.1:53, which in turn resolves over TLS and validates DNSSEC (see
 # configuration.nix).
 #
 # It runs with host networking, unlike every other stack: :53 has to be

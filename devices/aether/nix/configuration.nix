@@ -108,10 +108,8 @@
     }
   ];
   networking.defaultGateway = "192.168.0.1";
-  networking.nameservers = [
-    "1.1.1.1"
-    "9.9.9.9"
-  ];
+  # the only resolver on the box is unbound, on loopback
+  networking.nameservers = [ "127.0.0.1" ];
 
   # This ISP hijacks plain UDP DNS, not just its own resolver: a query sent to
   # j.root-servers.net for x1337x.cc came back in 2 ms with 202.83.21.15, which
@@ -125,11 +123,10 @@
   # ~600ms on a cold name, to keep queries away from a third-party resolver.
   # This box forwards instead.
   #
-  # unbound is therefore the one resolver the host, the containers (via
-  # resolved) and AdGuard Home ask. It caches and validates DNSSEC locally, and
+  # unbound is the one resolver on this box: the host reads it from resolv.conf,
+  # the containers reach it through podman's DNS, and AdGuard Home asks it for
+  # every LAN and tailnet query. It caches and validates DNSSEC itself and
   # forwards upstream over TLS, where an injected answer cannot be signed.
-  # resolved keeps running because containers get DNS through it, but it no
-  # longer does TLS itself and leaves validation to unbound.
   #
   # The deploy path uses the IP from ~/.ssh/config, so a resolver outage cannot
   # lock the box out of itself.
@@ -137,11 +134,22 @@
     enable = true;
     settings = {
       server = {
-        # AdGuard Home runs with --network=host, so loopback reaches it. Nothing
-        # else may: no firewall hole is needed for this port.
-        interface = [ "127.0.0.1" ];
-        port = 5335;
-        access-control = [ "127.0.0.0/8 allow" ];
+        # the resolver for the host and for every container that uses podman's
+        # DNS — the VPN sidecar keeps its own resolv.conf, see media.nix — so it
+        # takes port 53 on loopback. AdGuard Home stops binding 127.0.0.1 to
+        # leave it free and asks unbound there itself. Loopback only, so no
+        # firewall hole is needed. ::1 as well, because openresolv writes both
+        # 127.0.0.1 and ::1 into resolv.conf and a dead second server is a
+        # timeout on every lookup that reaches it.
+        interface = [
+          "127.0.0.1"
+          "::1"
+        ];
+        port = 53;
+        access-control = [
+          "127.0.0.0/8 allow"
+          "::1/128 allow"
+        ];
         harden-glue = true;
         harden-dnssec-stripped = true;
         val-clean-additional = true;
@@ -164,15 +172,12 @@
     };
   };
 
-  services.resolved = {
-    enable = true;
-    settings.Resolve = {
-      DNS = [ "127.0.0.1:5335" ];
-      DNSOverTLS = "no";
-      DNSSEC = "no";
-      Domains = [ "~." ];
-    };
-  };
+  # systemd-resolved is not in the path any more: it only ever forwarded to
+  # unbound, so the host and the containers now read a resolv.conf pointing
+  # straight at 127.0.0.1. One less process whose cache and DNSSEC settings can
+  # disagree with the resolver that actually answers. `resolvectl` goes with it;
+  # use `dig @127.0.0.1` instead.
+  services.resolved.enable = false;
 
   # HA's bluetooth integration talks to bluetoothd over D-Bus; without this the
   # radio shows up as hci0 but nothing can manage it

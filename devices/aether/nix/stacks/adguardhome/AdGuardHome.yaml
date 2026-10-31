@@ -1,3 +1,7 @@
+# AdGuard Home's config, owned by this repo. adguardhome-config renders it at
+# container start (bcrypt hash from sops) over /var/lib/stacks/adguardhome/conf,
+# and podman-adguardhome carries it as a restartTrigger, so editing this file is
+# the only way to change AdGuard's settings — the UI's copy is discarded.
 http:
   pprof:
     port: 6060
@@ -12,7 +16,7 @@ http:
   address: 0.0.0.0:3000
   session_ttl: 30d
 users:
-  - name: me@karthihegde.dev
+  - name: admin
     password: '@ADGUARD_PASSWORD_HASH@'
 auth_attempts: 5
 block_auth_min: 15
@@ -21,7 +25,6 @@ language: en
 theme: dark
 dns:
   bind_hosts:
-    - 127.0.0.1
     - 192.168.0.179
     - 100.113.199.45
   port: 53
@@ -32,7 +35,7 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - 127.0.0.1:5335
+    - 127.0.0.1:53
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
