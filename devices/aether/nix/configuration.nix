@@ -108,76 +108,41 @@
     }
   ];
   networking.defaultGateway = "192.168.0.1";
-  # the only resolver on the box is unbound, on loopback
-  networking.nameservers = [ "127.0.0.1" ];
+  networking.nameservers = [
+    "1.1.1.1"
+    "1.0.0.1"
+  ];
 
   # This ISP hijacks plain UDP DNS, not just its own resolver: a query sent to
   # j.root-servers.net for x1337x.cc came back in 2 ms with 202.83.21.15, which
-  # that server does not answer for, while the same lookup over IPv6 or over
-  # TLS gives Cloudflare's 104.21.83.238. Every destination on 53/udp is being
-  # answered by the ISP, so plain recursion is no safer here than forwarding.
+  # that server does not answer for, while the same lookup over TLS gives
+  # Cloudflare's 104.21.83.238. Every destination on 53/udp is answered by the
+  # ISP, so resolve over TLS, where an injected answer cannot be authenticated.
   #
-  # Recursion over TCP does work here — the interception is UDP-only, and a
-  # tcp-upstream unbound resolved the domain honestly when tested — but it was
-  # dropped on purpose: it costs a fresh TCP connection per authoritative hop,
-  # ~600ms on a cold name, to keep queries away from a third-party resolver.
-  # This box forwards instead.
+  # unbound lived here for a while and is deliberately gone: as a DoT forwarder
+  # it only added a hop in front of resolved, and as a recursive resolver
+  # (tcp-upstream does dodge the hijack — the interception is UDP-only) it cost
+  # a fresh TCP connection per authoritative server, ~600ms on a cold name.
+  # resolved does the same job with fewer moving parts.
   #
-  # unbound is the one resolver on this box: the host reads it from resolv.conf,
-  # the containers reach it through podman's DNS, and AdGuard Home asks it for
-  # every LAN and tailnet query. It caches and validates DNSSEC itself and
-  # forwards upstream over TLS, where an injected answer cannot be signed.
+  # DNSSEC stays off, as it was before any of this: the answers come from
+  # Cloudflare already validated, and a second validator on the box would only
+  # turn a bad signature into a SERVFAIL this config cannot explain.
   #
   # The deploy path uses the IP from ~/.ssh/config, so a resolver outage cannot
   # lock the box out of itself.
-  services.unbound = {
+  services.resolved = {
     enable = true;
-    settings = {
-      server = {
-        # the resolver for the host and for every container that uses podman's
-        # DNS — the VPN sidecar keeps its own resolv.conf, see media.nix — so it
-        # takes port 53 on loopback. AdGuard Home stops binding 127.0.0.1 to
-        # leave it free and asks unbound there itself. Loopback only, so no
-        # firewall hole is needed. ::1 as well, because openresolv writes both
-        # 127.0.0.1 and ::1 into resolv.conf and a dead second server is a
-        # timeout on every lookup that reaches it.
-        interface = [
-          "127.0.0.1"
-          "::1"
-        ];
-        port = 53;
-        access-control = [
-          "127.0.0.0/8 allow"
-          "::1/128 allow"
-        ];
-        harden-glue = true;
-        harden-dnssec-stripped = true;
-        val-clean-additional = true;
-        prefetch = true;
-        # Cloudflare answers with a 300s TTL; caching that for an hour would
-        # make record changes crawl, so keep the floor low and only cap the top
-        cache-min-ttl = 300;
-        cache-max-ttl = 86400;
-      };
-      forward-zone = [
-        {
-          name = ".";
-          forward-tls-upstream = true;
-          forward-addr = [
-            "1.1.1.1@853#cloudflare-dns.com"
-            "9.9.9.9@853#dns.quad9.net"
-          ];
-        }
+    settings.Resolve = {
+      DNS = [
+        "1.1.1.1#cloudflare-dns.com"
+        "1.0.0.1#cloudflare-dns.com"
       ];
+      DNSOverTLS = "yes";
+      DNSSEC = "no";
+      Domains = [ "~." ];
     };
   };
-
-  # systemd-resolved is not in the path any more: it only ever forwarded to
-  # unbound, so the host and the containers now read a resolv.conf pointing
-  # straight at 127.0.0.1. One less process whose cache and DNSSEC settings can
-  # disagree with the resolver that actually answers. `resolvectl` goes with it;
-  # use `dig @127.0.0.1` instead.
-  services.resolved.enable = false;
 
   # HA's bluetooth integration talks to bluetoothd over D-Bus; without this the
   # radio shows up as hci0 but nothing can manage it

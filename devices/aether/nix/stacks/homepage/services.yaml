@@ -1,7 +1,7 @@
 - Tools:
     - AdGuard Home:
         href: https://dns.karthihegde.dev/
-        description: DNS filtering; upstream is unbound on this box
+        description: DNS filtering; resolves over DoT to Cloudflare
         icon: adguard-home.png
         siteMonitor: https://dns.karthihegde.dev/
     - Authelia:
