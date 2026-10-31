@@ -53,6 +53,18 @@ in
       iptables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
       ip6tables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
 
+      # Home Assistant opens 18555/tcp and nothing claims it: not in its
+      # config, not in its log, and it accepts a connection then says nothing.
+      # Like any unlisted port the LAN and the WAN already cannot reach it,
+      # but trustedInterfaces accepts tailscale0 whole before this chain runs,
+      # so the tailnet can. Loopback stays open in case an integration is
+      # talking to itself over it. -I 1 because the accept above comes first;
+      # -C first so a repeated run cannot stack copies.
+      iptables -C nixos-fw ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
+        || iptables -I nixos-fw 1 ! -i lo -p tcp --dport 18555 -j DROP
+      ip6tables -C nixos-fw ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
+        || ip6tables -I nixos-fw 1 ! -i lo -p tcp --dport 18555 -j DROP
+
       # the LAN gets DNS and nothing else. A blanket accept used to be here,
       # but the only thing it was carrying was resolver traffic from two LAN
       # devices: every *.karthihegde.dev record points at a tailnet address, so
