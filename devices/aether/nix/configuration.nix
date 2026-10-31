@@ -113,18 +113,62 @@
     "9.9.9.9"
   ];
 
-  # This ISP poisons plain UDP DNS: x1337x.cc answered 202.83.21.15 over :53
-  # (unreachable) while the same query over TLS/HTTPS answered Cloudflare's
-  # 104.21.83.238. Resolve over TLS so poisoning stops working. The deploy path
-  # uses the IP from ~/.ssh/config, so a resolver outage cannot lock the box out.
+  # This ISP hijacks plain UDP DNS, not just its own resolver: a query sent to
+  # j.root-servers.net for x1337x.cc came back in 2 ms with 202.83.21.15, which
+  # that server does not answer for, while the same lookup over IPv6 or over
+  # TLS gives Cloudflare's 104.21.83.238. Every destination on 53/udp is being
+  # answered by the ISP, so plain recursion is no safer here than forwarding.
+  #
+  # Recursion over TCP does work here — the interception is UDP-only, and a
+  # tcp-upstream unbound resolved the domain honestly when tested — but it was
+  # dropped on purpose: it costs a fresh TCP connection per authoritative hop,
+  # ~600ms on a cold name, to keep queries away from a third-party resolver.
+  # This box forwards instead.
+  #
+  # unbound is therefore the one resolver the host, the containers (via
+  # resolved) and AdGuard Home ask. It caches and validates DNSSEC locally, and
+  # forwards upstream over TLS, where an injected answer cannot be signed.
+  # resolved keeps running because containers get DNS through it, but it no
+  # longer does TLS itself and leaves validation to unbound.
+  #
+  # The deploy path uses the IP from ~/.ssh/config, so a resolver outage cannot
+  # lock the box out of itself.
+  services.unbound = {
+    enable = true;
+    settings = {
+      server = {
+        # AdGuard Home runs with --network=host, so loopback reaches it. Nothing
+        # else may: no firewall hole is needed for this port.
+        interface = [ "127.0.0.1" ];
+        port = 5335;
+        access-control = [ "127.0.0.0/8 allow" ];
+        harden-glue = true;
+        harden-dnssec-stripped = true;
+        val-clean-additional = true;
+        prefetch = true;
+        # Cloudflare answers with a 300s TTL; caching that for an hour would
+        # make record changes crawl, so keep the floor low and only cap the top
+        cache-min-ttl = 300;
+        cache-max-ttl = 86400;
+      };
+      forward-zone = [
+        {
+          name = ".";
+          forward-tls-upstream = true;
+          forward-addr = [
+            "1.1.1.1@853#cloudflare-dns.com"
+            "9.9.9.9@853#dns.quad9.net"
+          ];
+        }
+      ];
+    };
+  };
+
   services.resolved = {
     enable = true;
     settings.Resolve = {
-      DNS = [
-        "1.1.1.1#cloudflare-dns.com"
-        "9.9.9.9#dns.quad9.net"
-      ];
-      DNSOverTLS = "yes";
+      DNS = [ "127.0.0.1:5335" ];
+      DNSOverTLS = "no";
       DNSSEC = "no";
       Domains = [ "~." ];
     };
