@@ -3,6 +3,8 @@
 # The dashboard's own config is checked in under ./homepage and mounted out of
 # the store, so a redeploy is the only way to change it. The box keeps just the
 # log directory writable.
+{ config, ... }:
+
 let
   d = "/var/lib/stacks/homepage";
   cfg = ./homepage;
@@ -20,6 +22,8 @@ in
       PUID = "1000";
       PGID = "1000";
     };
+    # widget API keys ({{HOMEPAGE_VAR_*}}) come from sops, not from services.yaml
+    environmentFiles = [ config.sops.secrets."homepage".path ];
     volumes = [
       "${cfg}/services.yaml:/app/config/services.yaml:ro"
       "${cfg}/settings.yaml:/app/config/settings.yaml:ro"

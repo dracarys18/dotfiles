@@ -177,6 +177,42 @@
   services.openssh.enable = true;
   security.sudo.wheelNeedsPassword = true;
 
+  # SSH extras from the hardening checklist. The rest of it (no password auth,
+  # no root login, MaxAuthTries 3, modern kex/ciphers, AllowUsers) is already
+  # on; AllowTcpForwarding stays enabled on purpose.
+  services.openssh.settings = {
+    AllowAgentForwarding = false;
+    PermitTunnel = "no";
+    ClientAliveInterval = 300;
+    ClientAliveCountMax = 2;
+  };
+
+  # Kernel/network hardening from the same checklist. rp_filter is deliberately
+  # NOT set: tailscale needs asymmetric routing to work.
+  boot.kernel.sysctl = {
+    "kernel.kptr_restrict" = 2;
+    "kernel.dmesg_restrict" = 1;
+    "kernel.yama.ptrace_scope" = 1;
+    "net.ipv4.conf.all.accept_redirects" = 0;
+    "net.ipv4.conf.all.send_redirects" = 0;
+    "net.ipv4.conf.all.accept_source_route" = 0;
+    "net.ipv4.conf.default.accept_source_route" = 0;
+    "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
+    "net.ipv4.tcp_syncookies" = 1;
+  };
+
+  # no firewire on this box, and these four are only ever loaded by an attacker
+  # or a very exotic client; nothing here uses them
+  boot.blacklistedKernelModules = [
+    "dccp"
+    "sctp"
+    "rds"
+    "tipc"
+    "firewire-core"
+    "firewire-ohci"
+    "firewire-sbp2"
+  ];
+
   services.tailscale.enable = true;
 
   # cartero's embedder talks to ollama at host.docker.internal:11434, which in
@@ -238,6 +274,7 @@
     secrets = lib.genAttrs [
       "caddy"
       "cartero"
+      "homepage"
       "karakeep"
       "media"
       "obsidian"

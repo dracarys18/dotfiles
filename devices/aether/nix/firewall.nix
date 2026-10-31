@@ -64,6 +64,24 @@ in
       ip6tables -A nixos-fw -s ${lanV6} -p tcp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s fe80::/10 -p udp --dport 53 -j nixos-fw-accept
 
+      # SSDP: HA's upnp integration learns the router through multicast, and
+      # every reply comes back from the gateway's port 1900. Without this the
+      # IGD entities work only until the next reboot, because the discovered
+      # device list is in memory and re-discovery is rejected.
+      iptables -A nixos-fw -s ${lanV4} -p udp --sport 1900 -j nixos-fw-accept
+
+      # mDNS: Matter (matter-server), zeroconf and every discovery-based
+      # integration live on multicast 5353. Matter nodes are found by mDNS, so
+      # without this a node keeps working only until its cached session expires
+      # and then never comes back. Both directions: queries arrive on 5353 and
+      # unicast answers leave from 5353.
+      iptables -A nixos-fw -s ${lanV4} -p udp --dport 5353 -j nixos-fw-accept
+      iptables -A nixos-fw -s ${lanV4} -p udp --sport 5353 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s ${lanV6} -p udp --dport 5353 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s fe80::/10 -p udp --dport 5353 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s ${lanV6} -p udp --sport 5353 -j nixos-fw-accept
+      ip6tables -A nixos-fw -s fe80::/10 -p udp --sport 5353 -j nixos-fw-accept
+
       # containers reach host services over the podman bridge, which no other
       # rule covers — cartero's embedder was timing out on 10.88.0.1:11434
       # because of exactly that. Opened per service rather than by trusting

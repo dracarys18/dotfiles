@@ -36,7 +36,7 @@
         widget:
           type: radarr
           url: http://radarr:7878
-          key: 89bbdf2a760a4a5089f6b2b5248d3d71
+          key: {{HOMEPAGE_VAR_RADARR_KEY}}
     - Sonarr:
         href: https://sonarr.karthihegde.dev/
         description: TV
@@ -45,7 +45,7 @@
         widget:
           type: sonarr
           url: http://sonarr:8989
-          key: 4512177946074403b0c4cb6f27ea51dd
+          key: {{HOMEPAGE_VAR_SONARR_KEY}}
     - Prowlarr:
         href: https://prowlarr.karthihegde.dev/
         description: Indexer manager for the *arr apps
@@ -54,7 +54,7 @@
         widget:
           type: prowlarr
           url: http://prowlarr:9696
-          key: 303e33d3a3e2479ba77d55e6e082b49a
+          key: {{HOMEPAGE_VAR_PROWLARR_KEY}}
     - Jellyfin:
         href: https://media.karthihegde.dev/
         description: Films and TV
