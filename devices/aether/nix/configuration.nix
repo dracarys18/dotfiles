@@ -113,6 +113,23 @@
     "9.9.9.9"
   ];
 
+  # This ISP poisons plain UDP DNS: x1337x.cc answered 202.83.21.15 over :53
+  # (unreachable) while the same query over TLS/HTTPS answered Cloudflare's
+  # 104.21.83.238. Resolve over TLS so poisoning stops working. The deploy path
+  # uses the IP from ~/.ssh/config, so a resolver outage cannot lock the box out.
+  services.resolved = {
+    enable = true;
+    settings.Resolve = {
+      DNS = [
+        "1.1.1.1#cloudflare-dns.com"
+        "9.9.9.9#dns.quad9.net"
+      ];
+      DNSOverTLS = "yes";
+      DNSSEC = "no";
+      Domains = [ "~." ];
+    };
+  };
+
   # HA's bluetooth integration talks to bluetoothd over D-Bus; without this the
   # radio shows up as hci0 but nothing can manage it
   hardware.bluetooth = {
