@@ -271,15 +271,6 @@
     ];
   };
 
-  fileSystems."/mnt/media" = {
-    device = "/dev/disk/by-uuid/fa207171-ce84-40fc-b066-19f2736aca45";
-    fsType = "btrfs";
-    options = [
-      "subvol=@media"
-      "noatime"
-    ];
-  };
-
   # One SOPS-encrypted dotenv file per stack (devices/aether/nix/secrets/<stack>.env),
   # decrypted at activation into /run/secrets/<stack> and handed to the
   # container as an environment file. Same age key as the Mac; put it at

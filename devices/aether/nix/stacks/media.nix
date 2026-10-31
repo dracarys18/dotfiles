@@ -30,7 +30,6 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
-    "d /mnt/media 0755 root root -"
     "d ${d}/config 0755 root root -"
     "d ${d}/config/jellyfin 0755 root root -"
     "d ${d}/config/radarr 0755 root root -"
@@ -46,9 +45,18 @@ in
     "d ${d}/data/media 0755 root root -"
     "d ${d}/data/media/movies 0775 1000 1000 -"
     "d ${d}/data/media/tv 0775 1000 1000 -"
-    "d ${d}/data/downloads 0755 root root -"
+    # the containers drop to PUID 1000, so qbittorrent cannot write here
+    # otherwise, and the *arr apps could not delete an imported torrent either
+    "d ${d}/data/downloads 0775 1000 1000 -"
   ];
 
+  # Downloads and the library are one tree, /data, mounted at the same path in
+  # every container. Radarr and Sonarr hardlink an imported download into
+  # /data/media instead of copying it, so a library file and its still-seeding
+  # torrent are the same inode and cost one copy of the bytes. That is what
+  # lets qbittorrent delete its own path once a seeding ratio is met without
+  # the library losing anything.
+  #
   # 6881 stays on every interface (peers connect in); 8118 is only used from
   # the podman network and the host, so it is loopback. Both are inside the
   # tailscale sidecar's namespace; firewall.nix opens 6881 to the internet
