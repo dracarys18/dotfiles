@@ -1,6 +1,8 @@
 # ~/Projects/adguardhome — this box is the tailnet's resolver, so it is the
 # last stack to switch over. AdGuard Home does the filtering per client and
-# talks DoH to Cloudflare, with Quad9/Google as fallbacks.
+# load-balances between Cloudflare over DoT and the host's unbound on
+# 127.0.0.1:5335, which in turn resolves over TLS and validates DNSSEC (see
+# configuration.nix).
 #
 # It runs with host networking, unlike every other stack: :53 has to be
 # reachable from the LAN and the tailnet, and a published port is DNAT'd
@@ -9,22 +11,24 @@
 # LAN and the tailnet may resolve and the internet may not. Nothing else needs
 # the fixed 10.99.0.2 address it used to have.
 #
-# Planned but not wired up yet: a local recursive resolver (unbound on the
-# host at 127.0.0.1:5335) as AGH's upstream, so no third-party resolver sees
-# queries. The mvance/unbound container exit-1'd with no diagnostics, so it
-# moved out of compose; when it lands, unbound becomes a plain Arch service
-# and AGH's upstream is changed in the UI.
+# The config is AdGuardHome.yaml beside this file, not the app's own state. AGH
+# rewrites its config on every settings change, so a runtime file drifts and
+# the drift is invisible in the repo; adguardhome-config overwrites the file
+# from the store before every start instead, which makes this one the source of
+# truth and throws away whatever the UI left behind. The admin password is a
+# bcrypt hash in sops; upstreams, blocklists and per-client rules are plain
+# config.
 #
-# Like every other stack here the container is declared and the config file is
-# not: AGH is a GUI app and owns /var/lib/stacks/adguardhome/conf itself.
-# Upstreams, blocklists and per-client rules are all set in the UI on :4243,
-# and the admin password is set there too — none of it is in this repo.
-#
-# It cannot bind 0.0.0.0:53 any more: podman's DNS (aardvark-dns) holds
-# 10.88.0.1:53 on the host stack, and a wildcard bind fails while a specific
-# address on the same port is taken. The config therefore lists the addresses
-# it serves, which means the tailnet address has to exist before it starts.
-{ ... }:
+# It cannot bind 0.0.0.0:53: podman's DNS (aardvark-dns) holds 10.88.0.1:53 on
+# the host stack, and a wildcard bind fails while a specific address on the
+# same port is taken. The config therefore lists the addresses it serves,
+# which means the tailnet address has to exist before it starts — that is why
+# one of the bind_hosts is a literal tailnet IP.
+{
+  config,
+  pkgs,
+  ...
+}:
 
 let
   d = "/var/lib/stacks/adguardhome";
@@ -35,6 +39,45 @@ in
     "d ${d}/conf 0700 root root -"
     "d ${d}/work 0700 root root -"
   ];
+
+  # yaml, not dotenv: sops-install-secrets ignores `key` for dotenv files and
+  # hands the template the whole decrypted file, which would have put every
+  # line of it into the password field
+  sops.secrets."adguardhome/password_hash" = {
+    sopsFile = ../secrets/adguardhome.yaml;
+    key = "password_hash";
+    mode = "0400";
+  };
+
+
+  # the container keeps the conf dir writable, because AGH saves the config
+  # whenever a setting changes and errors on every write otherwise. What it
+  # saves is discarded at the next start, so the repo wins without the app
+  # having to cope with a read-only file.
+  #
+  # sops.templates would be the obvious way to build this file, and it is how
+  # cartero does it, but its output under /run/secrets/rendered cannot be
+  # ordered against a unit start here: a deploy was seen to start the container
+  # against the *previous* render, and AGH then died parsing it. Reading the
+  # store copy and the secret directly cannot go stale — the config is whatever
+  # generation is being activated, and the only stale thing possible is an
+  # older bcrypt hash, which still parses.
+  systemd.services.adguardhome-config = {
+    wantedBy = [ "multi-user.target" ];
+    requiredBy = [ "podman-adguardhome.service" ];
+    before = [ "podman-adguardhome.service" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -eu
+      ${pkgs.gawk}/bin/awk \
+        -v sec=${config.sops.secrets."adguardhome/password_hash".path} '
+          BEGIN { while ((getline line < sec) > 0) hash = hash line; close(sec) }
+          { gsub(/@ADGUARD_PASSWORD_HASH@/, hash); print }
+        ' ${./adguardhome/AdGuardHome.yaml} > ${d}/conf/AdGuardHome.yaml.new
+      ${pkgs.coreutils}/bin/chmod 0600 ${d}/conf/AdGuardHome.yaml.new
+      ${pkgs.coreutils}/bin/mv ${d}/conf/AdGuardHome.yaml.new ${d}/conf/AdGuardHome.yaml
+    '';
+  };
 
   virtualisation.oci-containers.containers = {
     adguardhome = {
@@ -47,5 +90,13 @@ in
     };
   };
 
-  systemd.services.podman-adguardhome.after = [ "tailscaled.service" ];
+  # Editing AdGuardHome.yaml leaves this unit's own definition identical, and
+  # switch-to-configuration does not restart a unit for that alone — the deploy
+  # would install the new file and leave the old config running in memory.
+  # Trigger a restart on the store copy of the file, whose path changes
+  # whenever its contents do, so a config edit always lands.
+  systemd.services.podman-adguardhome = {
+    restartTriggers = [ ./adguardhome/AdGuardHome.yaml ];
+    after = [ "tailscaled.service" ];
+  };
 }
