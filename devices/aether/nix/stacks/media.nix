@@ -37,10 +37,12 @@ in
     "d ${d}/config/sonarr 0755 root root -"
     "d ${d}/config/prowlarr 0755 root root -"
     "d ${d}/config/qbittorrent 0755 root root -"
-    "d ${d}/config/jellyseerr 0755 root root -"
+    "d ${d}/config/seerr 0755 root root -"
     "d ${d}/config/tailscale 0755 root root -"
     "d ${d}/data 0755 root root -"
     "d ${d}/data/media 0755 root root -"
+    "d ${d}/data/media/movies 0775 1000 1000 -"
+    "d ${d}/data/media/tv 0775 1000 1000 -"
     "d ${d}/data/downloads 0755 root root -"
   ];
 
@@ -56,7 +58,6 @@ in
       volumes = [
         "${d}/config/jellyfin:/config"
         "${d}/data/media:/data/media"
-        "/mnt/media:/tv"
       ];
       ports = [ "127.0.0.1:8096:8096" ];
     };
@@ -76,8 +77,9 @@ in
       environment = linuxserverEnv;
       volumes = [
         "${d}/config/sonarr:/config"
-        "${d}/data/downloads:/data/downloads"
-        "${d}/data/media:/media"
+        # same single mount as radarr: downloads and media must share one
+        # filesystem so imports can hardlink instead of copying
+        "${d}/data:/data"
       ];
       ports = [ "127.0.0.1:8989:8989" ];
     };
@@ -132,7 +134,8 @@ in
       };
       volumes = [
         "${d}/config/qbittorrent:/config"
-        "${d}/data/downloads:/downloads"
+        # same path as the *arr apps see, so no remote path mapping is needed
+        "${d}/data/downloads:/data/downloads"
       ];
       dependsOn = [ "tailscale" ];
       extraOptions = [ "--network=container:tailscale" ];
@@ -153,12 +156,14 @@ in
       };
     };
 
-    jellyseerr = {
-      image = "fallenbagel/jellyseerr:latest";
-      environment = linuxserverEnv // {
-        LOG_LEVEL = "debug";
-      };
-      volumes = [ "${d}/config/jellyseerr:/app/config" ];
+    # Seerr (the Jellyseerr/Overseerr successor) migrates the old data on its
+    # first start, so the config dir is a copy of config/jellyseerr taken before
+    # the first boot — see the copy step in the migration note in the repo log.
+    # Same port, so caddy.nix needs no change.
+    seerr = {
+      image = "ghcr.io/seerr-team/seerr:latest";
+      environment = linuxserverEnv;
+      volumes = [ "${d}/config/seerr:/app/config" ];
       ports = [ "127.0.0.1:5055:5055" ];
     };
   };
