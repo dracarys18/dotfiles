@@ -116,10 +116,10 @@ statistics:
   ignored_enabled: false
 filters:
   # Three lists, chosen by measured coverage rather than by size: of the 5.1M
-  # unique domains the sixteen candidate lists hold between them, TIF adds
-  # 36.3%, r0xd4n3t 29.2% and 1Hosts Xtra 13.6% -- 79% from 4.1M entries.
-  # OISD Big bought 0.1% for 235k entries, Blocklist Project scam 0.0%, and
-  # Peter Lowe and KADhosts added no domain at all, so they are gone.
+  # unique domains the sixteen candidate lists hold between them, TIF adds 36.3%
+  # and r0xd4n3t 29.2%, and 1Hosts is kept in its Lite tier. OISD Big bought
+  # 0.1% for 235k entries, Blocklist Project scam 0.0%, and Peter Lowe and
+  # KADhosts added no domain at all, so they are gone.
   - enabled: true
     url: https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.txt
     name: HaGeZi TIF
@@ -128,9 +128,13 @@ filters:
     url: https://raw.githubusercontent.com/r0xd4n3t/pihole-adblock-lists/refs/heads/main/pihole_adlists.txt
     name: r0xd4n3t
     id: 3
+  # Lite, not Xtra: Xtra blocked whole legitimate domains rather than trackers
+  # on them — porter.in by name, and LinkedIn's asset host via its lnkdns CNAME,
+  # which renders the page unstyled. It bought 13.6% coverage for 786k entries;
+  # Lite is 102k and carries neither rule.
   - enabled: true
-    url: https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/domains.wildcards
-    name: 1Hosts Xtra
+    url: https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards
+    name: 1Hosts Lite
     id: 16
   # small, and kept for the policy rather than the coverage: these are what
   # make social media unreachable on purpose
