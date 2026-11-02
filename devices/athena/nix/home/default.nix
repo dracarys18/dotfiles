@@ -31,7 +31,10 @@
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
-    imports = [ ./nvim ];
+    imports = [
+      ./nvim
+      inputs.vellum.nixvimModules.default
+    ];
     # build Neovim plugins from the same nixpkgs as everything else
     nixpkgs.source = inputs.nixpkgs;
   };
