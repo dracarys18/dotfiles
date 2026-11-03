@@ -134,13 +134,54 @@
   services.resolved = {
     enable = true;
     settings.Resolve = {
-      DNS = [
-        "1.1.1.1#cloudflare-dns.com"
-        "1.0.0.1#cloudflare-dns.com"
-      ];
-      DNSOverTLS = "yes";
+      DNS = [ "127.0.0.1:5300" ];
+      DNSOverTLS = "no";
       DNSSEC = "no";
       Domains = [ "~." ];
+    };
+  };
+
+  # dnscrypt-proxy is the only thing that talks to the internet, and it speaks
+  # ODoH: the query is encrypted to Cloudflare but relayed by a different
+  # operator (crypto-sx, on Fastly anycast, ~8ms from here), so neither side sees
+  # both who asked and what was asked. Cloudflare is the target, so this replaces
+  # the old direct DoT hop rather than adding to it.
+  #
+  # No [sources]: both stamps are inline, so a failed download at boot cannot
+  # leave the box with no resolver at all. bootstrap_resolvers only resolves
+  # those two hostnames, once at startup — IPv6 first because this ISP intercepts
+  # only v4/53, with a v4 entry as fallback whose lies TLS will reject.
+  services.dnscrypt-proxy = {
+    enable = true;
+    # By default the module merges its packaged example config into the TOML it
+    # generates, and that example carries [sources]: two markdown lists fetched
+    # at every start, resolved over plaintext bootstrap, which stalled this box's
+    # DNS for 30s on first boot. Everything needed is declared below, so build the
+    # file from that alone. (Removing sources from `settings` does not work —
+    # the merge puts them back, and the generated file keeps its old hash.)
+    upstreamDefaults = false;
+    settings = {
+      listen_addresses = [ "127.0.0.1:5300" ];
+      ipv4_servers = true;
+      ipv6_servers = false;
+      dnscrypt_servers = false;
+      doh_servers = false;
+      odoh_servers = true;
+      require_dnssec = true;
+      server_names = [ "odoh-cloudflare" ];
+      cache = true;
+      bootstrap_resolvers = [
+        "[2606:4700:4700::1111]:53"
+        "1.1.1.1:53"
+      ];
+      static."odoh-cloudflare".stamp = "sdns://BQcAAAAAAAAAF29kb2guY2xvdWRmbGFyZS1kbnMuY29tCi9kbnMtcXVlcnk";
+      static."odohrelay-crypto-sx".stamp = "sdns://hQcAAAAAAAAAAAAab2RvaC1yZWxheS5lZGdlY29tcHV0ZS5hcHABLw";
+      anonymized_dns.routes = [
+        {
+          server_name = "odoh-cloudflare";
+          via = [ "odohrelay-crypto-sx" ];
+        }
+      ];
     };
   };
 
