@@ -141,58 +141,56 @@
     };
   };
 
-  # dnscrypt-proxy is the only thing that talks to the internet, and it speaks
-  # ODoH: the query is encrypted to Cloudflare but relayed by a different
-  # operator (crypto-sx, on Fastly anycast, ~8ms from here), so neither side sees
-  # both who asked and what was asked. Cloudflare is the target, so this replaces
-  # the old direct DoT hop rather than adding to it.
-  #
-  # No [sources]: both stamps are inline, so a failed download at boot cannot
-  # leave the box with no resolver at all. bootstrap_resolvers only resolves
-  # those two hostnames, once at startup — IPv6 first because this ISP intercepts
-  # only v4/53, with a v4 entry as fallback whose lies TLS will reject.
   services.dnscrypt-proxy = {
     enable = true;
-    # By default the module merges its packaged example config into the TOML it
-    # generates, and that example carries [sources]: two markdown lists fetched
-    # at every start, resolved over plaintext bootstrap, which stalled this box's
-    # DNS for 30s on first boot. Everything needed is declared below, so build the
-    # file from that alone. (Removing sources from `settings` does not work —
-    # the merge puts them back, and the generated file keeps its old hash.)
     upstreamDefaults = false;
     settings = {
       listen_addresses = [ "127.0.0.1:5300" ];
-      # Both families. This pair is not only a server-list filter: it lands in
-      # xTransport.useIPv4/useIPv6, so with v6 off the ODoH server and relay
-      # hostnames are looked up A-only and dialled over v4, even though the box
-      # has a native global address from the router's RA. Both names are
-      # dual-stack, and v6 is the faster path here (1.3ms vs 1.7ms to
-      # Cloudflare). v4 stays on as the fallback if an RA ever stops arriving.
       ipv4_servers = true;
       ipv6_servers = true;
-      dnscrypt_servers = false;
+      dnscrypt_servers = true;
       doh_servers = false;
-      odoh_servers = true;
+      odoh_servers = false;
       require_dnssec = true;
-      server_names = [ "odoh-cloudflare" ];
       cache = true;
-      # The box's own resolver is this process: at every start, resolved's only
-      # upstream is 127.0.0.1:5300, so asking the system resolver for the two
-      # upstream hostnames is a door that opens from the inside. Each lookup
-      # waited out a 20s timeout before falling back, which made a restart cost
-      # 41s with no DNS on the box (11:44:32 started, 11:45:14 live). Skip the
-      # system resolver entirely and ask the bootstrap servers, which are IPs.
       ignore_system_dns = true;
       bootstrap_resolvers = [
         "[2606:4700:4700::1111]:53"
         "1.1.1.1:53"
       ];
-      static."odoh-cloudflare".stamp = "sdns://BQcAAAAAAAAAF29kb2guY2xvdWRmbGFyZS1kbnMuY29tCi9kbnMtcXVlcnk";
-      static."odohrelay-crypto-sx".stamp = "sdns://hQcAAAAAAAAAAAAab2RvaC1yZWxheS5lZGdlY29tcHV0ZS5hcHABLw";
+      server_names = [
+        "cs-singapore"
+        "dnscry.pt-singapore-ipv4"
+        "quad9-dnscrypt-ip6-nofilter-pri"
+      ];
+      static."cs-singapore".stamp = "sdns://AQcAAAAAAAAADTM3LjEyMC4xNTEuMTEgMTNyrVlWMsJBa4cvCY-FG925ZShMbL6aTxkJZDDbqVoeMi5kbnNjcnlwdC1jZXJ0LmNyeXB0b3N0b3JtLmlz";
+      static."dnscry.pt-singapore-ipv4".stamp = "sdns://AQcAAAAAAAAADjE1Ny4yMC4xMDUuMTE1IF-A7YB2q_Cn7QZ946XHFuDvAUNlRXLcIcLv6zH5glrGGTIuZG5zY3J5cHQtY2VydC5kbnNjcnkucHQ";
+      static."quad9-dnscrypt-ip6-nofilter-pri".stamp = "sdns://AQcAAAAAAAAAElsyNjIwOmZlOjoxMF06ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0";
+      static."dnscry.pt-anon-mumbai02-ipv4".stamp = "sdns://gQwxNTcuMjAuMjcuNzk";
+      static."dnscry.pt-anon-mumbai02-ipv6".stamp = "sdns://gRFbMjYwMjpmYTA4OjU6Ojc1XQ";
+      static."anon-cs-singapore".stamp = "sdns://gREzNy4xMjAuMTUxLjExOjQ0Mw";
+      static."anon-cs-singapore6".stamp = "sdns://gRhbMmEwZDo1NjAwOjFmOjc6OjUzXTo0NDM";
       anonymized_dns.routes = [
         {
-          server_name = "odoh-cloudflare";
-          via = [ "odohrelay-crypto-sx" ];
+          server_name = "cs-singapore";
+          via = [
+            "dnscry.pt-anon-mumbai02-ipv4"
+            "dnscry.pt-anon-mumbai02-ipv6"
+          ];
+        }
+        {
+          server_name = "dnscry.pt-singapore-ipv4";
+          via = [
+            "anon-cs-singapore"
+            "anon-cs-singapore6"
+          ];
+        }
+        {
+          server_name = "quad9-dnscrypt-ip6-nofilter-pri";
+          via = [
+            "dnscry.pt-anon-mumbai02-ipv6"
+            "anon-cs-singapore6"
+          ];
         }
       ];
     };
