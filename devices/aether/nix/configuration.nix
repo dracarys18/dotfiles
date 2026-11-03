@@ -176,6 +176,13 @@
       require_dnssec = true;
       server_names = [ "odoh-cloudflare" ];
       cache = true;
+      # The box's own resolver is this process: at every start, resolved's only
+      # upstream is 127.0.0.1:5300, so asking the system resolver for the two
+      # upstream hostnames is a door that opens from the inside. Each lookup
+      # waited out a 20s timeout before falling back, which made a restart cost
+      # 41s with no DNS on the box (11:44:32 started, 11:45:14 live). Skip the
+      # system resolver entirely and ask the bootstrap servers, which are IPs.
+      ignore_system_dns = true;
       bootstrap_resolvers = [
         "[2606:4700:4700::1111]:53"
         "1.1.1.1:53"
