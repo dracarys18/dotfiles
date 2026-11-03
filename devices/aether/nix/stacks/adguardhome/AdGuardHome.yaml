@@ -27,7 +27,7 @@ dns:
   bind_hosts:
     - 192.168.0.179
     - 100.113.199.45
-    - "::"
+    - fd7a:115c:a1e0::f52d:c72e
   port: 53
   anonymize_client_ip: false
   ratelimit: 20
