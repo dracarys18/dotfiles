@@ -79,6 +79,9 @@ in
       ip6tables -A nixos-fw -s ${lanV6} -p udp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s ${lanV6} -p tcp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s fe80::/10 -p udp --dport 53 -j nixos-fw-accept
+      # TCP too: a truncated answer (EDNS is off for some clients) sends the
+      # query back over TCP, and a link-local client would otherwise time out
+      ip6tables -A nixos-fw -s fe80::/10 -p tcp --dport 53 -j nixos-fw-accept
 
       # SSDP: HA's upnp integration learns the router through multicast, and
       # every reply comes back from the gateway's port 1900. Without this the
