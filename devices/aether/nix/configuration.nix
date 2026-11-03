@@ -162,8 +162,14 @@
     upstreamDefaults = false;
     settings = {
       listen_addresses = [ "127.0.0.1:5300" ];
+      # Both families. This pair is not only a server-list filter: it lands in
+      # xTransport.useIPv4/useIPv6, so with v6 off the ODoH server and relay
+      # hostnames are looked up A-only and dialled over v4, even though the box
+      # has a native global address from the router's RA. Both names are
+      # dual-stack, and v6 is the faster path here (1.3ms vs 1.7ms to
+      # Cloudflare). v4 stays on as the fallback if an RA ever stops arriving.
       ipv4_servers = true;
-      ipv6_servers = false;
+      ipv6_servers = true;
       dnscrypt_servers = false;
       doh_servers = false;
       odoh_servers = true;
