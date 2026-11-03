@@ -35,15 +35,15 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - tls://1.1.1.1
-    - tls://1.0.0.1
+    - 127.0.0.1:5300
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
     - 8.8.8.8
     - 9.9.9.10
     - 2620:fe::10
-  fallback_dns: []
+  fallback_dns:
+    - tls://1.1.1.1
   upstream_mode: load_balance
   fastest_timeout: 1s
   allowed_clients: []
