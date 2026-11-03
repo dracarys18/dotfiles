@@ -53,6 +53,10 @@ in
       # true color in Ghostty
       set -sa terminal-features ',xterm-ghostty:RGB'
 
+      # vellum.nvim draws its preview through the terminal's graphics
+      # protocol; tmux drops those sequences unless it is told to pass them on
+      set -g allow-passthrough on
+
       set -g extended-keys on
       set -g extended-keys-format csi-u
     '';
