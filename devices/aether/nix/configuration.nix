@@ -159,37 +159,28 @@
         "1.1.1.1:53"
       ];
       server_names = [
-        "cs-singapore"
-        "dnscry.pt-singapore-ipv4"
-        "quad9-dnscrypt-ip6-nofilter-pri"
+        "dnscry.pt-mumbai02-ipv4"
+        "dnscry.pt-bengaluru-ipv4"
       ];
-      static."cs-singapore".stamp = "sdns://AQcAAAAAAAAADTM3LjEyMC4xNTEuMTEgMTNyrVlWMsJBa4cvCY-FG925ZShMbL6aTxkJZDDbqVoeMi5kbnNjcnlwdC1jZXJ0LmNyeXB0b3N0b3JtLmlz";
-      static."dnscry.pt-singapore-ipv4".stamp = "sdns://AQcAAAAAAAAADjE1Ny4yMC4xMDUuMTE1IF-A7YB2q_Cn7QZ946XHFuDvAUNlRXLcIcLv6zH5glrGGTIuZG5zY3J5cHQtY2VydC5kbnNjcnkucHQ";
-      static."quad9-dnscrypt-ip6-nofilter-pri".stamp = "sdns://AQcAAAAAAAAAElsyNjIwOmZlOjoxMF06ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0";
+      static."dnscry.pt-mumbai02-ipv4".stamp = "sdns://AQcAAAAAAAAADDE1Ny4yMC4yNy43OSCWqeT_u1nn0f3mZBAXCN7K40kyMWyMgma2VqLqJhijIhkyLmRuc2NyeXB0LWNlcnQuZG5zY3J5LnB0";
+      static."dnscry.pt-bengaluru-ipv4".stamp = "sdns://AQcAAAAAAAAADzE2MC4xOTEuMTgyLjIxNiDM3lhIXzCtFbHampFM4K_NDUnKalgxd72L-5ye1X4qExkyLmRuc2NyeXB0LWNlcnQuZG5zY3J5LnB0";
+      static."dnscry.pt-anon-bengaluru-ipv4".stamp = "sdns://gQ8xNjAuMTkxLjE4Mi4yMTY";
+      static."dnscry.pt-anon-bengaluru-ipv6".stamp = "sdns://gRZbMjQwMTpkNGUwOjE6ZjdmZDo6NTNd";
       static."dnscry.pt-anon-mumbai02-ipv4".stamp = "sdns://gQwxNTcuMjAuMjcuNzk";
       static."dnscry.pt-anon-mumbai02-ipv6".stamp = "sdns://gRFbMjYwMjpmYTA4OjU6Ojc1XQ";
-      static."anon-cs-singapore".stamp = "sdns://gREzNy4xMjAuMTUxLjExOjQ0Mw";
-      static."anon-cs-singapore6".stamp = "sdns://gRhbMmEwZDo1NjAwOjFmOjc6OjUzXTo0NDM";
       anonymized_dns.routes = [
         {
-          server_name = "cs-singapore";
+          server_name = "dnscry.pt-bengaluru-ipv4";
           via = [
             "dnscry.pt-anon-mumbai02-ipv4"
             "dnscry.pt-anon-mumbai02-ipv6"
           ];
         }
         {
-          server_name = "dnscry.pt-singapore-ipv4";
+          server_name = "dnscry.pt-mumbai02-ipv4";
           via = [
-            "anon-cs-singapore"
-            "anon-cs-singapore6"
-          ];
-        }
-        {
-          server_name = "quad9-dnscrypt-ip6-nofilter-pri";
-          via = [
-            "dnscry.pt-anon-mumbai02-ipv6"
-            "anon-cs-singapore6"
+            "dnscry.pt-anon-bengaluru-ipv4"
+            "dnscry.pt-anon-bengaluru-ipv6"
           ];
         }
       ];
