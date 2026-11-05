@@ -126,6 +126,40 @@
       '';
     };
 
+    # Tailscale exit node. `vpn on` checks that traffic actually flows and
+    # reverts if it doesn't — a selected node that doesn't forward takes the
+    # whole connection down, which is exactly what it did once already.
+    functions.vpn = {
+      description = "Turn the tailscale exit node on or off";
+      body = ''
+        set -l node sg-sin-wg-001.mullvad.ts.net
+        if test (count $argv) -ge 2
+            set node $argv[2]
+        end
+
+        switch "$argv[1]"
+            case on
+                tailscale set --exit-node=$node
+                for attempt in 1 2 3
+                    if curl -fsS -m 5 -o /dev/null https://ifconfig.me
+                        echo "vpn: on, via $node"
+                        return 0
+                    end
+                    sleep 2
+                end
+                tailscale set --exit-node=
+                echo "vpn: $node passes no traffic, turned back off" >&2
+                return 1
+            case off
+                tailscale set --exit-node=
+                echo "vpn: off"
+            case '*'
+                echo "usage: vpn on [node] | vpn off" >&2
+                return 1
+        end
+      '';
+    };
+
     shellAliases = {
       cat = "bat";
       tf = "terraform";
