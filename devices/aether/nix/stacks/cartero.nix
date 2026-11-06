@@ -50,6 +50,7 @@ in
   };
 
   sops.templates."anubis-policy.yaml" = {
+    restartUnits = [ "podman-anubis-news.service" ];
     mode = "0400";
     uid = 1000;
     gid = 0;
@@ -81,6 +82,7 @@ in
   };
 
   sops.templates."cartero-config.toml" = {
+    restartUnits = [ "podman-cartero.service" ];
     content = builtins.replaceStrings
       [
         "@JEV_API_KEY@"

@@ -1,20 +1,58 @@
-# Authelia config and users are checked in (./authelia/configuration.yml,
-# users rendered below); only sessions/2FA live in the sqlite volume.
+# Authelia config is checked in (./authelia/configuration.yml); users live in
+# lldap, and only sessions/2FA live in the sqlite volume.
 { config, lib, ... }:
 
 let
   d = "/var/lib/stacks/authelia";
 
-  # add a user: put the argon2 hash in sops under users.<name>, then list it here
-  users = [ "karthihegde" ];
-  displayNames = {
-    karthihegde = "Karthikey Hegde";
+  # Every vhost that uses `import auth` is a service, and every service gets
+  # its own lldap group <name>_users, so adding the vhost here is all it takes.
+  # The group itself is created and populated in lldap (admin.karthihegde.dev).
+  gatedVHosts = lib.filterAttrs (_: v: lib.hasInfix "import auth" v.extraConfig) config.services.caddy.virtualHosts;
+
+  serviceName = domain: lib.removeSuffix ".karthihegde.dev" domain;
+
+  # the lldap ui cannot be gated by a group it is used to populate
+  groupFor = domain: if serviceName domain == "admin" then "admins" else "${serviceName domain}_users";
+
+  # OIDC clients cannot be derived from caddy, so they stay explicit.
+  oidcClients = {
+    karakeep = "karakeep_users";
   };
-  emails = {
-    karthihegde = "karthihegde@karthihegde.dev";
-  };
+
+  accessControl =
+    "access_control:\n"
+    + "  default_policy: deny\n"
+    + "  rules:\n"
+    + "    - domain: '*.karthihegde.dev'\n"
+    + "      networks:\n"
+    + "        - 127.0.0.1/32\n"
+    + "        - 10.88.0.0/16\n"
+    + "      policy: bypass\n"
+    + lib.concatStrings (
+      lib.mapAttrsToList (domain: _:
+        "    - domain: '${domain}'\n"
+        + "      subject:\n"
+        + "        - 'group:${groupFor domain}'\n"
+        + "      policy: one_factor\n")
+      gatedVHosts
+    );
+
+  oidcPolicies =
+    "    authorization_policies:\n"
+    + lib.concatStrings (
+      lib.mapAttrsToList (client: group:
+        "      ${client}:\n"
+        + "        default_policy: 'deny'\n"
+        + "        rules:\n"
+        + "          - policy: 'one_factor'\n"
+        + "            subject:\n"
+        + "              - 'group:${group}'\n")
+      oidcClients
+    );
 in
 {
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/config 0755 root root -"
@@ -52,14 +90,27 @@ in
         key = "karakeep_client_secret";
         mode = "0400";
       };
-    }
-    // lib.genAttrs (map (u: "authelia/user-${u}") users) (n: {
-      sopsFile = ../secrets/authelia.yaml;
-      key = "user_${lib.removePrefix "authelia/user-" n}";
-      mode = "0400";
-    });
+      "lldap/admin_password" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "lldap_admin_password";
+        owner = "lldap";
+        mode = "0400";
+        restartUnits = [ "lldap.service" ];
+      };
+      "lldap/jwt_secret" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "lldap_jwt_secret";
+        owner = "lldap";
+        mode = "0400";
+        restartUnits = [ "lldap.service" ];
+      };
+    };
+
+  systemd.services.podman-authelia.environment.AUTHELIA_CONFIG_HASH =
+    builtins.hashString "sha256" config.sops.templates."authelia-configuration.yml".content;
 
   sops.templates."authelia-configuration.yml" = {
+    restartUnits = [ "podman-authelia.service" ];
     content = builtins.replaceStrings
       [
         "@SESSION_SECRET@"
@@ -68,6 +119,9 @@ in
         "@OIDC_HMAC_SECRET@"
         "@KARAKEEP_CLIENT_SECRET@"
         "@OIDC_ISSUER_PRIVATE_KEY@"
+        "@LLDAP_PASSWORD@"
+        "@ACCESS_CONTROL@"
+        "@OIDC_POLICIES@"
       ]
       [
         config.sops.placeholder."authelia/session_secret"
@@ -76,32 +130,62 @@ in
         config.sops.placeholder."authelia/oidc_hmac_secret"
         config.sops.placeholder."authelia/karakeep_client_secret"
         config.sops.placeholder."authelia/oidc_issuer_private_key"
+        config.sops.placeholder."lldap/admin_password"
+        accessControl
+        oidcPolicies
       ]
       (builtins.readFile ./authelia/configuration.yml);
   };
 
-  sops.templates."authelia-users.yml".content =
-    "users:\n"
-    + lib.concatMapStringsSep "\n"
-      (u:
-        "  ${u}:\n"
-        + "    displayname: '${displayNames.${u}}'\n"
-        + "    password: '${config.sops.placeholder."authelia/user-${u}"}'\n"
-        + "    email: '${emails.${u}}'\n"
-        + "    groups:\n"
-        + "      - admins")
-      users
-    + "\n";
-
   virtualisation.oci-containers.containers.authelia = {
     image = "ghcr.io/authelia/authelia:latest";
-    extraOptions = [ "--pull=newer" ];
+    extraOptions = [
+      "--pull=newer"
+      "--network=host"
+    ];
     environment.TZ = "Asia/Kolkata";
     volumes = [
       "${d}/config:/config"
       "${config.sops.templates."authelia-configuration.yml".path}:/config/configuration.yml:ro"
-      "${config.sops.templates."authelia-users.yml".path}:/config/users_database.yml:ro"
     ];
-    ports = [ "127.0.0.1:9091:9091" ];
   };
+
+  systemd.services.podman-authelia = {
+    after = [ "lldap.service" ];
+    wants = [ "lldap.service" ];
+  };
+
+  users.users.lldap = {
+    isSystemUser = true;
+    group = "lldap";
+  };
+  users.groups.lldap = { };
+
+  services.lldap = {
+    enable = true;
+    settings = {
+      ldap_base_dn = "dc=karthihegde,dc=dev";
+      ldap_user_dn = "admin";
+      ldap_user_email = "admin@karthihegde.dev";
+      ldap_host = "127.0.0.1";
+      ldap_port = 3890;
+      http_host = "127.0.0.1";
+      http_port = 5090;
+      http_url = "https://admin.karthihegde.dev";
+      ldap_user_pass_file = config.sops.secrets."lldap/admin_password".path;
+      jwt_secret_file = config.sops.secrets."lldap/jwt_secret".path;
+      force_ldap_user_pass_reset = "always";
+    };
+  };
+
+  systemd.services.lldap.serviceConfig = {
+    DynamicUser = lib.mkForce false;
+    User = "lldap";
+    Group = "lldap";
+  };
+
+  services.caddy.virtualHosts."admin.karthihegde.dev".extraConfig = ''
+    import auth
+    reverse_proxy 127.0.0.1:5090
+  '';
 }

@@ -340,6 +340,10 @@
   # container as an environment file. Same age key as the Mac; put it at
   # /var/lib/sops-nix/key.txt on aether.
   sops = {
+    # install secrets from a systemd unit, not from the activation script: the
+    # activation hook is deprecated in 26.05 and removed in 26.11, and it is
+    # what writes /run/nixos/activation-restart-list
+    useSystemdActivation = true;
     age.keyFile = "/var/lib/sops-nix/key.txt";
     # builds shouldn't need the private key just to evaluate the config
     validateSopsFiles = false;

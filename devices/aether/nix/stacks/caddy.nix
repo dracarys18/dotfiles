@@ -54,6 +54,7 @@ let
       <li><a href="https://torrent.karthihegde.dev/">qBittorrent<span>torrents</span></a></li>
       <li><a href="https://dns.karthihegde.dev/">AdGuard<span>dns</span></a></li>
       <li><a href="https://auth.karthihegde.dev/">Authelia<span>sso</span></a></li>
+      <li><a href="https://admin.karthihegde.dev/">Users<span>lldap</span></a></li>
       <li><a href="https://tangled.karthihegde.dev/">Tangled<span>git</span></a></li>
       <li><a href="https://news.karthihegde.dev/">News<span>feeds</span></a></li>
     </ul>
@@ -72,6 +73,8 @@ in
     key = "basic_auth";
     mode = "0400";
   };
+
+  sops.templates."caddy-adguard.env".restartUnits = [ "caddy.service" ];
 
   sops.templates."caddy-adguard.env".content = ''
     ADGUARD_BASIC_AUTH="${config.sops.placeholder."adguardhome/basic_auth"}"

@@ -1,5 +1,5 @@
 server:
-  address: 'tcp://0.0.0.0:9091'
+  address: 'tcp://127.0.0.1:9091'
 
 log:
   level: 'info'
@@ -24,12 +24,13 @@ identity_providers:
       karakeep:
         id_token:
           - 'email'
+@OIDC_POLICIES@
     clients:
       - client_id: 'karakeep'
         client_name: 'Karakeep'
         client_secret: '@KARAKEEP_CLIENT_SECRET@'
         public: false
-        authorization_policy: 'one_factor'
+        authorization_policy: 'karakeep'
         require_pkce: false
         redirect_uris:
           - 'https://keep.karthihegde.dev/api/auth/callback/custom'
@@ -49,8 +50,16 @@ identity_providers:
 authentication_backend:
   password_reset:
     disable: true
-  file:
-    path: /config/users_database.yml
+  ldap:
+    address: 'ldap://127.0.0.1:3890'
+    timeout: '5s'
+    base_dn: 'dc=karthihegde,dc=dev'
+    user: 'uid=admin,ou=people,dc=karthihegde,dc=dev'
+    password: '@LLDAP_PASSWORD@'
+    additional_users_dn: 'ou=people'
+    additional_groups_dn: 'ou=groups'
+    users_filter: '(&({username_attribute}={input})(objectClass=person))'
+    groups_filter: '(&(member={dn})(objectClass=groupOfNames))'
 
 webauthn:
   enable_passkey_login: true
@@ -79,13 +88,4 @@ notifier:
   filesystem:
     filename: /config/notification.txt
 
-access_control:
-  default_policy: deny
-  rules:
-    - domain: '*.karthihegde.dev'
-      networks:
-        - 127.0.0.1/32
-        - 10.88.0.0/16
-      policy: bypass
-    - domain: '*.karthihegde.dev'
-      policy: one_factor
+@ACCESS_CONTROL@
