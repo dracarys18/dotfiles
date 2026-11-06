@@ -16,10 +16,14 @@ in
   virtualisation.oci-containers.containers = {
     karakeep-web-1 = {
       image = "ghcr.io/karakeep-app/karakeep:release";
+      extraOptions = [ "--pull=newer" ];
       environment = {
         MEILI_ADDR = "http://karakeep-meilisearch-1:7700";
         BROWSER_WEB_URL = "http://karakeep-chrome-1:9222";
         DATA_DIR = "/data";
+        OAUTH_WELLKNOWN_URL = "https://auth.karthihegde.dev/.well-known/openid-configuration";
+        OAUTH_CLIENT_ID = "karakeep";
+        OAUTH_PROVIDER_NAME = "Authelia";
       };
       environmentFiles = [ config.sops.secrets."karakeep".path ];
       volumes = [ "${d}/data:/data" ];
@@ -38,6 +42,7 @@ in
 
     karakeep-chrome-1 = {
       image = "docker.io/zenika/alpine-chrome:latest";
+      extraOptions = [ "--pull=newer" ];
       cmd = [
         "--no-sandbox"
         "--disable-gpu"

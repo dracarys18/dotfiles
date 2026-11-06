@@ -7,9 +7,9 @@
     ./caddy.nix
     ./cartero.nix
     ./homeassistant.nix
-    ./homepage.nix
     ./karakeep.nix
     ./media.nix
+    ./observability.nix
     ./obsidian.nix
     ./searchxng.nix
     ./bentopdf.nix

@@ -84,7 +84,10 @@ in
         "${d}/conf:/opt/adguardhome/conf"
         "${d}/work:/opt/adguardhome/work"
       ];
-      extraOptions = [ "--network=host" ];
+      extraOptions = [
+        "--pull=newer"
+        "--network=host"
+      ];
     };
   };
 

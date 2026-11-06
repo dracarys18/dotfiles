@@ -3,30 +3,13 @@
 #
 # config.toml, myfeed.opml and the templates are checked in under ./cartero and
 # mounted out of the store; only postgres/redis/data are runtime state.
-{ config, pkgs, ... }:
+{ config, ... }:
 
 let
   d = "/var/lib/stacks/cartero";
   cfg = ./cartero;
 
-  anubisPolicy = pkgs.writeText "anubis-policy.yaml" ''
-    bots:
-      - name: mobile-feeds
-        path_regex: ^/feed\.(rss|atom|json)$
-        action: ALLOW
-      - name: api
-        path_regex: ^/search(/|\?|$)
-        action: ALLOW
-      - name: ai-crawlers
-        user_agent_regex: "(?i:gptbot|chatgpt-user|oai-searchbot|claudebot|claude-web|anthropic-ai|ccbot|bytespider|amazonbot|google-extended|applebot-extended|perplexity|cohere-ai|diffbot|imagesiftbot|omgilibot|timpibot|youbot|ai2bot|meta-externalagent|velenpublicwebcrawler)"
-        action: DENY
-      - name: seo-crawlers
-        user_agent_regex: "(?i:ahrefsbot|semrushbot|mj12bot|dotbot|dataforseobot|petalbot)"
-        action: DENY
-      - name: everything-else
-        path_regex: .*
-        action: CHALLENGE
-  '';
+  anubisPolicy = config.sops.templates."anubis-policy.yaml".path;
 in
 {
   systemd.tmpfiles.rules = [
@@ -59,6 +42,42 @@ in
       key = "telegram_bot_token";
       mode = "0400";
     };
+    "cartero-config/app_token" = {
+      sopsFile = ../secrets/cartero-config.yaml;
+      key = "app_token";
+      mode = "0400";
+    };
+  };
+
+  sops.templates."anubis-policy.yaml" = {
+    mode = "0400";
+    uid = 1000;
+    gid = 0;
+    content = ''
+      bots:
+        - name: cartero-app
+          headers_regex:
+            X-Cartero-Client: "^${config.sops.placeholder."cartero-config/app_token"}$"
+          action: ALLOW
+        - name: cartero-app-ua
+          user_agent_regex: "(?i)cartero/"
+          action: ALLOW
+        - name: mobile-feeds
+          path_regex: ^/feed\.(rss|atom|json)$
+          action: ALLOW
+        - name: api
+          path_regex: ^/search(/|\?|$)
+          action: ALLOW
+        - name: ai-crawlers
+          user_agent_regex: "(?i:gptbot|chatgpt-user|oai-searchbot|claudebot|claude-web|anthropic-ai|ccbot|bytespider|amazonbot|google-extended|applebot-extended|perplexity|cohere-ai|diffbot|imagesiftbot|omgilibot|timpibot|youbot|ai2bot|meta-externalagent|velenpublicwebcrawler|keenable)"
+          action: DENY
+        - name: seo-crawlers
+          user_agent_regex: "(?i:ahrefsbot|semrushbot|mj12bot|dotbot|dataforseobot|petalbot)"
+          action: DENY
+        - name: everything-else
+          path_regex: .*
+          action: CHALLENGE
+    '';
   };
 
   sops.templates."cartero-config.toml" = {
@@ -87,6 +106,7 @@ in
 
     cartero-postgres = {
       image = "pgvector/pgvector:pg17";
+      extraOptions = [ "--pull=newer" ];
       environment = {
         POSTGRES_USER = "cartero";
         POSTGRES_DB = "cartero";
@@ -122,6 +142,7 @@ in
       # no --dns here: overriding the resolver drops podman's internal one, so
       # the container cannot resolve cartero-postgres/cartero-redis by name
       extraOptions = [
+        "--pull=newer"
         "--add-host=host.docker.internal:host-gateway"
         "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
       ];
@@ -138,6 +159,7 @@ in
         DIFFICULTY = "5";
       };
       volumes = [ "${anubisPolicy}:/etc/anubis/policy.yaml:ro" ];
+      extraOptions = [ "--pull=newer" ];
       dependsOn = [ "cartero" ];
     };
 
@@ -149,6 +171,7 @@ in
         "run"
       ];
       environmentFiles = [ config.sops.secrets."cartero".path ];
+      extraOptions = [ "--pull=newer" ];
       # news.karthihegde.dev is this tunnel's public hostname; the ingress rule
       # in Cloudflare targets http://cartero:8080, which podman's DNS resolves
       autoStart = true;
@@ -158,6 +181,7 @@ in
       image = "ghcr.io/jina-ai/reader:latest";
       autoStart = false;
       extraOptions = [
+        "--pull=newer"
         "--memory=2g"
         "--memory-swap=2g"
         "--shm-size=1gb"

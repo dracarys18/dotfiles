@@ -17,6 +17,7 @@ in
   virtualisation.oci-containers.containers = {
     searxng-core = {
       image = "docker.io/searxng/searxng:latest";
+      extraOptions = [ "--pull=newer" ];
       environmentFiles = [ config.sops.secrets."searchxng".path ];
       volumes = [
         "${d}/core-config:/etc/searxng"
@@ -31,6 +32,7 @@ in
 
     searxng-valkey = {
       image = "docker.io/valkey/valkey:9-alpine";
+      extraOptions = [ "--pull=newer" ];
       cmd = [
         "valkey-server"
         "--save"

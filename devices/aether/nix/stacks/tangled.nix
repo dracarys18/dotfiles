@@ -48,6 +48,7 @@ in
       ];
       # TUNNEL_TOKEN: devices/aether/nix/secrets/tangled.env
       environmentFiles = [ config.sops.secrets."tangled".path ];
+      extraOptions = [ "--pull=newer" ];
       dependsOn = [ "tangled-knot" ];
     };
   };

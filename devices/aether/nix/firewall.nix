@@ -107,20 +107,6 @@ in
       # podman0, so a compromised container cannot reach every host port.
       iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -d 10.88.0.1 -p tcp --dport 11434 -j nixos-fw-accept
 
-      # Homepage's site monitors run inside the homepage container and ask for
-      # *.karthihegde.dev, which resolves to whatever tailnet address this box
-      # has today. Tailscale routes that address back out tailscale0, where
-      # ts-forward drops traffic that did not come from the tailnet, so the
-      # monitors time out. Rewrite any 443 request aimed at one of this host's
-      # own addresses to the bridge instead: Caddy still sees the original Host
-      # header (and serves the matching certificate), and only 443 from podman0
-      # is opened, not the whole host. addrtype LOCAL rather than the address
-      # itself, so a new tailnet address needs no edit here.
-      # -C first: nat rules are not flushed by a firewall reload, so a plain -A
-      # would stack a new copy on every switch.
-      iptables -t nat -C PREROUTING -i podman0 -s 10.88.0.0/16 -p tcp --dport 443 -m addrtype --dst-type LOCAL -j DNAT --to-destination 10.88.0.1:443 2>/dev/null \
-        || iptables -t nat -A PREROUTING -i podman0 -s 10.88.0.0/16 -p tcp --dport 443 -m addrtype --dst-type LOCAL -j DNAT --to-destination 10.88.0.1:443
-      iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -d 10.88.0.1 -p tcp --dport 443 -j nixos-fw-accept
     '';
 
     # tailscale sends from the tailnet address over an interface that the

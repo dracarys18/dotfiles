@@ -13,6 +13,7 @@ in
 
   virtualisation.oci-containers.containers.couchdb-for-ols = {
     image = "couchdb:3.5";
+    extraOptions = [ "--pull=newer" ];
     user = "5984:5984";
     environment.COUCHDB_USER = "obsidian_admin";
     # COUCHDB_PASSWORD is a secret: devices/aether/nix/secrets/obsidian.env

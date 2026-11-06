@@ -1,0 +1,91 @@
+server:
+  address: 'tcp://0.0.0.0:9091'
+
+log:
+  level: 'info'
+
+theme: 'dark'
+
+identity_validation:
+  reset_password:
+    jwt_secret: '@JWT_SECRET@'
+
+identity_providers:
+  oidc:
+    hmac_secret: '@OIDC_HMAC_SECRET@'
+    jwks:
+      - key_id: 'main'
+        algorithm: 'RS256'
+        use: 'sig'
+        key: "@OIDC_ISSUER_PRIVATE_KEY@"
+    enable_client_debug_messages: false
+    enforce_pkce: 'public_clients_only'
+    claims_policies:
+      karakeep:
+        id_token:
+          - 'email'
+    clients:
+      - client_id: 'karakeep'
+        client_name: 'Karakeep'
+        client_secret: '@KARAKEEP_CLIENT_SECRET@'
+        public: false
+        authorization_policy: 'one_factor'
+        require_pkce: false
+        redirect_uris:
+          - 'https://keep.karthihegde.dev/api/auth/callback/custom'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
+        claims_policy: 'karakeep'
+
+authentication_backend:
+  password_reset:
+    disable: true
+  file:
+    path: /config/users_database.yml
+
+webauthn:
+  enable_passkey_login: true
+  display_name: 'karthihegde.dev'
+  selection_criteria:
+    attachment: platform
+    discoverability: preferred
+    user_verification: preferred
+
+session:
+  name: 'authelia_session'
+  secret: '@SESSION_SECRET@'
+  expiration: '1h'
+  inactivity: '5m'
+  remember_me: '1M'
+  cookies:
+    - domain: 'karthihegde.dev'
+      authelia_url: 'https://auth.karthihegde.dev'
+
+storage:
+  encryption_key: '@STORAGE_ENCRYPTION_KEY@'
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: '*.karthihegde.dev'
+      networks:
+        - 127.0.0.1/32
+        - 10.88.0.0/16
+      policy: bypass
+    - domain: '*.karthihegde.dev'
+      policy: one_factor

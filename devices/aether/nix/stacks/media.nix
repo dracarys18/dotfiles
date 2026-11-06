@@ -65,6 +65,7 @@ in
   virtualisation.oci-containers.containers = {
     jellyfin = {
       image = "lscr.io/linuxserver/jellyfin:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = linuxserverEnv;
       volumes = [
         "${d}/config/jellyfin:/config"
@@ -75,6 +76,7 @@ in
 
     radarr = {
       image = "lscr.io/linuxserver/radarr:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = linuxserverEnv;
       volumes = [
         "${d}/config/radarr:/config"
@@ -85,6 +87,7 @@ in
 
     sonarr = {
       image = "lscr.io/linuxserver/sonarr:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = linuxserverEnv;
       volumes = [
         "${d}/config/sonarr:/config"
@@ -97,6 +100,7 @@ in
 
     prowlarr = {
       image = "lscr.io/linuxserver/prowlarr:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = linuxserverEnv;
       volumes = [ "${d}/config/prowlarr:/config" ];
       ports = [ "127.0.0.1:9696:9696" ];
@@ -130,6 +134,7 @@ in
         "6881:6881/udp"
       ];
       extraOptions = [
+        "--pull=newer"
         "--hostname=qbittorrent-vpn"
         "--dns=193.138.218.74"
         "--network=podman:alias=vpn-tunnel"
@@ -149,18 +154,15 @@ in
         "${d}/data/downloads:/data/downloads"
       ];
       dependsOn = [ "tailscale" ];
-      extraOptions = [ "--network=container:tailscale" ];
-      labels = {
-        "homepage.group" = "Media";
-        "homepage.name" = "QbitTorrent";
-        "homepage.icon" = "qbittorrent.png";
-        "homepage.href" = "http://torrent.karthihegde.dev/";
-        "homepage.description" = "Torrent";
-      };
+      extraOptions = [
+        "--pull=newer"
+        "--network=container:tailscale"
+      ];
     };
 
     flaresolverr = {
       image = "ghcr.io/flaresolverr/flaresolverr:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = {
         LOG_LEVEL = "info";
         TZ = "Asia/Kolkata";
@@ -173,6 +175,7 @@ in
     # Same port, so caddy.nix needs no change.
     seerr = {
       image = "ghcr.io/seerr-team/seerr:latest";
+      extraOptions = [ "--pull=newer" ];
       environment = linuxserverEnv;
       volumes = [ "${d}/config/seerr:/app/config" ];
       ports = [ "127.0.0.1:5055:5055" ];

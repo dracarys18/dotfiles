@@ -12,15 +12,14 @@
     ./stacks
   ];
 
-  # every stack runs rootful (system-level) podman: adguardhome needs :53, and
-  # dockerSocket is what homepage talks to. nixpkgs creates the default network
-  # with dns_enabled = false, so containers cannot resolve each other by name
-  # (karakeep-web asking for karakeep-chrome-1 gets ENOTFOUND) — every stack
-  # that talks to a sibling relies on this
+  # every stack runs rootful (system-level) podman: adguardhome needs :53.
+  # nixpkgs creates the default network with dns_enabled = false, so containers
+  # cannot resolve each other by name (karakeep-web asking for karakeep-chrome-1
+  # gets ENOTFOUND) — every stack that talks to a sibling relies on this
   virtualisation.podman = {
     enable = true;
-    dockerSocket.enable = true;
     defaultNetwork.settings.dns_enabled = true;
+    dockerSocket.enable = true;
   };
   virtualisation.oci-containers.backend = "podman";
 
@@ -206,7 +205,11 @@
     "i2c-dev"
     "i2c-piix4"
   ];
-  boot.kernelParams = [ "acpi_enforce_resources=lax" ];
+  boot.kernelParams = [
+    "acpi_enforce_resources=lax"
+    "slab_nomerge"
+    "page_alloc.shuffle=1"
+  ];
 
   # fish is the login shell, same as the Mac. The NixOS module is needed as
   # well: it puts fish in /etc/shells and writes /etc/fish/config.fish, while
@@ -267,12 +270,16 @@
     "kernel.kptr_restrict" = 2;
     "kernel.dmesg_restrict" = 1;
     "kernel.yama.ptrace_scope" = 1;
+    "kernel.perf_event_paranoid" = 3;
+    "kernel.kexec_load_disabled" = 1;
+    "kernel.unprivileged_bpf_disabled" = 1;
     "net.ipv4.conf.all.accept_redirects" = 0;
     "net.ipv4.conf.all.send_redirects" = 0;
     "net.ipv4.conf.all.accept_source_route" = 0;
     "net.ipv4.conf.default.accept_source_route" = 0;
     "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
     "net.ipv4.tcp_syncookies" = 1;
+    "net.ipv4.tcp_rfc1337" = 1;
   };
 
   # no firewire on this box, and these four are only ever loaded by an attacker
@@ -337,9 +344,10 @@
     # builds shouldn't need the private key just to evaluate the config
     validateSopsFiles = false;
     secrets = lib.genAttrs [
+      "beszel"
+      "beszel-agent"
       "caddy"
       "cartero"
-      "homepage"
       "karakeep"
       "media"
       "obsidian"
