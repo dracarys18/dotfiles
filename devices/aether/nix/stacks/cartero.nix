@@ -3,11 +3,30 @@
 #
 # config.toml, myfeed.opml and the templates are checked in under ./cartero and
 # mounted out of the store; only postgres/redis/data are runtime state.
-{ config, ... }:
+{ config, pkgs, ... }:
 
 let
   d = "/var/lib/stacks/cartero";
   cfg = ./cartero;
+
+  anubisPolicy = pkgs.writeText "anubis-policy.yaml" ''
+    bots:
+      - name: mobile-feeds
+        path_regex: ^/feed\.(rss|atom|json)$
+        action: ALLOW
+      - name: api
+        path_regex: ^/search(/|\?|$)
+        action: ALLOW
+      - name: ai-crawlers
+        user_agent_regex: "(?i:gptbot|chatgpt-user|oai-searchbot|claudebot|claude-web|anthropic-ai|ccbot|bytespider|amazonbot|google-extended|applebot-extended|perplexity|cohere-ai|diffbot|imagesiftbot|omgilibot|timpibot|youbot|ai2bot|meta-externalagent|velenpublicwebcrawler)"
+        action: DENY
+      - name: seo-crawlers
+        user_agent_regex: "(?i:ahrefsbot|semrushbot|mj12bot|dotbot|dataforseobot|petalbot)"
+        action: DENY
+      - name: everything-else
+        path_regex: .*
+        action: CHALLENGE
+  '';
 in
 {
   systemd.tmpfiles.rules = [
@@ -106,6 +125,20 @@ in
         "--add-host=host.docker.internal:host-gateway"
         "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
       ];
+    };
+
+    anubis-news = {
+      image = "ghcr.io/techarohq/anubis:latest";
+      environment = {
+        BIND = ":8923";
+        TARGET = "http://cartero:8080";
+        PUBLIC_URL = "https://news.karthihegde.dev";
+        POLICY_FNAME = "/etc/anubis/policy.yaml";
+        CUSTOM_REAL_IP_HEADER = "CF-Connecting-IP";
+        DIFFICULTY = "5";
+      };
+      volumes = [ "${anubisPolicy}:/etc/anubis/policy.yaml:ro" ];
+      dependsOn = [ "cartero" ];
     };
 
     cloudflare-tunnel = {
