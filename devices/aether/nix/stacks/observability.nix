@@ -1,12 +1,22 @@
-{ config, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  beszel = pkgs.callPackage ../pkgs/beszel.nix { };
+in
 {
+  systemd.services.beszel-hub.serviceConfig.ExecStartPre = lib.mkForce [
+    "${beszel}/bin/beszel-hub migrate up"
+    "${beszel}/bin/beszel-hub migrate history-sync"
+  ];
+
   services.beszel.hub = {
     enable = true;
+    package = beszel;
     environmentFile = config.sops.secrets."beszel".path;
     environment = {
       APP_URL = "https://metrics.karthihegde.dev";
       TRUSTED_AUTH_HEADER = "Remote-Email";
+      TRUSTED_PROXY_IPS = "127.0.0.1";
       USER_EMAIL = "karthihegde@karthihegde.dev";
       DISABLE_SSH = "true";
     };
@@ -14,6 +24,7 @@
 
   services.beszel.agent = {
     enable = true;
+    package = beszel;
     smartmon.enable = true;
     environmentFile = config.sops.secrets."beszel-agent".path;
     environment = {
