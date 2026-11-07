@@ -472,16 +472,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1793640684,
-        "narHash": "sha256-kPDJj8sDz1oCr2AxXNYVrcyJU3ApIb59u11TJGRrZfI=",
-        "owner": "dracarys18",
+        "lastModified": 1794034928,
+        "narHash": "sha256-BnGN4x+WqX0EjtTG/byXRPyPEl3kKnl3cdK7279I3wQ=",
+        "owner": "blackhat-7",
         "repo": "vellum.nvim",
-        "rev": "fc5b09e2b797604e20848bbe49b4561272a7c67c",
+        "rev": "031d939229a27ac8cee432936b44ee56685cdcc8",
         "type": "github"
       },
       "original": {
-        "owner": "dracarys18",
-        "ref": "nix-packaging",
+        "owner": "blackhat-7",
         "repo": "vellum.nvim",
         "type": "github"
       }

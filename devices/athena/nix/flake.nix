@@ -52,11 +52,9 @@
       url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # markdown preview plugin, packaged in the fork's flake (PR pending upstream).
-    # Kept as an input rather than copied inline so there is one copy of the
-    # packaging and the lock file pins it.
+    # markdown preview plugin
     vellum = {
-      url = "github:dracarys18/vellum.nvim/nix-packaging";
+      url = "github:blackhat-7/vellum.nvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # catppuccin's own theme for every app that has one
