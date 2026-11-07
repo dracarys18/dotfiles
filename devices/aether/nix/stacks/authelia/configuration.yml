@@ -24,6 +24,13 @@ identity_providers:
       karakeep:
         id_token:
           - 'email'
+      jellyfin:
+        id_token:
+          - 'groups'
+          - 'email'
+          - 'email_verified'
+          - 'preferred_username'
+          - 'name'
 @OIDC_POLICIES@
     clients:
       - client_id: 'karakeep'
@@ -46,6 +53,28 @@ identity_providers:
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'client_secret_basic'
         claims_policy: 'karakeep'
+      - client_id: 'jellyfin'
+        client_name: 'Jellyfin'
+        client_secret: '@JELLYFIN_CLIENT_SECRET@'
+        public: false
+        authorization_policy: 'jellyfin'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://media.karthihegde.dev/sso/OIDC/Callback/authelia'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
+        claims_policy: 'jellyfin'
 
 authentication_backend:
   password_reset:

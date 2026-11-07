@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Providers>
+    <OidcProviderConfig>
+      <ProviderId>authelia</ProviderId>
+      <DisplayName>Authelia</DisplayName>
+      <Authority>https://auth.karthihegde.dev</Authority>
+      <ClientId>jellyfin</ClientId>
+      <ClientSecretFile>/run/secrets/jellyfin/client_secret</ClientSecretFile>
+      <Scopes>openid profile email groups</Scopes>
+      <RoleClaim>groups</RoleClaim>
+      <UsernameClaim>preferred_username</UsernameClaim>
+      <DisplayNameClaim>name</DisplayNameClaim>
+      <EmailClaim>email</EmailClaim>
+      <EmailVerifiedClaim>email_verified</EmailVerifiedClaim>
+      <SyncDisplayName>true</SyncDisplayName>
+      <SyncProfileImage>false</SyncProfileImage>
+      <Enabled>true</Enabled>
+      <StrictAccessTokenValidation>true</StrictAccessTokenValidation>
+      <PinnedAuthority>https://auth.karthihegde.dev</PinnedAuthority>
+      <PinnedIssuer>https://auth.karthihegde.dev</PinnedIssuer>
+      <PinnedTokenEndpoint>https://auth.karthihegde.dev/api/oidc/token</PinnedTokenEndpoint>
+      <PinnedJwksUri>https://auth.karthihegde.dev/jwks.json</PinnedJwksUri>
+      <PinnedUserInfoEndpoint>https://auth.karthihegde.dev/api/oidc/userinfo</PinnedUserInfoEndpoint>
+      <PinnedAuthorizeEndpoint>https://auth.karthihegde.dev/api/oidc/authorization</PinnedAuthorizeEndpoint>
+    </OidcProviderConfig>
+  </Providers>
+  <RoleMappings>
+    <RoleMapping>
+      <RoleName>jellyfin_users</RoleName>
+      <IsAdmin>false</IsAdmin>
+      <EnableAllLibraries>true</EnableAllLibraries>
+    </RoleMapping>
+    <RoleMapping>
+      <RoleName>admins</RoleName>
+      <IsAdmin>true</IsAdmin>
+      <EnableAllLibraries>true</EnableAllLibraries>
+    </RoleMapping>
+  </RoleMappings>
+  <AutoCreateUsers>true</AutoCreateUsers>
+  <AllowedGroups>
+    <string>jellyfin_users</string>
+    <string>admins</string>
+  </AllowedGroups>
+  <ServerBaseUrl>https://media.karthihegde.dev</ServerBaseUrl>
+</PluginConfiguration>

@@ -78,6 +78,9 @@ in
         - name: everything-else
           path_regex: .*
           action: CHALLENGE
+          challenge:
+            algorithm: argon2id
+            difficulty: 8
     '';
   };
 
@@ -158,7 +161,6 @@ in
         PUBLIC_URL = "https://news.karthihegde.dev";
         POLICY_FNAME = "/etc/anubis/policy.yaml";
         CUSTOM_REAL_IP_HEADER = "CF-Connecting-IP";
-        DIFFICULTY = "5";
       };
       volumes = [ "${anubisPolicy}:/etc/anubis/policy.yaml:ro" ];
       extraOptions = [ "--pull=newer" ];

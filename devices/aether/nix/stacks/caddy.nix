@@ -43,6 +43,7 @@ let
       <li><a href="https://has.karthihegde.dev/">Home Assistant<span>house</span></a></li>
       <li><a href="https://metrics.karthihegde.dev/">Metrics<span>beszel</span></a></li>
       <li><a href="https://media.karthihegde.dev/">Jellyfin<span>media</span></a></li>
+      <li><a href="https://media.karthihegde.dev/sso/OIDC/QuickConnect/authelia">Sign in a device<span>quick connect</span></a></li>
       <li><a href="https://requests.karthihegde.dev/">Seerr<span>requests</span></a></li>
       <li><a href="https://keep.karthihegde.dev/">Karakeep<span>bookmarks</span></a></li>
       <li><a href="https://note.karthihegde.dev/">Obsidian<span>notes</span></a></li>
@@ -120,8 +121,18 @@ in
         import auth
         reverse_proxy 127.0.0.1:8069
       '';
-      "media.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8096";
-      "requests.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5055";
+      "media.karthihegde.dev".extraConfig = ''
+        @plainRoot {
+          path /
+          not header Referer */sso/OIDC/Callback/*
+        }
+        redir @plainRoot /sso/OIDC/Start/authelia 302
+        reverse_proxy 127.0.0.1:8096
+      '';
+      "requests.karthihegde.dev".extraConfig = ''
+        import auth
+        reverse_proxy 127.0.0.1:5055
+      '';
       "home.karthihegde.dev".extraConfig = ''
         root * ${landing}
         file_server

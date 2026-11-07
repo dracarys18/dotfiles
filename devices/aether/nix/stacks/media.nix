@@ -26,6 +26,12 @@ let
     nameserver 1.1.1.1
     nameserver 9.9.9.9
   '';
+
+  ssoOidc = pkgs.fetchzip {
+    url = "https://github.com/aussierk/jellyfin-plugin-oidc/releases/download/v2.1.0.1/oidc-rbac.zip";
+    hash = "sha256-EZ16RNEIzDgUCSH1GnDzYiWLUeHLhQyrhJygLXZjvTM=";
+    stripRoot = false;
+  };
 in
 {
   systemd.tmpfiles.rules = [
@@ -50,6 +56,15 @@ in
     "d ${d}/data/downloads 0775 1000 1000 -"
   ];
 
+  sops.secrets."jellyfin/client_secret" = {
+    sopsFile = ../secrets/authelia.yaml;
+    key = "jellyfin_client_secret";
+    uid = 1000;
+    gid = 1000;
+    mode = "0400";
+    restartUnits = [ "podman-jellyfin.service" ];
+  };
+
   # Downloads and the library are one tree, /data, mounted at the same path in
   # every container. Radarr and Sonarr hardlink an imported download into
   # /data/media instead of copying it, so a library file and its still-seeding
@@ -70,6 +85,9 @@ in
       volumes = [
         "${d}/config/jellyfin:/config"
         "${d}/data/media:/data/media"
+        "${ssoOidc}:/config/data/plugins/Jellyfin.Plugin.OIDC:ro"
+        "${./media/Jellyfin.Plugin.OIDC.xml}:/config/data/plugins/configurations/Jellyfin.Plugin.OIDC.xml:ro"
+        "${config.sops.secrets."jellyfin/client_secret".path}:/run/secrets/jellyfin/client_secret:ro"
       ];
       ports = [ "127.0.0.1:8096:8096" ];
     };
