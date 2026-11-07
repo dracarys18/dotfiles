@@ -253,6 +253,17 @@
 
   services.openssh.enable = true;
   security.sudo.wheelNeedsPassword = true;
+  security.sudo.extraRules = [
+    {
+      users = [ "karthihegde" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
 
   # SSH extras from the hardening checklist. The rest of it (no password auth,
   # no root login, MaxAuthTries 3, modern kex/ciphers, AllowUsers) is already

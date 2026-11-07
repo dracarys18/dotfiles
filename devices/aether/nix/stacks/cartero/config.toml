@@ -122,8 +122,9 @@ depends_on = ["keyword_filter"]
 [processors.extract_text.settings]
 max_chunks = 1000
 min_content_length = 300
-reader_url = "https://r.jina.ai/"
 concurrency = 20
+flaresolverr_url = "http://flaresolverr:8191"
+flaresolverr_timeout_ms = 60000
 
 [processors.embed]
 type = "embed_text"

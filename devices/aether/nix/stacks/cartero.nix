@@ -143,6 +143,7 @@ in
       dependsOn = [
         "cartero-postgres"
         "cartero-redis"
+        "flaresolverr"
       ];
       # no --dns here: overriding the resolver drops podman's internal one, so
       # the container cannot resolve cartero-postgres/cartero-redis by name

@@ -199,4 +199,6 @@ in
       ports = [ "127.0.0.1:5055:5055" ];
     };
   };
+
+  systemd.services.podman-flaresolverr.serviceConfig.MemoryHigh = "4G";
 }

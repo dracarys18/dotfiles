@@ -13,7 +13,7 @@ ATHENA := $(ROOT)/devices/athena/nix
 AETHER := $(ROOT)/devices/aether/nix
 
 NIX_BIN := /nix/var/nix/profiles/default/bin/nix
-NIX := $(NIX_BIN) --extra-experimental-features 'nix-command flakes'
+NIX := $(NIX_BIN)
 REBUILD := /run/current-system/sw/bin/darwin-rebuild
 PROJECTS ?= $(HOME)/Projects
 
@@ -74,13 +74,13 @@ ifeq ($(HOST),athena)
 	@$(NIX) flake archive '$(ATHENA)' >/dev/null
 	sudo darwin-rebuild switch --flake '$(ATHENA)#mac'
 else ifeq ($(HOST),aether)
-	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --interactive-sudo true --skip-checks
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --skip-checks
 else
 	$(error HOST must be one of: $(MACHINES))
 endif
 
 deploy: ## Deploy the aether server with deploy-rs (remote build)
-	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --interactive-sudo true --skip-checks
+	cd '$(AETHER)' && $(NIX) run .#deploy -- .#aether --remote-build --skip-checks
 
 update: ## Update HOST's flake.lock, then switch it
 ifeq ($(HOST),athena)

@@ -64,8 +64,7 @@
         hostname = "aether";
         profiles.system = {
           # the box refuses root logins, so deploy-rs ssh's as this user and
-          # sudo's to root; make passes --interactive-sudo so the server's
-          # password is asked for rather than stored as a NOPASSWD rule
+          # sudo's to root; that user has NOPASSWD in configuration.nix
           sshUser = "karthihegde";
           user = "root";
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.aether;
