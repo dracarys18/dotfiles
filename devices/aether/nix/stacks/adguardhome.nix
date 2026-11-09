@@ -45,6 +45,10 @@ in
     sopsFile = ../secrets/adguardhome.yaml;
     key = "password_hash";
     mode = "0400";
+    restartUnits = [
+      "adguardhome-config.service"
+      "podman-adguardhome.service"
+    ];
   };
 
 
@@ -64,6 +68,7 @@ in
     wantedBy = [ "multi-user.target" ];
     requiredBy = [ "podman-adguardhome.service" ];
     before = [ "podman-adguardhome.service" ];
+    partOf = [ "podman-adguardhome.service" ];
     serviceConfig.Type = "oneshot";
     script = ''
       set -eu
