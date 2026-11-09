@@ -472,11 +472,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794034928,
-        "narHash": "sha256-BnGN4x+WqX0EjtTG/byXRPyPEl3kKnl3cdK7279I3wQ=",
+        "lastModified": 1794117197,
+        "narHash": "sha256-LKFHxe+n/Rugg5hTsRjKtu+f8Yr9cPOPgLoOcin+HBk=",
         "owner": "blackhat-7",
         "repo": "vellum.nvim",
-        "rev": "031d939229a27ac8cee432936b44ee56685cdcc8",
+        "rev": "4ec5d4979f7d3fb08a799a432a71b4c7feee9144",
         "type": "github"
       },
       "original": {

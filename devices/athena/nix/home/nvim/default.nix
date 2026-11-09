@@ -14,5 +14,6 @@
     ./plugins/lang.nix
     ./plugins/ai.nix
     ./plugins/dap.nix
+    ./plugins/vellum.nix
   ];
 }

@@ -77,6 +77,8 @@
         };
       };
     };
+
+    vellum.enable = true;
   };
 
 }
