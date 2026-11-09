@@ -6,12 +6,13 @@
     ./authelia.nix
     ./caddy.nix
     ./cartero.nix
+    ./gatus.nix
     ./homeassistant.nix
-    ./karakeep.nix
     ./media.nix
     ./observability.nix
     ./obsidian.nix
     ./searchxng.nix
+    ./shiori.nix
     ./bentopdf.nix
     ./tangled.nix
   ];

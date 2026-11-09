@@ -14,7 +14,7 @@
 
   # every stack runs rootful (system-level) podman: adguardhome needs :53.
   # nixpkgs creates the default network with dns_enabled = false, so containers
-  # cannot resolve each other by name (karakeep-web asking for karakeep-chrome-1
+  # cannot resolve each other by name (cartero asking for cartero-postgres-1
   # gets ENOTFOUND) — every stack that talks to a sibling relies on this
   virtualisation.podman = {
     enable = true;
@@ -363,10 +363,11 @@
       "beszel-agent"
       "caddy"
       "cartero"
-      "karakeep"
+      "gatus"
       "media"
       "obsidian"
       "searchxng"
+      "shiori"
       "tangled"
       "tangled-knot"
     ] (name: {

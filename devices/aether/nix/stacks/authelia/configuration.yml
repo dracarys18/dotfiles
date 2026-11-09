@@ -21,9 +21,6 @@ identity_providers:
     enable_client_debug_messages: false
     enforce_pkce: 'public_clients_only'
     claims_policies:
-      karakeep:
-        id_token:
-          - 'email'
       jellyfin:
         id_token:
           - 'groups'
@@ -33,26 +30,6 @@ identity_providers:
           - 'name'
 @OIDC_POLICIES@
     clients:
-      - client_id: 'karakeep'
-        client_name: 'Karakeep'
-        client_secret: '@KARAKEEP_CLIENT_SECRET@'
-        public: false
-        authorization_policy: 'karakeep'
-        require_pkce: false
-        redirect_uris:
-          - 'https://keep.karthihegde.dev/api/auth/callback/custom'
-        scopes:
-          - 'openid'
-          - 'profile'
-          - 'email'
-        response_types:
-          - 'code'
-        grant_types:
-          - 'authorization_code'
-        access_token_signed_response_alg: 'none'
-        userinfo_signed_response_alg: 'none'
-        token_endpoint_auth_method: 'client_secret_basic'
-        claims_policy: 'karakeep'
       - client_id: 'jellyfin'
         client_name: 'Jellyfin'
         client_secret: '@JELLYFIN_CLIENT_SECRET@'

@@ -31,6 +31,7 @@ in
       LISTEN = "127.0.0.1:45876";
       HUB_URL = "http://127.0.0.1:8090";
       DOCKER_HOST = "unix:///run/podman/podman.sock";
+      NICS = "lan0";
       KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE6eRZp9WS3c3COpCpdLMbAWBofTxiEjEoDQRu+dzBMI";
     };
   };

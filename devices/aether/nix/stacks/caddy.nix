@@ -15,54 +15,6 @@ let
     }
   '';
 
-  landing = pkgs.writeTextDir "index.html" ''
-    <!doctype html>
-    <html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>karthihegde.dev</title>
-    <style>
-      :root { color-scheme: dark; }
-      body { margin: 0; font: 16px/1.5 system-ui, -apple-system, sans-serif; background: #0e0e0e; color: #d6d6d6;
-             display: grid; place-items: center; min-height: 100vh; }
-      main { width: min(880px, 90vw); padding: 3rem 0; }
-      h1 { font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #6f6f6f; margin: 0 0 1.6rem; }
-      ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem;
-           grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
-      a { display: block; padding: .85rem 1rem; border: 1px solid #242424; border-radius: .6rem;
-          color: inherit; text-decoration: none; transition: border-color .12s, background .12s; }
-      a:hover, a:focus-visible { border-color: #4a4a4a; background: #161616; outline: none; }
-      span { display: block; font-size: .72rem; color: #6a6a6a; margin-top: .15rem; }
-    </style>
-    </head>
-    <body>
-    <main>
-    <h1>karthihegde.dev</h1>
-    <ul>
-      <li><a href="https://has.karthihegde.dev/">Home Assistant<span>house</span></a></li>
-      <li><a href="https://metrics.karthihegde.dev/">Metrics<span>beszel</span></a></li>
-      <li><a href="https://media.karthihegde.dev/">Jellyfin<span>media</span></a></li>
-      <li><a href="https://media.karthihegde.dev/sso/OIDC/QuickConnect/authelia">Sign in a device<span>quick connect</span></a></li>
-      <li><a href="https://requests.karthihegde.dev/">Seerr<span>requests</span></a></li>
-      <li><a href="https://keep.karthihegde.dev/">Karakeep<span>bookmarks</span></a></li>
-      <li><a href="https://note.karthihegde.dev/">Obsidian<span>notes</span></a></li>
-      <li><a href="https://pdf.karthihegde.dev/">BentoPDF<span>pdf</span></a></li>
-      <li><a href="https://search.karthihegde.dev/">SearXNG<span>search</span></a></li>
-      <li><a href="https://radarr.karthihegde.dev/">Radarr<span>movies</span></a></li>
-      <li><a href="https://sonarr.karthihegde.dev/">Sonarr<span>tv</span></a></li>
-      <li><a href="https://prowlarr.karthihegde.dev/">Prowlarr<span>indexers</span></a></li>
-      <li><a href="https://torrent.karthihegde.dev/">qBittorrent<span>torrents</span></a></li>
-      <li><a href="https://dns.karthihegde.dev/">AdGuard<span>dns</span></a></li>
-      <li><a href="https://auth.karthihegde.dev/">Authelia<span>sso</span></a></li>
-      <li><a href="https://admin.karthihegde.dev/">Users<span>lldap</span></a></li>
-      <li><a href="https://tangled.karthihegde.dev/">Tangled<span>git</span></a></li>
-      <li><a href="https://news.karthihegde.dev/">News<span>feeds</span></a></li>
-    </ul>
-    </main>
-    </body>
-    </html>
-  '';
   # Authelia SSO lands first, then Caddy hands AdGuard its own credential, so
   # the AdGuard login form never appears. The value reaches caddy through
   # systemd's EnvironmentFile (read as root) rather than an imported file:
@@ -92,12 +44,9 @@ in
     # ADGUARD_BASIC_AUTH is the rendered template next to it
     environmentFile = config.sops.secrets."caddy".path;
 
-    # globalConfig turns the admin API off, so `caddy reload` has nothing to
-    # talk to and fails the whole activation. Restart on config changes instead.
-    enableReload = false;
-
     globalConfig = ''
-      admin off
+      admin unix//run/caddy/admin.sock
+      grace_period 30s
       acme_dns cloudflare {
         api_token {env.CF_API_TOKEN}
       }
@@ -116,7 +65,12 @@ in
         }
       '';
 
-      "keep.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3069";
+      "keep.karthihegde.dev".extraConfig = ''
+        import auth
+        reverse_proxy 127.0.0.1:8095 {
+          header_up Remote-User shiori
+        }
+      '';
       "pdf.karthihegde.dev".extraConfig = ''
         import auth
         reverse_proxy 127.0.0.1:8069
@@ -133,10 +87,7 @@ in
         import auth
         reverse_proxy 127.0.0.1:5055
       '';
-      "home.karthihegde.dev".extraConfig = ''
-        root * ${landing}
-        file_server
-      '';
+      "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8390";
 
       "auth.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:9091";
       "search.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:6996";
@@ -179,6 +130,7 @@ in
   # firewall.nix holds the policy
 
   systemd.tmpfiles.rules = [
+    "d /run/caddy 0750 caddy caddy -"
     "d /var/lib/stacks/caddy 0755 root root -"
   ];
 
@@ -188,8 +140,7 @@ in
     config.sops.templates."caddy-adguard.env".path
   ];
 
-  # `admin off` above means there is no /load endpoint, so `caddy reload` always
-  # fails and activation reports a failed unit while the old config keeps
-  # serving; restart on change instead
-  systemd.services.caddy.reloadIfChanged = false;
+  systemd.services.caddy.serviceConfig.ExecReload = lib.mkForce [
+    "${config.services.caddy.package}/bin/caddy reload --config ${config.services.caddy.configFile} --adapter caddyfile --address unix//run/caddy/admin.sock --force"
+  ];
 }

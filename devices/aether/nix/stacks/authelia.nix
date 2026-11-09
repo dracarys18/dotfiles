@@ -17,7 +17,6 @@ let
 
   # OIDC clients cannot be derived from caddy, so they stay explicit.
   oidcClients = {
-    karakeep = "karakeep_users";
     jellyfin = "jellyfin_users";
   };
 
@@ -86,11 +85,6 @@ in
         key = "oidc_issuer_private_key";
         mode = "0400";
       };
-      "authelia/karakeep_client_secret" = {
-        sopsFile = ../secrets/authelia.yaml;
-        key = "karakeep_client_secret";
-        mode = "0400";
-      };
       "authelia/jellyfin_client_secret" = {
         sopsFile = ../secrets/authelia.yaml;
         key = "jellyfin_client_secret";
@@ -123,7 +117,6 @@ in
         "@STORAGE_ENCRYPTION_KEY@"
         "@JWT_SECRET@"
         "@OIDC_HMAC_SECRET@"
-        "@KARAKEEP_CLIENT_SECRET@"
         "@JELLYFIN_CLIENT_SECRET@"
         "@OIDC_ISSUER_PRIVATE_KEY@"
         "@LLDAP_PASSWORD@"
@@ -135,7 +128,6 @@ in
         config.sops.placeholder."authelia/storage_encryption_key"
         config.sops.placeholder."authelia/jwt_secret"
         config.sops.placeholder."authelia/oidc_hmac_secret"
-        config.sops.placeholder."authelia/karakeep_client_secret"
         config.sops.placeholder."authelia/jellyfin_client_secret"
         config.sops.placeholder."authelia/oidc_issuer_private_key"
         config.sops.placeholder."lldap/admin_password"
