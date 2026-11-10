@@ -66,6 +66,9 @@ in
         - name: mobile-feeds
           path_regex: ^/feed\.(rss|atom|json)$
           action: ALLOW
+        - name: health
+          path_regex: ^/health$
+          action: ALLOW
         - name: api
           path_regex: ^/search(/|\?|$)
           action: ALLOW

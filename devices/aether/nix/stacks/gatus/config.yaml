@@ -188,7 +188,7 @@ endpoints:
 
   - name: news
     group: apps
-    url: "https://news.karthihegde.dev/feed.rss"
+    url: "https://news.karthihegde.dev/health"
     interval: 1m
     alerts:
       - type: discord
@@ -198,6 +198,7 @@ endpoints:
         description: "healthcheck failed"
     conditions:
       - "[STATUS] == 200"
+      - "[BODY] == pat(*\"status\":\"ok\"*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
   - name: tangled
