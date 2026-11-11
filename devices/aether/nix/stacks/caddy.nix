@@ -36,8 +36,11 @@ in
   services.caddy = {
     enable = true;
     package = pkgs.caddy.withPlugins {
-      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.2" ];
-      hash = "sha256-4QbLyUaZ+5P+ZOotM6D3w275RDD/NaprzMS2orX7I6I=";
+      plugins = [
+        "github.com/caddy-dns/cloudflare@v0.2.2"
+        "github.com/caddyserver/replace-response@v0.0.0-20250618171559-80962887e4c6"
+      ];
+      hash = "sha256-rhWH7CeYggUAoxRWXHX77cKw/Zz2bc5rCb4nEbMjhyY=";
     };
 
     # CF_API_TOKEN comes from sops: devices/aether/nix/secrets/caddy.env;
@@ -87,7 +90,26 @@ in
         import auth
         reverse_proxy 127.0.0.1:5055
       '';
-      "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8390";
+      # the dashboard is the container's index.html with one extra script: it
+      # totals the 30d uptime of every endpoint and prints it under the heading.
+      # identity encoding only for the document, or the SPA's js/css would be
+      # proxied uncompressed to feed the text replacement.
+      "home.karthihegde.dev".extraConfig = ''
+        handle /uptime.js {
+          root * ${./gatus}
+          header Cache-Control "no-cache"
+          file_server
+        }
+        handle / {
+          replace "</body>" "<script src=\"/uptime.js\" defer></script></body>"
+          reverse_proxy 127.0.0.1:8390 {
+            header_up Accept-Encoding identity
+          }
+        }
+        handle {
+          reverse_proxy 127.0.0.1:8390
+        }
+      '';
 
       "auth.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:9091";
       "search.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:6996";
@@ -140,7 +162,12 @@ in
     config.sops.templates."caddy-adguard.env".path
   ];
 
+  # the package's own unit is installed as the fragment (systemd.packages), and
+  # it carries a reload against /etc/caddy/Caddyfile, which does not exist here.
+  # the first empty string resets that list; without it the stale command runs
+  # first, fails, and the whole activation rolls back
   systemd.services.caddy.serviceConfig.ExecReload = lib.mkForce [
+    ""
     "${config.services.caddy.package}/bin/caddy reload --config ${config.services.caddy.configFile} --adapter caddyfile --address unix//run/caddy/admin.sock --force"
   ];
 }

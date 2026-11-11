@@ -2,6 +2,38 @@ storage:
   type: sqlite
   path: /data/gatus.db
 
+ui:
+  title: "status · karthihegde.dev"
+  description: "Live health of every karthihegde.dev service"
+  header: "karthihegde.dev"
+  dashboard-heading: "Status"
+  dashboard-subheading: "every service, probed every five minutes"
+  custom-css: |
+    footer { display: none; }
+    #gatus-uptime-banner {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid hsl(var(--border));
+      border-radius: 0.5rem;
+      background-color: hsl(var(--card));
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+    #gatus-uptime-banner .label { color: hsl(var(--muted-foreground)); }
+    #gatus-uptime-banner .value {
+      font-size: 1.125rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: hsl(var(--muted-foreground));
+    }
+    #gatus-uptime-banner .count { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+    #gatus-uptime-banner[data-health="good"] .value { color: #16a34a; }
+    #gatus-uptime-banner[data-health="warn"] .value { color: #d97706; }
+    #gatus-uptime-banner[data-health="bad"] .value { color: #dc2626; }
+
 alerting:
   discord:
     webhook-url: ${discord_webhook}
@@ -17,7 +49,7 @@ endpoints:
   - name: home
     group: web
     url: "https://home.karthihegde.dev/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -31,7 +63,7 @@ endpoints:
   - name: auth
     group: web
     url: "https://auth.karthihegde.dev/api/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -46,7 +78,7 @@ endpoints:
   - name: admin
     group: web
     url: "https://admin.karthihegde.dev/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -60,7 +92,7 @@ endpoints:
   - name: metrics
     group: web
     url: "https://metrics.karthihegde.dev/api/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -74,7 +106,7 @@ endpoints:
   - name: dns
     group: web
     url: "https://dns.karthihegde.dev/control/status"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -89,7 +121,7 @@ endpoints:
   - name: media
     group: media
     url: "https://media.karthihegde.dev/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -103,7 +135,7 @@ endpoints:
   - name: requests
     group: media
     url: "https://requests.karthihegde.dev/api/v1/status"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -118,7 +150,7 @@ endpoints:
   - name: keep
     group: apps
     url: "https://keep.karthihegde.dev/api/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -132,7 +164,7 @@ endpoints:
   - name: note
     group: apps
     url: "https://note.karthihegde.dev/_up"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -146,7 +178,7 @@ endpoints:
   - name: pdf
     group: apps
     url: "https://pdf.karthihegde.dev/"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -160,7 +192,7 @@ endpoints:
   - name: search
     group: apps
     url: "https://search.karthihegde.dev/healthz"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -174,7 +206,7 @@ endpoints:
   - name: has
     group: apps
     url: "https://has.karthihegde.dev/manifest.json"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -189,7 +221,7 @@ endpoints:
   - name: news
     group: apps
     url: "https://news.karthihegde.dev/health"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -204,7 +236,7 @@ endpoints:
   - name: tangled
     group: apps
     url: "https://tangled.karthihegde.dev/"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -218,7 +250,7 @@ endpoints:
   - name: radarr
     group: arr
     url: "https://radarr.karthihegde.dev/ping"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -233,7 +265,7 @@ endpoints:
   - name: sonarr
     group: arr
     url: "https://sonarr.karthihegde.dev/ping"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -248,7 +280,7 @@ endpoints:
   - name: prowlarr
     group: arr
     url: "https://prowlarr.karthihegde.dev/ping"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -263,7 +295,7 @@ endpoints:
   - name: torrent
     group: arr
     url: "https://torrent.karthihegde.dev/"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
@@ -277,7 +309,7 @@ endpoints:
   - name: wan
     group: network
     url: "https://www.google.com/generate_204"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 2
@@ -294,7 +326,7 @@ endpoints:
     dns:
       query-name: "home.karthihegde.dev"
       query-type: "A"
-    interval: 1m
+    interval: 5m
     alerts:
       - type: discord
         failure-threshold: 1
