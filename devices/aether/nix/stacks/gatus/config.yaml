@@ -280,7 +280,7 @@ endpoints:
     interval: 1m
     alerts:
       - type: discord
-        failure-threshold: 1
+        failure-threshold: 2
         success-threshold: 2
         send-on-resolved: true
         description: "healthcheck failed"
@@ -290,7 +290,7 @@ endpoints:
 
   - name: adguard-dns
     group: network
-    url: "10.88.0.1:53"
+    url: "100.113.199.45:53"
     dns:
       query-name: "home.karthihegde.dev"
       query-type: "A"

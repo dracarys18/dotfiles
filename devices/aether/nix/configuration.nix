@@ -153,6 +153,7 @@
       require_dnssec = true;
       cache = true;
       ignore_system_dns = true;
+      timeout = 2000;
       bootstrap_resolvers = [
         "[2606:4700:4700::1111]:53"
         "1.1.1.1:53"
