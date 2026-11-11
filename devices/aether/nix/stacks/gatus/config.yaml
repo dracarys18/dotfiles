@@ -72,7 +72,7 @@ endpoints:
         description: "healthcheck failed"
     conditions:
       - "[STATUS] == 200"
-      - "[RESPONSE_TIME] < 2000"
+      - "[RESPONSE_TIME] < 3000"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
   - name: admin
@@ -318,7 +318,7 @@ endpoints:
         description: "healthcheck failed"
     conditions:
       - "[STATUS] == 204"
-      - "[RESPONSE_TIME] < 1000"
+      - "[RESPONSE_TIME] < 3000"
 
   - name: adguard-dns
     group: network
@@ -335,4 +335,4 @@ endpoints:
         description: "healthcheck failed"
     conditions:
       - "[DNS_RCODE] == NOERROR"
-      - "[RESPONSE_TIME] < 500"
+      - "[RESPONSE_TIME] < 1000"
