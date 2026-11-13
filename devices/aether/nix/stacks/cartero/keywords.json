@@ -1,0 +1,250 @@
+[
+  {
+    "keyword": "AI",
+    "context_string": "Applied AI and the LLM ecosystem: new model releases and comparisons, AI products and tools, coding assistants and agents, building with LLMs (RAG, prompting, serving, local models), and image, audio and video generation tools.",
+    "not_for": "Research that advances machine learning itself, which is Machine Learning. Politics, regulation or lawsuits about AI, which match no topic.",
+    "examples": [
+      "Claude Opus 5.5 released with new benchmark results",
+      "Building a RAG pipeline on Postgres with pgvector",
+      "How I use coding agents to refactor a large codebase",
+      "Running Qwen locally with llama.cpp"
+    ]
+  },
+  {
+    "keyword": "Machine Learning",
+    "context_string": "Core machine learning research and breakthroughs: new architectures and training methods, learning theory, scaling results, reinforcement learning, interpretability, and research papers that advance the field.",
+    "not_for": "Product launches, AI tools and building applications with LLMs, which are AI.",
+    "examples": [
+      "A new attention variant that scales linearly with context length",
+      "A mechanistic explanation of grokking",
+      "Scaling laws for mixture-of-experts models",
+      "Sparse autoencoders find interpretable features in a language model"
+    ]
+  },
+  {
+    "keyword": "Databases",
+    "context_string": "How databases work and are used: storage engines, transactions, query planning and indexing, PostgreSQL, MySQL and SQLite, NoSQL, vector and search engines, ORMs and migrations."
+  },
+  {
+    "keyword": "Data Engineering",
+    "context_string": "Moving and modeling data at scale: pipelines and orchestration, streaming with Kafka and Flink, lakehouse formats like Iceberg and Parquet, warehouses and data quality."
+  },
+  {
+    "keyword": "Distributed Systems",
+    "context_string": "Systems across many machines: consensus, consistency, replication and partitioning, CRDTs, distributed transactions, queues and large-scale architecture."
+  },
+  {
+    "keyword": "Networking",
+    "context_string": "How networks work: TCP/IP, QUIC and HTTP, routing and BGP, DNS, VPNs and WireGuard, NAT, load balancers, proxies and CDNs."
+  },
+  {
+    "keyword": "Infrastructure",
+    "context_string": "Running software in the cloud: Kubernetes and containers, infrastructure as code, CI/CD, AWS, GCP, Azure and Cloudflare, and serverless."
+  },
+  {
+    "keyword": "Reliability",
+    "context_string": "Keeping systems up: observability, SRE practice, on-call, outages, incident reports and postmortems."
+  },
+  {
+    "keyword": "Operating Systems",
+    "context_string": "Kernels and OS internals: Linux kernel development, schedulers, memory management, file systems, drivers, eBPF and io_uring."
+  },
+  {
+    "keyword": "Systems Programming",
+    "context_string": "Low-level programming in C, C++ and Zig: memory management and memory safety, concurrency primitives, lock-free code and async I/O."
+  },
+  {
+    "keyword": "Performance",
+    "context_string": "Making software fast: profiling, benchmarking, CPU caches and SIMD, latency and memory optimization, and speed-up war stories."
+  },
+  {
+    "keyword": "Rust",
+    "context_string": "The Rust language and ecosystem: ownership, async Rust, unsafe and FFI, Cargo and crates, and projects built in Rust."
+  },
+  {
+    "keyword": "Go",
+    "context_string": "The Go language and ecosystem: goroutines, the runtime and garbage collector, tooling and projects built in Go."
+  },
+  {
+    "keyword": "Python",
+    "context_string": "The Python language and ecosystem: CPython, typing, asyncio, packaging with pip and uv, Django and FastAPI, NumPy and pandas."
+  },
+  {
+    "keyword": "JavaScript & TypeScript",
+    "context_string": "The JavaScript and TypeScript languages, runtimes like Node.js, Deno and Bun, and JavaScript tooling."
+  },
+  {
+    "keyword": "JVM",
+    "context_string": "Java, Kotlin, Scala and Clojure, the JVM, its garbage collectors and JIT."
+  },
+  {
+    "keyword": "Functional Programming",
+    "context_string": "Functional languages and ideas: Haskell, OCaml, Elixir, Erlang, Lisp, immutability, algebraic data types and effects."
+  },
+  {
+    "keyword": "Programming Languages",
+    "context_string": "Language design and new or niche languages: type systems, paradigms, syntax and semantics, and comparisons between languages."
+  },
+  {
+    "keyword": "Compilers",
+    "context_string": "How languages are implemented: parsers, type checkers, intermediate representations, LLVM, optimization and code generation, interpreters, VMs, JITs and WebAssembly."
+  },
+  {
+    "keyword": "Formal Methods",
+    "context_string": "Proving software correct: formal verification, proof assistants like Lean and Coq, TLA+, model checking and type theory."
+  },
+  {
+    "keyword": "Frontend",
+    "context_string": "Building user interfaces for the web: React, Vue, Svelte and other frameworks, CSS, design systems, accessibility and animations."
+  },
+  {
+    "keyword": "Web Platform",
+    "context_string": "Browsers and the web platform: browser engines and internals, web standards and APIs, web performance and the future of the web."
+  },
+  {
+    "keyword": "Backend & APIs",
+    "context_string": "Server-side web development: web frameworks, REST, GraphQL and gRPC, WebSockets, authentication flows, caching and data formats."
+  },
+  {
+    "keyword": "Security Research",
+    "context_string": "Offensive security: vulnerabilities and exploits, CVE write-ups, reverse engineering, malware analysis, fuzzing and hacking stories."
+  },
+  {
+    "keyword": "Security",
+    "context_string": "Defending systems: application and cloud security, authentication and access control, supply-chain security, breaches and incident analysis."
+  },
+  {
+    "keyword": "Cryptography",
+    "context_string": "Cryptography: encryption, signatures and protocols, TLS, zero-knowledge proofs, post-quantum cryptography and cryptographic attacks."
+  },
+  {
+    "keyword": "Privacy",
+    "context_string": "Privacy and surveillance: tracking, data collection, data protection law like GDPR, encryption policy and digital rights."
+  },
+  {
+    "keyword": "Semiconductors",
+    "context_string": "Chips and how they are made: CPU and GPU design, computer architecture, fabs, lithography and the chip industry."
+  },
+  {
+    "keyword": "Embedded & Electronics",
+    "context_string": "Microcontrollers, firmware, FPGAs, circuit and PCB design, and hardware hacking."
+  },
+  {
+    "keyword": "Retro Computing",
+    "context_string": "Vintage computers, old software and computing history: classic hardware, emulation, restorations and how early systems worked."
+  },
+  {
+    "keyword": "GPU Computing",
+    "context_string": "Programming GPUs for general computation: CUDA, compute shaders, parallel algorithms and accelerators."
+  },
+  {
+    "keyword": "Graphics & Games",
+    "context_string": "Computer graphics and game development: rendering, shaders, ray tracing, Vulkan, Metal and WebGPU, game engines and 3D math."
+  },
+  {
+    "keyword": "Software Architecture",
+    "context_string": "Designing software systems: architecture patterns, monoliths and microservices, domain-driven design, API design and technical trade-offs."
+  },
+  {
+    "keyword": "Testing",
+    "context_string": "Software testing and quality: unit, integration and end-to-end tests, property-based testing, fuzzing for correctness and CI test strategy."
+  },
+  {
+    "keyword": "Engineering Culture",
+    "context_string": "How software teams work: engineering practices, code review, productivity, careers, management and hiring."
+  },
+  {
+    "keyword": "Developer Tools",
+    "context_string": "Tools developers use daily: editors and IDEs, Git, build systems and package managers, terminals, shells, CLI and TUI tools, debuggers."
+  },
+  {
+    "keyword": "Open Source",
+    "context_string": "How open source works: licensing, governance and foundations, maintainers, funding, forks and community disputes, and notable open-source project news."
+  },
+  {
+    "keyword": "Algorithms",
+    "context_string": "Algorithms and data structures: complexity, trees, graphs, dynamic programming, probabilistic structures, puzzles and competitive programming."
+  },
+  {
+    "keyword": "Mathematics",
+    "context_string": "Mathematics itself: algebra, calculus, probability and statistics, number theory, combinatorics, proofs and recreational math."
+  },
+  {
+    "keyword": "Quantum Computing",
+    "context_string": "Quantum computers: qubits, quantum algorithms, error correction, hardware and quantum programming."
+  },
+  {
+    "keyword": "Linux",
+    "context_string": "Linux on the desktop and as a system: distributions, desktop environments, window managers, Wayland, NixOS, package managers and systemd."
+  },
+  {
+    "keyword": "Self-Hosting",
+    "context_string": "Running your own services and homelab: self-hosted apps, home servers and NAS, Proxmox, Docker at home, reverse proxies and backups."
+  },
+  {
+    "keyword": "Android",
+    "context_string": "Android as a platform: AOSP, custom ROMs like GrapheneOS, rooting, Android internals and app development with Kotlin."
+  },
+  {
+    "keyword": "Blockchain",
+    "context_string": "Blockchains and crypto technology: protocols and consensus, smart contracts, rollups, wallets and the crypto ecosystem."
+  },
+  {
+    "keyword": "Space",
+    "context_string": "Astronomy and spaceflight: planets, stars and cosmology, telescopes, rockets, satellites and space missions."
+  },
+  {
+    "keyword": "Physics",
+    "context_string": "Physics research and explanations: quantum mechanics, particle physics, condensed matter, relativity and optics."
+  },
+  {
+    "keyword": "Climate & Energy",
+    "context_string": "Climate science and energy: climate change research, renewables, batteries, nuclear fission and fusion, and the energy grid."
+  },
+  {
+    "keyword": "Biology & Medicine",
+    "context_string": "Life sciences and health: biology, genetics, neuroscience, medicine, drugs and health research."
+  },
+  {
+    "keyword": "Computational Biology",
+    "context_string": "Computing applied to biology: genomics and sequencing, protein structure and folding, molecular simulation and bioinformatics."
+  },
+  {
+    "keyword": "Chemistry & Materials",
+    "context_string": "Chemistry and materials science: new materials, chemical processes and their applications."
+  },
+  {
+    "keyword": "Lua",
+    "context_string": "Lua the language and its ecosystem: Lua 5.4 and 5.5 releases and VM work, LuaJIT and its performance, embedding Lua in C and C++, LuaRocks, and notable code written in Lua such as Neovim configs, LÖVE games, Roblox and OpenResty.",
+    "not_for": "Cross-language comparisons and language design theory, which are Programming Languages; news about the Neovim editor or other tools themselves, which are Developer Tools.",
+    "examples": [
+      "Lua 5.5 ships with new scoping rules",
+      "Why LuaJIT's trace compiler still beats everything",
+      "Embedding Lua in a C game engine",
+      "A tour of a 5000-line Neovim config written in Lua"
+    ]
+  },
+  {
+    "keyword": "New Launches",
+    "context_string": "New products being announced and released: CPU, GPU, laptop, phone, tablet, wearable, handheld and smart-home launches from Samsung, Google, Apple, AMD, Intel, Nvidia, Qualcomm and others, with their specs, pricing, first reviews and benchmarks.",
+    "not_for": "Chip fabrication and process nodes, which are Semiconductors; programming GPUs with CUDA, ROCm or Metal, which is GPU Computing; microcontrollers and PCBs, which are Embedded & Electronics; and software updates to existing devices, which are not launches.",
+    "examples": [
+      "Google announces a new Pixel and Tensor chip",
+      "Samsung launches the Galaxy S26 series",
+      "AMD launches a Ryzen 9 with stacked V-Cache",
+      "Apple announces a touchscreen MacBook Pro with an OLED display"
+    ]
+  },
+  {
+    "keyword": "Companies",
+    "context_string": "News about the companies themselves rather than their products, judged at the company level: leadership changes such as a CEO transition, resignation, ouster or appointment of a new CTO or chief scientist, key departures and hires, reorganizations, acquisitions and mergers, layoffs, earnings and business strategy at Nvidia, Google, Apple, OpenAI, Anthropic, Microsoft, Amazon and Meta.",
+    "not_for": "Announcements of specific devices or products, which are New Launches; model capability, benchmarks or research, which are AI or Machine Learning; chip fabrication and process nodes, which are Semiconductors; and ordinary stock price moves with no structural news, which match no topic.",
+    "examples": [
+      "OpenAI replaces its CEO after a board dispute",
+      "Anthropic hires a new chief research officer from DeepMind",
+      "Nvidia acquires an inference startup",
+      "Google reorganizes its AI teams under one leader",
+      "Apple's chief chip architect steps down"
+    ]
+  }
+]

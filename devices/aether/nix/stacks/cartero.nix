@@ -135,6 +135,8 @@ in
       volumes = [
         "${config.sops.templates."cartero-config.toml".path}:/app/config.toml:ro"
         "${cfg}/myfeed.opml:/app/myfeed.opml:ro"
+        "${cfg}/keywords.json:/app/keywords.json:ro"
+        "${cfg}/spamlist.txt:/app/spamlist.txt:ro"
         "${cfg}/templates:/app/templates:ro"
         "${d}/data:/app/data"
       ];

@@ -4,6 +4,7 @@
     <outline type="rss" text="404media" title="404media" xmlUrl="https://www.404media.co/rss"></outline>
     <outline type="rss" text="aaron_patterson" title="aaron_patterson" xmlUrl="http://tenderlovemaking.com/atom.xml"></outline>
     <outline type="rss" text="abdullin_com" title="abdullin_com" xmlUrl="https://abdullin.com/atom.xml"></outline>
+    <outline type="rss" text="abhinav_upadhyay" title="abhinav_upadhyay" xmlUrl="https://blog.codingconfessions.com/feed"></outline>
     <outline type="rss" text="acm" title="acm" xmlUrl="https://cacm.acm.org/feed/"></outline>
     <outline type="rss" text="addy_osmani" title="addy_osmani" xmlUrl="http://addyosmani.com/rss.xml"></outline>
     <outline type="rss" text="airbnb" title="airbnb" xmlUrl="https://medium.com/feed/airbnb-engineering"></outline>
@@ -105,7 +106,7 @@
     <outline type="rss" text="oona_risnen" title="oona_risnen" xmlUrl="https://www.windytan.com/feeds/posts/default"></outline>
     <outline type="rss" text="palantir" title="palantir" xmlUrl="https://blog.palantir.com/feed"></outline>
     <outline type="rss" text="parade_db" title="parade_db" xmlUrl="https://www.paradedb.com/feed.xml"></outline>
-    <outline type="rss" text="percona" title="percona" xmlUrl="https://duckdb.org/feed.xml"></outline>
+    <outline type="rss" text="percona" title="percona" xmlUrl="https://www.percona.com/blog/feed/"></outline>
     <outline type="rss" text="peteris_krumins" title="peteris_krumins" xmlUrl="https://catonmat.net/feed"></outline>
     <outline type="rss" text="petersteinberger_com" title="petersteinberger_com" xmlUrl="http://petersteinberger.com/rss.xml"></outline>
     <outline type="rss" text="petr_mitrichev" title="petr_mitrichev" xmlUrl="https://blog.mitrichev.ch/feeds/posts/default"></outline>
@@ -135,3 +136,4 @@
     <outline type="rss" text="zendesk" title="zendesk" xmlUrl="https://zendesk.engineering/feed"></outline>
   </body>
 </opml>
+

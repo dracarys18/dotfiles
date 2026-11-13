@@ -83,8 +83,12 @@ targets = ["feed_target","bluesky"]
 [sources.lobsters.settings]
 max_items = 50
 sort_by = "hot"
-include_categories = ["go","rust","c","linux", "android", "security", "devops", "scaling","performance", "compilers", "vim", "databases", "zig"]
-exclude_categories = []
+include_categories = [
+  "go", "databases", "compilers", "plt", "performance", "distributed",
+  "networking", "osdev", "security", "cryptography", "lua", "hardware",
+  "ios", "rust", "retrocomputing", "historical",
+]
+exclude_categories = ["ai", "job", "announce", "meta", "satire"]
 
 [sources.techcrunch]
 type = "scraper"
@@ -110,7 +114,7 @@ depends_on = ["dedupe"]
 min_score = 0
 
 [interests]
-keywords_file = "https://gist.githubusercontent.com/dracarys18/c39af1e5f138d66f14311b7b8c368a6c/raw/1affd930dd5ba5b3619bd0debc00691b6bf8a98f/keywords.json"
+keywords_file = "/app/keywords.json"
 off_topic_threshold = 0.8
 min_quality = 2.0
 min_quality_incomplete = 1.4
@@ -216,7 +220,7 @@ embed_threshold = 0.8
 embed_window = "168h"
 
 [blocklist]
-domains_file = "https://gist.githubusercontent.com/dracarys18/435d3d14814bd6077cf383a6701d5c67/raw/593561bafc6e1a2f89a63ca7483ac71e726dc1f8/spamlist.txt"
+domains_file = "/app/spamlist.txt"
 
 [prompts.topic]
 instructions = "Which topic is this article about? Judge by its main subject, not passing mentions."
@@ -224,16 +228,17 @@ none = "The article is unrelated to all of the other topics, such as general new
 
 [prompts.quality]
 instructions = """
-How valuable is this to an experienced software engineer who reads for depth rather than news? \
+How valuable is this to an experienced software engineer who reads for depth? \
 Judge the substance, not how popular its topic is. \
 For a software project or tool, judge how useful and technically interesting the project is, not how long its description is. \
+A genuinely significant event — a CEO or founder leaving, an acquisition, a major outage, a shutdown — is worth reading even when the coverage is a short news item. \
 If content_status is incomplete, rate what the title and summary suggest instead of treating the article as empty.\
 """
 incomplete = "incomplete: the article text could not be fully retrieved"
 levels = [
   "Worthless: spam, marketing or a sales pitch, SEO filler, AI-generated fluff, or no real content.",
-  "Thin: a news blurb, rebrand or product announcement, link roundup, listicle, or opinion with little evidence or technical detail.",
-  "Decent: a clear article with some useful information or perspective, or a working open-source project or tool with a clear description of what it does.",
+  "Thin: a routine news blurb or product announcement with no significance, rebrand, link roundup, listicle, or opinion with little evidence or technical detail.",
+  "Decent: a clear article with some useful information or perspective, a significant event covered briefly, or a working open-source project or tool with a clear description of what it does.",
   "Substantive: original insight, real technical depth, data, or hands-on experience an experienced engineer would learn from, or a notable project with real technical substance.",
   "Exceptional: an in-depth investigation, definitive deep-dive, novel result, or standout project worth saving and sharing.",
 ]
