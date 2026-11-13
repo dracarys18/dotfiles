@@ -20,6 +20,16 @@ let
     jellyfin = "jellyfin_users";
   };
 
+  # the host's own traffic has to reach the vhosts without a login: gatus used to
+  # run as a container (10.88.x, bypassed), and now runs as a service, so it
+  # connects from this box's LAN and tailnet addresses. only those specific
+  # addresses bypass — the tailnet as a whole still authenticates.
+  lanV4 =
+    let
+      a = lib.head config.networking.interfaces.lan0.ipv4.addresses;
+    in
+    "${a.address}/32";
+
   accessControl =
     "access_control:\n"
     + "  default_policy: deny\n"
@@ -28,6 +38,9 @@ let
     + "      networks:\n"
     + "        - 127.0.0.1/32\n"
     + "        - 10.88.0.0/16\n"
+    + "        - ${lanV4}\n"
+    + "        - 100.113.199.45/32\n"
+    + "        - fd7a:115c:a1e0::f52d:c72e/128\n"
     + "      policy: bypass\n"
     + lib.concatStrings (
       lib.mapAttrsToList (domain: _:
