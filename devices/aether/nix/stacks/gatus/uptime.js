@@ -57,6 +57,25 @@
     }
   }
 
+  function linkHostnames() {
+    var hosts = document.querySelectorAll('.dashboard-container .endpoint .text-muted-foreground span');
+    for (var i = 0; i < hosts.length; i++) {
+      var element = hosts[i];
+      var host = element.textContent;
+      if (element.querySelector('a') || !/^[a-z0-9-]+(\.[a-z0-9-]+)*\.karthihegde\.dev$/.test(host)) {
+        continue;
+      }
+      var link = document.createElement('a');
+      link.className = 'gatus-hostname-link';
+      link.href = 'https://' + host;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = host;
+      element.textContent = '';
+      element.appendChild(link);
+    }
+  }
+
   function refresh() {
     series()
       .then(function (uptimes) {
@@ -84,6 +103,8 @@
   }
 
   refresh();
+  linkHostnames();
   setInterval(refresh, 60000);
   setInterval(mount, 2000);
+  setInterval(linkHostnames, 2000);
 })();

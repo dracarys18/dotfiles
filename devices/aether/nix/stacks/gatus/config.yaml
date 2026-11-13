@@ -1,6 +1,10 @@
 storage:
   type: sqlite
-  path: /data/gatus.db
+  path: /var/lib/stacks/gatus/data/gatus.db
+
+web:
+  address: 127.0.0.1
+  port: 8390
 
 ui:
   title: "status · karthihegde.dev"
@@ -33,6 +37,8 @@ ui:
     #gatus-uptime-banner[data-health="good"] .value { color: #16a34a; }
     #gatus-uptime-banner[data-health="warn"] .value { color: #d97706; }
     #gatus-uptime-banner[data-health="bad"] .value { color: #dc2626; }
+    .gatus-hostname-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+    .gatus-hostname-link:hover { color: hsl(var(--foreground)); }
 
 alerting:
   discord:
@@ -46,7 +52,7 @@ alerting:
 
 
 endpoints:
-  - name: home
+  - name: Gatus
     group: web
     url: "https://home.karthihegde.dev/health"
     interval: 5m
@@ -60,7 +66,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: auth
+  - name: Authelia
     group: web
     url: "https://auth.karthihegde.dev/api/health"
     interval: 5m
@@ -75,7 +81,7 @@ endpoints:
       - "[RESPONSE_TIME] < 3000"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: admin
+  - name: LLDAP
     group: web
     url: "https://admin.karthihegde.dev/health"
     interval: 5m
@@ -89,7 +95,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: metrics
+  - name: Beszel
     group: web
     url: "https://metrics.karthihegde.dev/api/health"
     interval: 5m
@@ -103,7 +109,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: dns
+  - name: AdGuard Home
     group: web
     url: "https://dns.karthihegde.dev/control/status"
     interval: 5m
@@ -118,7 +124,7 @@ endpoints:
       - "[BODY] == pat(*\"protection_enabled\"*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: media
+  - name: Jellyfin
     group: media
     url: "https://media.karthihegde.dev/health"
     interval: 5m
@@ -132,7 +138,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: requests
+  - name: Seerr
     group: media
     url: "https://requests.karthihegde.dev/api/v1/status"
     interval: 5m
@@ -147,7 +153,7 @@ endpoints:
       - "[BODY] == pat(*\"version\"*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: keep
+  - name: Shiori
     group: apps
     url: "https://keep.karthihegde.dev/api/health"
     interval: 5m
@@ -161,7 +167,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: note
+  - name: Obsidian
     group: apps
     url: "https://note.karthihegde.dev/_up"
     interval: 5m
@@ -175,7 +181,7 @@ endpoints:
       - "[STATUS] == 401"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: pdf
+  - name: BentoPDF
     group: apps
     url: "https://pdf.karthihegde.dev/"
     interval: 5m
@@ -189,7 +195,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: search
+  - name: SearXNG
     group: apps
     url: "https://search.karthihegde.dev/healthz"
     interval: 5m
@@ -203,7 +209,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: has
+  - name: Home Assistant
     group: apps
     url: "https://has.karthihegde.dev/manifest.json"
     interval: 5m
@@ -218,7 +224,7 @@ endpoints:
       - "[BODY] == pat(*Home automation platform*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: news
+  - name: Cartero
     group: apps
     url: "https://news.karthihegde.dev/health"
     interval: 5m
@@ -233,7 +239,7 @@ endpoints:
       - "[BODY] == pat(*\"status\":\"ok\"*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: tangled
+  - name: Tangled
     group: apps
     url: "https://tangled.karthihegde.dev/"
     interval: 5m
@@ -247,7 +253,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: radarr
+  - name: Radarr
     group: arr
     url: "https://radarr.karthihegde.dev/ping"
     interval: 5m
@@ -262,7 +268,7 @@ endpoints:
       - "[BODY] == pat(*OK*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: sonarr
+  - name: Sonarr
     group: arr
     url: "https://sonarr.karthihegde.dev/ping"
     interval: 5m
@@ -277,7 +283,7 @@ endpoints:
       - "[BODY] == pat(*OK*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: prowlarr
+  - name: Prowlarr
     group: arr
     url: "https://prowlarr.karthihegde.dev/ping"
     interval: 5m
@@ -292,7 +298,7 @@ endpoints:
       - "[BODY] == pat(*OK*)"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: torrent
+  - name: qBittorrent
     group: arr
     url: "https://torrent.karthihegde.dev/"
     interval: 5m
@@ -306,7 +312,7 @@ endpoints:
       - "[STATUS] == 200"
       - "[CERTIFICATE_EXPIRATION] > 240h"
 
-  - name: wan
+  - name: WAN
     group: network
     url: "https://www.google.com/generate_204"
     interval: 5m
@@ -320,7 +326,7 @@ endpoints:
       - "[STATUS] == 204"
       - "[RESPONSE_TIME] < 3000"
 
-  - name: adguard-dns
+  - name: AdGuard DNS
     group: network
     url: "100.113.199.45:53"
     dns:
