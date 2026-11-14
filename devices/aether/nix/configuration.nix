@@ -124,18 +124,29 @@
   # a fresh TCP connection per authoritative server, ~600ms on a cold name.
   # resolved does the same job with fewer moving parts.
   #
-  # DNSSEC stays off, as it was before any of this: the answers come from
-  # Cloudflare already validated, and a second validator on the box would only
-  # turn a bad signature into a SERVFAIL this config cannot explain.
+  # DNSSEC is validated here rather than trusted to Cloudflare: the uplink is
+  # encrypted end to end and the box has a root trust anchor from systemd, so a
+  # bogus answer from anywhere between here and the authoritative servers turns
+  # into a SERVFAIL instead of a silently wrong address.
   #
   # The deploy path uses the IP from ~/.ssh/config, so a resolver outage cannot
   # lock the box out of itself.
   services.resolved = {
     enable = true;
     settings.Resolve = {
-      DNS = [ "127.0.0.1:5300" ];
-      DNSOverTLS = "no";
-      DNSSEC = "no";
+      # cloudflare over TLS, straight from this box. the local resolvers that
+      # used to be here were a single point of stall: FallbackDNS is only
+      # consulted when DNS is empty, and resolved's retry chain on a lost reply
+      # is 5+10+20+30+30s, so one dropped answer from dnscrypt-proxy hung every
+      # client here for two minutes. two cloudflare addresses, because one is
+      # still one. the #name is required: with DNSOverTLS=yes resolved verifies
+      # the certificate against that name, not against the address.
+      DNS = [
+        "1.1.1.1#one.one.one.one"
+        "1.0.0.1#one.one.one.one"
+      ];
+      DNSOverTLS = "yes";
+      DNSSEC = "yes";
       Domains = [ "~." ];
     };
   };

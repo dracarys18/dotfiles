@@ -113,7 +113,6 @@
     <outline type="rss" text="planetscale" title="planetscale" xmlUrl="https://planet.postgresql.org/rss20.xml"></outline>
     <outline type="rss" text="pubnub" title="pubnub" xmlUrl="https://www.pubnub.com/feed/blog/"></outline>
     <outline type="rss" text="razorpay" title="razorpay" xmlUrl="https://engineering.razorpay.com/feed"></outline>
-    <outline type="rss" text="real_python" title="real_python" xmlUrl="https://realpython.com/atom.xml"></outline>
     <outline type="rss" text="redplait_blogspot_com" title="redplait_blogspot_com" xmlUrl="http://redplait.blogspot.com/atom.xml"></outline>
     <outline type="rss" text="rocksdb" title="rocksdb" xmlUrl="http://rocksdb.org/feed.xml"></outline>
     <outline type="rss" text="rust" title="rust" xmlUrl="https://blog.rust-lang.org/feed.xml"></outline>

@@ -231,14 +231,17 @@ instructions = """
 How valuable is this to an experienced software engineer who reads for depth? \
 Judge the substance, not how popular its topic is. \
 For a software project or tool, judge how useful and technically interesting the project is, not how long its description is. \
-A genuinely significant event — a CEO or founder leaving, an acquisition, a major outage, a shutdown — is worth reading even when the coverage is a short news item. \
+A genuinely significant business or technical event — a CEO or founder leaving, an acquisition, a major outage, a shutdown — is worth reading even when the coverage is a short news item. \
+Coverage whose substance is someone's private life, relationships, affairs, allegations or personal scandal is worthless no matter how large the company, and is never made significant by the person's seniority. \
+A getting-started guide, primer or "how to use X" walkthrough aimed at people new to a language, library, API or vendor product is not valuable to an experienced engineer, however well written. \
+A step-by-step account of building something genuinely hard — an incremental compiler, a database, an allocator, a bootloader, a scheduler — is depth, not a tutorial, and is valuable. \
 If content_status is incomplete, rate what the title and summary suggest instead of treating the article as empty.\
 """
 incomplete = "incomplete: the article text could not be fully retrieved"
 levels = [
-  "Worthless: spam, marketing or a sales pitch, SEO filler, AI-generated fluff, or no real content.",
-  "Thin: a routine news blurb or product announcement with no significance, rebrand, link roundup, listicle, or opinion with little evidence or technical detail.",
-  "Decent: a clear article with some useful information or perspective, a significant event covered briefly, or a working open-source project or tool with a clear description of what it does.",
+  "Worthless: spam, marketing or a sales pitch, SEO filler, AI-generated fluff, no real content, or gossip about a person's private life, relationships, affairs, allegations or personal scandal.",
+  "Thin: a routine news blurb or product announcement with no significance, a beginner tutorial or getting-started guide, rebrand, link roundup, listicle, or opinion with little evidence or technical detail.",
+  "Decent: a clear article with some useful information or perspective, a significant business or technical event covered briefly, or a working open-source project or tool with a clear description of what it does.",
   "Substantive: original insight, real technical depth, data, or hands-on experience an experienced engineer would learn from, or a notable project with real technical substance.",
   "Exceptional: an in-depth investigation, definitive deep-dive, novel result, or standout project worth saving and sharing.",
 ]
@@ -255,4 +258,14 @@ threshold = 0.7
 [[prompts.flags]]
 name = "research_slop"
 question = "Is this an unrefereed preprint (for example on arXiv) whose main contribution is a benchmark, evaluation, survey or a minor variation of existing work, rather than a new result or method worth reading?"
+threshold = 0.6
+
+[[prompts.flags]]
+name = "tabloid"
+question = "Is this tabloid material: coverage whose substance is a person's private life, relationships, affairs, allegations or personal scandal, rather than the company's business, products or technology?"
+threshold = 0.6
+
+[[prompts.flags]]
+name = "beginner"
+question = "Is this aimed at beginners: a getting-started guide, primer, or 'how to use X' walkthrough whose substance is teaching the basics of a language, library, API or vendor product? A step-by-step build of something genuinely hard — an incremental compiler, a database, an allocator, a kernel — is not beginner material and is what we want."
 threshold = 0.6
