@@ -1,6 +1,6 @@
 # ~/Projects/adguardhome — this box is the tailnet's resolver, so it is the
 # last stack to switch over. AdGuard Home does the filtering per client and
-# resolves over DoT to Cloudflare itself (see configuration.nix).
+# resolves upstream through dnscrypt-proxy (see configuration.nix).
 #
 # It runs with host networking, unlike every other stack: :53 has to be
 # reachable from the LAN and the tailnet, and a published port is DNAT'd
@@ -22,6 +22,16 @@
 # same port is taken. The config therefore lists the addresses it serves,
 # which means the tailnet address has to exist before it starts — that is why
 # one of the bind_hosts is a literal tailnet IP.
+#
+# DoT is served with a certificate from a CA of our own (dot-ca.pem beside this
+# file), not with the one caddy holds for dns.karthihegde.dev: that one lives
+# under /var/lib/caddy and is renewed on a schedule, so it would have to be
+# copied out and kept in step forever, and a stale copy is a resolver that stops
+# verifying. The CA key was deleted after signing, which leaves nothing on this
+# box able to mint a second certificate for adguard.aether.internal, and the
+# leaf and its key are in sops. AdGuard's HTTPS and DoQ listeners are on port 0
+# in AdGuardHome.yaml because 443 belongs to caddy and TLS here is for the DNS
+# hop only.
 {
   config,
   pkgs,
@@ -52,6 +62,34 @@ in
   };
 
 
+  # resolved verifies the DoT hop to AdGuard against this and nothing else, so
+  # the leaf never has to be publicly trusted
+  security.pki.certificateFiles = [ ./adguardhome/dot-ca.pem ];
+
+  # the leaf and its key, installed into the conf dir below rather than mounted
+  # from /run/secrets: the config unit already runs before the container and can
+  # make the directory in one step, and a mount whose source is missing is a
+  # directory podman creates on the host instead
+  sops.secrets."adguardhome/tls_cert" = {
+    sopsFile = ../secrets/adguardhome.yaml;
+    key = "tls_cert";
+    mode = "0400";
+    restartUnits = [
+      "adguardhome-config.service"
+      "podman-adguardhome.service"
+    ];
+  };
+
+  sops.secrets."adguardhome/tls_key" = {
+    sopsFile = ../secrets/adguardhome.yaml;
+    key = "tls_key";
+    mode = "0400";
+    restartUnits = [
+      "adguardhome-config.service"
+      "podman-adguardhome.service"
+    ];
+  };
+
   # the container keeps the conf dir writable, because AGH saves the config
   # whenever a setting changes and errors on every write otherwise. What it
   # saves is discarded at the next start, so the repo wins without the app
@@ -79,6 +117,9 @@ in
         ' ${./adguardhome/AdGuardHome.yaml} > ${d}/conf/AdGuardHome.yaml.new
       ${pkgs.coreutils}/bin/chmod 0600 ${d}/conf/AdGuardHome.yaml.new
       ${pkgs.coreutils}/bin/mv ${d}/conf/AdGuardHome.yaml.new ${d}/conf/AdGuardHome.yaml
+
+      ${pkgs.coreutils}/bin/install -D -m 0400 ${config.sops.secrets."adguardhome/tls_cert".path} ${d}/conf/tls/tls.crt
+      ${pkgs.coreutils}/bin/install -D -m 0400 ${config.sops.secrets."adguardhome/tls_key".path} ${d}/conf/tls/tls.key
     '';
   };
 
@@ -104,5 +145,35 @@ in
   systemd.services.podman-adguardhome = {
     restartTriggers = [ ./adguardhome/AdGuardHome.yaml ];
     after = [ "tailscaled.service" ];
+  };
+
+  # resolved has no way back to the first server on its own. When adguard is
+  # restarted, a query that lands in the gap marks it failed and every later
+  # query follows cloudflare — the box stays unfiltered after adguard is up
+  # again, and resetting the learnt feature levels does not move it back. So the
+  # restart carries a restart of resolved, gated on adguard actually answering
+  # DoT with the certificate resolved is about to check.
+  systemd.services.adguardhome-resolver-pin = {
+    wantedBy = [ "multi-user.target" ];
+    requires = [ "podman-adguardhome.service" ];
+    after = [ "podman-adguardhome.service" ];
+    partOf = [ "podman-adguardhome.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      TimeoutStartSec = 60;
+    };
+    script = ''
+      set -eu
+      until ${pkgs.openssl}/bin/openssl s_client \
+        -connect 127.0.0.1:853 \
+        -servername adguard.aether.internal \
+        -CAfile ${./adguardhome/dot-ca.pem} \
+        -verify_return_error \
+        </dev/null 2>/dev/null | ${pkgs.gnugrep}/bin/grep -q 'Verify return code: 0 (ok)'; do
+        sleep 1
+      done
+      ${config.systemd.package}/bin/systemctl restart systemd-resolved.service
+    '';
   };
 }

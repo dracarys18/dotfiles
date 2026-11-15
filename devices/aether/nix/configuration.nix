@@ -134,14 +134,23 @@
   services.resolved = {
     enable = true;
     settings.Resolve = {
-      # cloudflare over TLS, straight from this box. the local resolvers that
-      # used to be here were a single point of stall: FallbackDNS is only
-      # consulted when DNS is empty, and resolved's retry chain on a lost reply
-      # is 5+10+20+30+30s, so one dropped answer from dnscrypt-proxy hung every
-      # client here for two minutes. two cloudflare addresses, because one is
-      # still one. the #name is required: with DNSOverTLS=yes resolved verifies
-      # the certificate against that name, not against the address.
+      # adguard home first, so this box is filtered like everything else on the
+      # network, then cloudflare over TLS if the container is down or slow: one
+      # server was a single point of stall, because FallbackDNS is only
+      # consulted when DNS is empty and resolved's retry chain on a lost reply
+      # is 5+10+20+30+30s. resolved uses whichever server answers, so a query
+      # that falls through to cloudflare once keeps going there until the
+      # current server fails in turn.
+      #
+      # the hop to adguard is loopback rather than 192.168.0.179: the container
+      # binds 127.0.0.1 for this client alone, so the query needs no LAN
+      # address, no firewall hole and no interface to be up, and cannot be
+      # answered by anything off the box. adguard serves DoT with a
+      # certificate from the CA in stacks/adguardhome.nix, which is what lets
+      # DNSOverTLS be "yes" here instead of "opportunistic": the #name is the
+      # name each certificate is verified against.
       DNS = [
+        "127.0.0.1#adguard.aether.internal"
         "1.1.1.1#one.one.one.one"
         "1.0.0.1#one.one.one.one"
       ];
