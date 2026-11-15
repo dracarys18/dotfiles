@@ -77,6 +77,8 @@ in
       "com.apple.Siri" = {
         StatusMenuVisible = false;
         VoiceTriggerUserEnabled = false;
+        # the value Settings restores the menu bar item from
+        SiriPrefStashedStatusMenuVisible = false;
       };
       # no .DS_Store files on network drives
       "com.apple.desktopservices".DSDontWriteNetworkStores = true;
@@ -86,6 +88,7 @@ in
       "com.apple.assistant.support" = {
         "Siri Data Sharing Opt-In Status" = 2;
         "Search Queries Data Sharing Status" = 2;
+        "Assistant Enabled" = false;
       };
       "com.apple.lookup.shared".LookupSuggestionsDisabled = true;
     };

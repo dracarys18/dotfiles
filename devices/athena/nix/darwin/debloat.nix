@@ -18,6 +18,11 @@ let
     "com.apple.sirittsd"
     "com.apple.SiriTTSTrainingAgent"
     "com.apple.corespeechd"
+    # macOS 27 additions: the context service the assistant reads the screen
+    # with, the Control Center item, and Apple Intelligence's request router
+    "com.apple.siri.context.service"
+    "com.apple.notificationcenterui.siri"
+    "com.apple.intelligentroutingd"
 
     # Apple Intelligence
     "com.apple.generativeexperiencesd"
@@ -118,10 +123,49 @@ let
     "com.apple.InstallerDiagnostics.installerdiagwatcher"
   ];
 
+  # Siri's extensions, which are neither launchd jobs nor covered by anything
+  # else: they are elected per user, and while an extension is running it lives
+  # in the same process list as the assistant and outlives the settings pane
+  # that spawned it. Includes the metrics, analytics and upload workers, voice
+  # assets and the app-intent extensions, so nothing Siri-shaped can be hosted.
+  plugins = [
+    "com.apple.aiml.siri.SiriLogProcessor"
+    "com.apple.lighthouse.SiriCoreMetricsWorker"
+    "com.apple.siri.analytics.SAMaintenance"
+    "com.apple.siri.car.PnRCarPlayOnDeviceWorker"
+    "com.apple.siri.GMSSELFIngestor"
+    "com.apple.siri.inference.SiriInference.SiriInferenceRuntimeDiagnostics"
+    "com.apple.siri.messages.SiriMessagesAppIntentsExtension"
+    "com.apple.siri.metrics.AssetMetrics"
+    "com.apple.siri.metrics.DevicePropertiesExtension"
+    "com.apple.siri.ODDFeatureDigestsExtension"
+    "com.apple.siri.ODDIExperimentationExtension"
+    "com.apple.siri.ODDIMetricsExtension"
+    "com.apple.siri.OnDeviceAnalytics.SiriAttentionAndInvocationExtension"
+    "com.apple.siri.OnDeviceAnalytics.SpeakerIdSamplingExtension"
+    "com.apple.siri.parsec.HashtagImagesApp.HashtagImagesExtension"
+    "com.apple.siri.SiriAppLaunchIntents.AppLaunchIntentExtension"
+    "com.apple.siri.SiriExtensionsDigestExtension"
+    "com.apple.siri.SiriGeo.SiriGeoAppIntentExtension"
+    "com.apple.siri.SiriPhoneAppIntentsExtension"
+    "com.apple.siri.SiriPrivateLearningAnalytics.SiriUserSegmentation"
+    "com.apple.siri.SiriPrivateLearningAnalytics.SiriUserSegments.Plugin"
+    "com.apple.siri.SiriSuggestionsLightHousePlugin"
+    "com.apple.siri.SiriTimeInternal.AlarmIntentsExtension"
+    "com.apple.siri.SiriTimeInternal.TimerIntentsExtension"
+    "com.apple.siri.SiriTTSService.STSDiagnostic"
+    "com.apple.SiriMetrics.SiriTurnRestatementExtension"
+    "com.apple.siriplugin.FileSearch"
+    "com.apple.SiriSetup.SiriSetupSettingsIntents"
+    "com.apple.texttospeech.SiriAUSP"
+    "com.apple.unilog.SiriUploadWorker"
+  ];
+
   # launchctl has no declarative form, so the lists above are applied by this
   #
   #   debloat [UID]          disable everything now (UID defaults to you)
   #   debloat --boot UID     what the boot daemon runs
+  #   debloat --plugins      only the plug-in elections (runs as you)
   #   debloat --undo [UID]   re-enable everything; also remove this module
   #                          from darwin/default.nix or the next switch disables them again
   debloat = pkgs.writeShellApplication {
@@ -129,6 +173,15 @@ let
     text = ''
       AGENTS=(${lib.escapeShellArgs agents})
       DAEMONS=(${lib.escapeShellArgs daemons})
+      PLUGINS=(${lib.escapeShellArgs plugins})
+
+      ignore_plugins() {
+          local n=0
+          for id in "''${PLUGINS[@]}"; do
+              pluginkit -e ignore -i "$id" 2>/dev/null && n=$((n+1))
+          done
+          echo "  ignored $n of ''${#PLUGINS[@]} plug-ins"
+      }
 
       as_root() {
           if [ "$(id -u)" -eq 0 ]; then
@@ -155,13 +208,19 @@ let
       case "''${1:-}" in
           --boot)
               # launchd brings some of these back at boot and at login, so apply
-              # now and once more after the user's session is up
+              # now and once more after the user's session is up. The wait is
+              # skipped when the session already exists (the hourly re-run).
               disable_all "gui/$2"
-              until launchctl print "gui/$2" >/dev/null 2>&1; do
-                  sleep 5
-              done
-              sleep 60
+              if ! launchctl print "gui/$2" >/dev/null 2>&1; then
+                  until launchctl print "gui/$2" >/dev/null 2>&1; do
+                      sleep 5
+                  done
+                  sleep 60
+              fi
               disable_all "gui/$2"
+              ;;
+          --plugins)
+              ignore_plugins
               ;;
           --undo)
               uid="''${2:-$(id -u)}"
@@ -171,10 +230,15 @@ let
               for label in "''${DAEMONS[@]}"; do
                   as_root launchctl enable "system/$label"
               done
-              echo "  enabled ''${#AGENTS[@]} agents and ''${#DAEMONS[@]} daemons, restart to bring them back"
+              for id in "''${PLUGINS[@]}"; do
+                  pluginkit -e use -i "$id" 2>/dev/null || true
+              done
+              echo "  enabled ''${#AGENTS[@]} agents, ''${#DAEMONS[@]} daemons and ''${#PLUGINS[@]} plug-ins, restart to bring them back"
               ;;
           *)
               disable_all "gui/''${1:-$(id -u)}"
+              # elections are per user; as root this would write root's own
+              [ "$(id -u)" -eq 0 ] || ignore_plugins
               echo "  disabled ''${#AGENTS[@]} agents and ''${#DAEMONS[@]} daemons"
               ;;
       esac
@@ -194,6 +258,17 @@ in
       uid
     ];
     RunAtLoad = true;
+  };
+
+  # The plug-in elections have to be written by the user whose extensions they
+  # are, which the root daemon above is not, so they get their own user agent.
+  # Like the launchd overrides these are stored, not re-derived: one pass at
+  # login holds until the next macOS update clears them.
+  launchd.user.agents.siri-plugins = {
+    serviceConfig = {
+      ProgramArguments = [ "${debloat}/bin/debloat" "--plugins" ];
+      RunAtLoad = true;
+    };
   };
 
   system.activationScripts.postActivation.text = ''
