@@ -37,9 +37,12 @@
     };
     # TODO(macOS 27): temporary, see darwin/yabai.nix for when and how to remove.
     # yabai 7.1.25 + macOS 27 scripting-addition patterns (upstream has no macOS
-    # 27 support yet: asmvik/yabai#2802), pinned to a reviewed commit.
+    # 27 support yet: asmvik/yabai#2802), pinned to a reviewed commit. The beta
+    # 6 build this started on patches a Dock that no longer exists: space
+    # create/focus/destroy silently did nothing on 27.2.1, so the pin moved to
+    # the commit that follows the Dock into WindowManager.app.
     yabai-macos27 = {
-      url = "github:AhsanFazal/yabai/ad0a12d63f639534a296a1d065b0d04979f1b4db";
+      url = "github:AhsanFazal/yabai/ad8d5adfdc39c76399599ae79a264f2525f6ca5e";
       flake = false;
     };
     # kubectl abbreviations for fish

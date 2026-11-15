@@ -71,14 +71,17 @@ in
       sudo ${config.services.yabai.package}/bin/yabai --load-sa
       yabai -m signal --add event=dock_did_restart action="sudo ${config.services.yabai.package}/bin/yabai --load-sa"
 
-      # always exactly 6 spaces
-      space_count=$(yabai -m query --spaces | jq '. | length')
+      # always exactly 6 spaces. Counted over regular spaces only: a
+      # native-fullscreen space is in --spaces too, and counting it made the
+      # loop believe six were already there, so the config settled on five.
+      normal_spaces() { yabai -m query --spaces | jq '[.[] | select(."is-native-fullscreen" | not)]'; }
+      space_count=$(normal_spaces | jq length)
       while [ "$space_count" -lt 6 ]; do
           yabai -m space --create
           space_count=$((space_count + 1))
       done
       while [ "$space_count" -gt 6 ]; do
-          yabai -m space --destroy "$space_count"
+          yabai -m space --destroy "$(normal_spaces | jq '.[-1].index')"
           space_count=$((space_count - 1))
       done
 
@@ -91,7 +94,6 @@ in
       yabai -m rule --add label=telegram app="^Telegram$" space=3
 
       # OBS gets the last regular space, labelled "obs"
-      normal_spaces() { yabai -m query --spaces | jq '[.[] | select(."is-native-fullscreen" | not)]'; }
       [ "$(normal_spaces | jq length)" -lt 3 ] && yabai -m space --create
       yabai -m space "$(normal_spaces | jq '.[-1].index')" --label obs
       yabai -m rule --add label=obs app="^OBS Studio$" space=obs
