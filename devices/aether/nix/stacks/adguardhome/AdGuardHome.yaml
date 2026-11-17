@@ -184,7 +184,13 @@ filtering:
   blocked_services:
     schedule:
       time_zone: UTC
-    ids: []
+    ids:
+      - instagram
+      - twitter
+      - facebook
+      - tiktok
+      - snapchat
+      - reddit
   protection_disabled_until: null
   safe_search:
     enabled: false
@@ -220,64 +226,7 @@ clients:
     rdns: true
     dhcp: true
     hosts: true
-  persistent:
-    - safe_search:
-        enabled: false
-        bing: false
-        duckduckgo: false
-        ecosia: false
-        google: false
-        pixabay: false
-        yandex: false
-        youtube: false
-      blocked_services:
-        schedule:
-          time_zone: UTC
-        ids: []
-      name: archmaestro
-      ids:
-        - 192.168.0.148
-      tags: []
-      upstreams: []
-      uid: 01a158ed-586a-7b78-bda8-d181d7930e37
-      upstreams_cache_size: 0
-      upstreams_cache_enabled: false
-      use_global_settings: false
-      filtering_enabled: false
-      parental_enabled: false
-      safebrowsing_enabled: false
-      use_global_blocked_services: false
-      ignore_querylog: false
-      ignore_statistics: false
-    - safe_search:
-        enabled: true
-        bing: true
-        duckduckgo: true
-        ecosia: true
-        google: true
-        pixabay: true
-        yandex: true
-        youtube: true
-      blocked_services:
-        schedule:
-          time_zone: UTC
-        ids: []
-      name: iot
-      ids:
-        - 192.168.0.185
-        - 192.168.0.249
-      tags: []
-      upstreams: []
-      uid: 01a158ed-586a-7b87-bf58-a4a7a7a94ffd
-      upstreams_cache_size: 0
-      upstreams_cache_enabled: false
-      use_global_settings: false
-      filtering_enabled: true
-      parental_enabled: false
-      safebrowsing_enabled: true
-      use_global_blocked_services: false
-      ignore_querylog: false
-      ignore_statistics: false
+  persistent: []
 log:
   enabled: true
   file: ""
