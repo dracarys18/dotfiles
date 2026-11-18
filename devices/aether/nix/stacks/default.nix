@@ -8,11 +8,14 @@
     ./cartero.nix
     ./gatus.nix
     ./homeassistant.nix
+    ./homepage.nix
     ./media.nix
     ./observability.nix
+    ./postgres.nix
     ./obsidian.nix
     ./searchxng.nix
     ./shiori.nix
+    ./sparkyfitness.nix
     ./bentopdf.nix
     ./tangled.nix
   ];

@@ -52,9 +52,9 @@ alerting:
 
 
 endpoints:
-  - name: Gatus
-    group: web
-    url: "https://home.karthihegde.dev/health"
+  - name: SparkyFitness
+    group: apps
+    url: "https://fit.karthihegde.dev/"
     interval: 5m
     alerts:
       - type: discord

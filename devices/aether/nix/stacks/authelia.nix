@@ -1,6 +1,6 @@
 # Authelia config is checked in (./authelia/configuration.yml); users live in
 # lldap, and only sessions/2FA live in the sqlite volume.
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   d = "/var/lib/stacks/authelia";
@@ -15,9 +15,14 @@ let
   # the lldap ui cannot be gated by a group it is used to populate
   groupFor = domain: if serviceName domain == "admin" then "admins" else "${serviceName domain}_users";
 
+  serviceGroups = lib.unique (
+    lib.mapAttrsToList (domain: _: groupFor domain) gatedVHosts ++ lib.attrValues oidcClients
+  );
+
   # OIDC clients cannot be derived from caddy, so they stay explicit.
   oidcClients = {
     jellyfin = "jellyfin_users";
+    sparkyfitness = "fit_users";
   };
 
   # the host's own traffic has to reach the vhosts without a login: gatus used to
@@ -69,6 +74,7 @@ in
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/config 0755 root root -"
+    "d /var/lib/stacks/lldap 0750 lldap lldap -"
   ];
 
   sops.secrets =
@@ -103,6 +109,11 @@ in
         key = "jellyfin_client_secret";
         mode = "0400";
       };
+      "authelia/oidc_sparkyfitness_secret" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "oidc_sparkyfitness_secret";
+        mode = "0400";
+      };
       "lldap/admin_password" = {
         sopsFile = ../secrets/authelia.yaml;
         key = "lldap_admin_password";
@@ -131,8 +142,10 @@ in
         "@JWT_SECRET@"
         "@OIDC_HMAC_SECRET@"
         "@JELLYFIN_CLIENT_SECRET@"
+        "@SPARKYFITNESS_CLIENT_SECRET@"
         "@OIDC_ISSUER_PRIVATE_KEY@"
         "@LLDAP_PASSWORD@"
+        "@STORAGE_PASSWORD@"
         "@ACCESS_CONTROL@"
         "@OIDC_POLICIES@"
       ]
@@ -142,8 +155,10 @@ in
         config.sops.placeholder."authelia/jwt_secret"
         config.sops.placeholder."authelia/oidc_hmac_secret"
         config.sops.placeholder."authelia/jellyfin_client_secret"
+        config.sops.placeholder."authelia/oidc_sparkyfitness_secret"
         config.sops.placeholder."authelia/oidc_issuer_private_key"
         config.sops.placeholder."lldap/admin_password"
+        config.sops.placeholder."postgres-apps/authelia_password"
         accessControl
         oidcPolicies
       ]
@@ -176,6 +191,7 @@ in
 
   services.lldap = {
     enable = true;
+    environmentFile = config.sops.templates."lldap.env".path;
     settings = {
       ldap_base_dn = "dc=karthihegde,dc=dev";
       ldap_user_dn = "admin";
@@ -191,10 +207,72 @@ in
     };
   };
 
+  systemd.services.authelia-logs-prune = {
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.podman}/bin/podman exec postgres psql -U authelia -d authelia -c \"DELETE FROM authentication_logs WHERE time < now() - interval '30 days'\"";
+    };
+  };
+
+  systemd.timers.authelia-logs-prune = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+    };
+  };
+
+  sops.templates."lldap.env" = {
+    restartUnits = [ "lldap.service" ];
+    mode = "0400";
+    content = ''
+      LLDAP_DATABASE_URL=postgres://lldap:${config.sops.placeholder."postgres-apps/lldap_password"}@127.0.0.1:5432/lldap
+    '';
+  };
+
   systemd.services.lldap.serviceConfig = {
     DynamicUser = lib.mkForce false;
     User = "lldap";
     Group = "lldap";
+    StateDirectory = lib.mkForce "";
+    WorkingDirectory = lib.mkForce "/var/lib/stacks/lldap";
+    ReadWritePaths = [ "/var/lib/stacks/lldap" ];
+  };
+
+  systemd.services.lldap-groups = {
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "lldap.service"
+      "sops-install-secrets.service"
+    ];
+    wants = [
+      "lldap.service"
+      "sops-install-secrets.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    path = [
+      pkgs.curl
+      pkgs.jq
+    ];
+    script = ''
+      set -eu
+      api=http://127.0.0.1:5090
+      token=$(curl -sf -X POST "$api/auth/simple/login" -H 'Content-Type: application/json' \
+        -d "$(jq -cn --arg u admin --arg p "$(cat ${config.sops.secrets."lldap/admin_password".path})" '{username: $u, password: $p}')" |
+        jq -r .token)
+      have=$(curl -sf -X POST "$api/api/graphql" -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+        -d '{"query":"{ groups { displayName } }"}' | jq -r '.data.groups[].displayName')
+      for g in ${lib.concatStringsSep " " serviceGroups}; do
+        if ! printf '%s\n' "$have" | grep -qx "$g"; then
+          curl -sf -X POST "$api/api/graphql" -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+            -d "$(jq -cn --arg q "mutation { createGroup(name: \"$g\") { id } }" '{query: $q}')" > /dev/null
+          echo "created $g"
+        fi
+      done
+    '';
   };
 
   services.caddy.virtualHosts."admin.karthihegde.dev".extraConfig = ''

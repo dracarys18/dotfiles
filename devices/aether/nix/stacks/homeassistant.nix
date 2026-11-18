@@ -1,5 +1,5 @@
 # ~/Projects/homeassistant — both services need the host network
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
   d = "/var/lib/stacks/homeassistant";
@@ -17,6 +17,7 @@ let
     zone:
 
     recorder:
+      db_url: !env_var RECORDER_DB_URL
       purge_keep_days: 5
       commit_interval: 30
 
@@ -32,10 +33,18 @@ in
     "d ${d}/matter-data 0755 root root -"
   ];
 
+  sops.templates."homeassistant.env" = {
+    restartUnits = [ "podman-homeassistant.service" ];
+    content = ''
+      RECORDER_DB_URL=postgresql://homeassistant:${config.sops.placeholder."postgres-apps/homeassistant_password"}@127.0.0.1:5432/homeassistant
+    '';
+  };
+
   virtualisation.oci-containers.containers = {
     homeassistant = {
       image = "ghcr.io/home-assistant/home-assistant:stable";
       environment.TZ = "Asia/Kolkata";
+      environmentFiles = [ config.sops.templates."homeassistant.env".path ];
       volumes = [
         "${d}/config:/config"
         "${configuration}:/config/configuration.yaml:ro"

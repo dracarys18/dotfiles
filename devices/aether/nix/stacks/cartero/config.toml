@@ -10,7 +10,7 @@ db = 0
 
 [storage]
 type = "postgres"
-dsn = "postgres://cartero:cartero@cartero-postgres:5432/cartero?sslmode=disable"
+dsn = "postgres://cartero:cartero@postgres:5432/cartero?sslmode=disable"
 
 [platforms.jev]
 type = "jev"

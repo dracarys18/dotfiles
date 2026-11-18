@@ -385,8 +385,10 @@
       "caddy"
       "cartero"
       "gatus"
+      "homepage"
       "media"
       "obsidian"
+      "postgres"
       "searchxng"
       "shiori"
       "tangled"
@@ -404,6 +406,8 @@
     /var/lib/stacks/<stack>/  persistent data, one dir per stack
     secrets come from sops: devices/aether/nix/secrets/<stack>.env -> /run/secrets/<stack>
   '';
+
+  services.journald.extraConfig = "SystemMaxUse=1G";
 
   system.stateVersion = "26.05";
 }

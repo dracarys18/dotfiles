@@ -1,0 +1,68 @@
+/* Pure black dashboard.
+   Loaded before the app's own stylesheet, so selectors are scoped with
+   html.dark to win without a pile of !important. Cards get their hairline
+   from cardStyle: hairline in settings.yaml. */
+
+html.dark {
+  --bg-color: 0 0 0;
+}
+
+/* cards: a hair above black, so the hairline edge has something to sit on */
+html.dark .service-card {
+  background-color: rgb(255 255 255 / 4%);
+  border-radius: 10px;
+}
+
+html.dark .service-card:hover {
+  background-color: rgb(255 255 255 / 8%);
+}
+
+/* search field */
+html.dark input {
+  background-color: rgb(255 255 255 / 4%);
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 10px;
+}
+
+html.dark input:focus {
+  border-color: rgb(255 255 255 / 20%);
+}
+
+/* group headings: quieter, a little tracked out */
+html.dark .service-group-name {
+  color: rgb(255 255 255 / 55%);
+  letter-spacing: 0.04em;
+}
+
+/* the header widgets sit in one row with room to breathe */
+html.dark .information-widget-resource {
+  margin-right: 1.9rem;
+}
+
+/* uptime has no meaningful percentage — homepage feeds it the seconds of the
+   current minute, so its bar just sweeps for no reason. Uptime always renders
+   last in the resources row, so hide the bar on that row only. */
+html.dark .information-widget-resource:last-child .resource-usage {
+  display: none;
+}
+
+/* ...and swap its clock for a quiet green "up" dot, without the "UP" caption
+   that reads as a stray word next to the duration */
+html.dark .information-widget-resource:last-child .resource-icon {
+  display: none;
+}
+
+html.dark .information-widget-resource:last-child .pr-1 {
+  display: none;
+}
+
+html.dark .information-widget-resource:last-child::before {
+  content: "";
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin: 0 0.35rem;
+  border-radius: 50%;
+  background-color: #22c55e;
+  box-shadow: 0 0 6px rgb(34 197 94 / 60%);
+}

@@ -15,7 +15,6 @@ in
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/redis 0755 root root -"
-    "d ${d}/postgres 0755 root root -"
     "d ${d}/data 0755 root root -"
   ];
 
@@ -112,18 +111,6 @@ in
       ports = [ "127.0.0.1:6379:6379" ];
     };
 
-    cartero-postgres = {
-      image = "pgvector/pgvector:pg17";
-      extraOptions = [ "--pull=newer" ];
-      environment = {
-        POSTGRES_USER = "cartero";
-        POSTGRES_DB = "cartero";
-      };
-      environmentFiles = [ config.sops.secrets."cartero".path ];
-      volumes = [ "${d}/postgres:/var/lib/postgresql/data" ];
-      ports = [ "127.0.0.1:5432:5432" ];
-    };
-
     cartero = {
       image = "ghcr.io/dracarys18/cartero:latest";
       environment = {
@@ -146,12 +133,12 @@ in
         "/app/config.toml"
       ];
       dependsOn = [
-        "cartero-postgres"
+        "postgres"
         "cartero-redis"
         "flaresolverr"
       ];
       # no --dns here: overriding the resolver drops podman's internal one, so
-      # the container cannot resolve cartero-postgres/cartero-redis by name
+      # the container cannot resolve postgres/cartero-redis by name
       extraOptions = [
         "--pull=newer"
         "--add-host=host.docker.internal:host-gateway"

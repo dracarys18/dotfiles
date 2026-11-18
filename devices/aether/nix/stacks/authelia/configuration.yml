@@ -52,6 +52,25 @@ identity_providers:
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'client_secret_basic'
         claims_policy: 'jellyfin'
+      - client_id: 'sparkyfitness'
+        client_name: 'SparkyFitness'
+        client_secret: '@SPARKYFITNESS_CLIENT_SECRET@'
+        public: false
+        authorization_policy: 'sparkyfitness'
+        redirect_uris:
+          - 'https://fit.karthihegde.dev/api/auth/sso/callback/sparkyfitness'
+          - 'https://fit.karthihegde.dev/sso/callback/sparkyfitness'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_post'
 
 authentication_backend:
   password_reset:
@@ -87,8 +106,11 @@ session:
 
 storage:
   encryption_key: '@STORAGE_ENCRYPTION_KEY@'
-  local:
-    path: /config/db.sqlite3
+  postgres:
+    address: 'tcp://127.0.0.1:5432'
+    database: 'authelia'
+    username: 'authelia'
+    password: '@STORAGE_PASSWORD@'
 
 notifier:
   filesystem:

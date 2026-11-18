@@ -33,6 +33,7 @@ in
     ADGUARD_BASIC_AUTH="${config.sops.placeholder."adguardhome/basic_auth"}"
   '';
 
+
   services.caddy = {
     enable = true;
     package = pkgs.caddy.withPlugins {
@@ -65,6 +66,8 @@ in
         }
       '';
 
+      "fit.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3670";
+
       "keep.karthihegde.dev".extraConfig = ''
         import auth
         reverse_proxy 127.0.0.1:8095 {
@@ -87,7 +90,7 @@ in
         import auth
         reverse_proxy 127.0.0.1:5055
       '';
-      "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:8390";
+      "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3669";
 
       "auth.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:9091";
       "search.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:6996";

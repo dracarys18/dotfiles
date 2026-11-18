@@ -1,0 +1,20 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings/
+
+# pure black, forced so a light-mode browser doesn't flip it
+theme: dark
+color: zinc
+
+# cards: thin borders instead of drop shadows that vanish on black, and the
+# 5 service groups fit on one row on a wide screen
+cardStyle: hairline
+blockStyle: refined
+useEqualHeights: true
+maxGroupColumns: 5
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
+
+statusStyle: dot
