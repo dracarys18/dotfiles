@@ -21,6 +21,9 @@ let
       purge_keep_days: 5
       commit_interval: 30
 
+    history:
+    logbook:
+
     automation: !include automations.yaml
     script: !include scripts.yaml
     scene: !include scenes.yaml
@@ -30,7 +33,8 @@ in
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/config 0755 root root -"
-    "d ${d}/matter-data 0755 root root -"
+    "d ${d}/matter-data 0755 1000 1000 -"
+    "Z ${d}/matter-data 0755 1000 1000 -"
   ];
 
   sops.templates."homeassistant.env" = {
@@ -60,14 +64,18 @@ in
     };
 
     matter-server = {
-      image = "ghcr.io/home-assistant-libs/python-matter-server:stable";
+      image = "ghcr.io/matter-js/matterjs-server:stable";
+      environment = {
+        STORAGE_PATH = "/data";
+        PRIMARY_INTERFACE = "lan0";
+      };
       volumes = [
         "${d}/matter-data:/data"
         "/run/dbus:/run/dbus:ro"
       ];
       extraOptions = [
+        "--pull=newer"
         "--network=host"
-        "--security-opt=apparmor=unconfined"
       ];
     };
   };
