@@ -38,6 +38,13 @@ in
 
   sops.secrets."gatus".restartUnits = [ "gatus.service" ];
 
+  sops.templates."gatus-postgres.env" = {
+    restartUnits = [ "gatus.service" ];
+    content = ''
+      postgres_dsn=postgres://gatus:${config.sops.placeholder."postgres-apps/gatus_password"}@127.0.0.1:5432/gatus?sslmode=disable
+    '';
+  };
+
   systemd.services.gatus = {
     description = "Gatus health dashboard";
     wantedBy = [ "multi-user.target" ];
@@ -57,7 +64,10 @@ in
       ExecStart = lib.getExe gatus;
       User = "gatus";
       Group = "gatus";
-      EnvironmentFile = config.sops.secrets."gatus".path;
+      EnvironmentFile = [
+        config.sops.secrets."gatus".path
+        config.sops.templates."gatus-postgres.env".path
+      ];
       WorkingDirectory = d;
       Restart = "always";
       RestartSec = 5;

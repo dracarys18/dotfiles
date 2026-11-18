@@ -1,6 +1,6 @@
 storage:
-  type: sqlite
-  path: /var/lib/stacks/gatus/data/gatus.db
+  type: postgres
+  path: ${postgres_dsn}
 
 web:
   address: 127.0.0.1
@@ -325,6 +325,20 @@ endpoints:
     conditions:
       - "[STATUS] == 204"
       - "[RESPONSE_TIME] < 3000"
+
+  - name: Postgres
+    group: apps
+    url: "tcp://127.0.0.1:5432"
+    interval: 5m
+    alerts:
+      - type: discord
+        failure-threshold: 1
+        success-threshold: 2
+        send-on-resolved: true
+        description: "postgres is not accepting connections"
+    conditions:
+      - "[CONNECTED] == true"
+      - "[RESPONSE_TIME] < 500"
 
   - name: AdGuard DNS
     group: network

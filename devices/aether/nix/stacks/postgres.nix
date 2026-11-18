@@ -46,6 +46,20 @@ let
       createrole = false;
       extensions = [ ];
     }
+    {
+      role = "shiori";
+      database = "shiori";
+      password = config.sops.placeholder."postgres-apps/shiori_password";
+      createrole = false;
+      extensions = [ ];
+    }
+    {
+      role = "gatus";
+      database = "gatus";
+      password = config.sops.placeholder."postgres-apps/gatus_password";
+      createrole = false;
+      extensions = [ ];
+    }
   ];
 
   appSql = a: ''
@@ -112,6 +126,16 @@ in
     "postgres-apps/lldap_password" = {
       sopsFile = ../secrets/postgres-apps.yaml;
       key = "lldap_password";
+      mode = "0400";
+    };
+    "postgres-apps/shiori_password" = {
+      sopsFile = ../secrets/postgres-apps.yaml;
+      key = "shiori_password";
+      mode = "0400";
+    };
+    "postgres-apps/gatus_password" = {
+      sopsFile = ../secrets/postgres-apps.yaml;
+      key = "gatus_password";
       mode = "0400";
     };
   };
