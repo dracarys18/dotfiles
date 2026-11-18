@@ -1,0 +1,118 @@
+title: Home
+views:
+  - title: Home
+    path: home
+    icon: mdi:home-variant
+    theme: Black
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: This month
+            icon: mdi:calendar-month
+          - type: markdown
+            content: >
+              Consumed **{{ states('sensor.electricity_this_month') | float(0) | round(2) }} kWh** electricity this month
+          - type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+          - type: entity
+            entity: person.karthikey_hegde
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lighting
+            icon: mdi:lightbulb-group-outline
+          - type: tile
+            entity: light.all_lights
+            name: All lights
+            icon: mdi:lightbulb-group
+            state_content: state
+          - type: tile
+            entity: light.wiz_rgbw_tunable_0d4612
+            name: WiZ 0D4612
+            features:
+              - type: light-brightness
+          - type: tile
+            entity: light.wiz_rgbw_tunable_6507e4
+            name: WiZ 6507E4
+            features:
+              - type: light-brightness
+      - type: grid
+        cards:
+          - type: heading
+            heading: Power
+            icon: mdi:flash-outline
+          - type: tile
+            entity: switch.smart_wi_fi_plug
+            name: Smart plug
+          - type: tile
+            entity: sensor.smart_wi_fi_plug_power
+            name: Draw
+            color: amber
+          - type: tile
+            entity: sensor.smart_wi_fi_plug_energy
+            name: Consumed
+            icon: mdi:counter
+            color: teal
+          - type: history-graph
+            title: Draw, voltage and current (24 h)
+            hours_to_show: 24
+            entities:
+              - entity: sensor.smart_wi_fi_plug_power
+                name: W
+              - entity: sensor.smart_wi_fi_plug_effective_voltage
+                name: V
+              - entity: sensor.smart_wi_fi_plug_effective_current
+                name: A
+          - type: statistics-graph
+            title: Energy per day
+            chart_type: bar
+            period: day
+            days_to_show: 14
+            stat_types:
+              - change
+            entities:
+              - entity: sensor.smart_wi_fi_plug_energy
+                name: kWh
+      - type: grid
+        cards:
+          - type: heading
+            heading: Router
+            icon: mdi:router-network
+          - type: tile
+            entity: binary_sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_wan_status
+            name: WAN link
+          - type: tile
+            entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_external_ip
+            name: Public address
+            icon: mdi:ip-network-outline
+          - type: history-graph
+            title: Throughput (6 h)
+            hours_to_show: 6
+            entities:
+              - entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_download_speed
+                name: Down
+              - entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_upload_speed
+                name: Up
+          - type: heading
+            heading: Devices
+            icon: mdi:devices
+          - type: glance
+            title: Battery
+            columns: 3
+            entities:
+              - entity: sensor.pixel_7_battery_level
+                name: Pixel 7
+              - entity: sensor.galaxy_watch_ultra_snsz_battery_level
+                name: Watch
+              - entity: sensor.ipad_2_battery_level
+                name: iPad
+          - type: entities
+            title: Presence
+            entities:
+              - entity: device_tracker.pixel_7
+              - entity: device_tracker.galaxy_watch_ultra_snsz
+              - entity: device_tracker.ipad_2

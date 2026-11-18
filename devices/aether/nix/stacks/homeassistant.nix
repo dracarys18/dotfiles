@@ -12,6 +12,23 @@ let
     frontend:
       themes: !include_dir_merge_named themes
 
+    lovelace:
+      dashboards:
+        home-dash:
+          mode: yaml
+          title: Home
+          icon: mdi:home-analytics
+          show_in_sidebar: true
+          filename: home-dash.yaml
+
+    light:
+      - platform: group
+        name: All lights
+        unique_id: all_lights
+        entities:
+          - light.wiz_rgbw_tunable_0d4612
+          - light.wiz_rgbw_tunable_6507e4
+
     sun:
     person:
     zone:
@@ -20,6 +37,21 @@ let
       db_url: !env_var RECORDER_DB_URL
       purge_keep_days: 5
       commit_interval: 30
+
+    sql:
+      - name: Electricity this month
+        db_url: !env_var RECORDER_DB_URL
+        column: kwh
+        unit_of_measurement: kWh
+        query: >
+          select round(coalesce(a.sum, 0)::numeric - coalesce(b.sum, 0)::numeric, 2) as kwh
+          from (select s.sum from statistics s join statistics_meta m on m.id = s.metadata_id
+                where m.statistic_id = 'sensor.smart_wi_fi_plug_energy'
+                order by s.start_ts desc limit 1) a
+          cross join (select s.sum from statistics s join statistics_meta m on m.id = s.metadata_id
+                where m.statistic_id = 'sensor.smart_wi_fi_plug_energy'
+                  and s.start_ts < extract(epoch from (date_trunc('month', now() at time zone 'Asia/Kolkata') at time zone 'Asia/Kolkata'))
+                order by s.start_ts desc limit 1) b
 
     history:
     logbook:
@@ -52,6 +84,8 @@ in
       volumes = [
         "${d}/config:/config"
         "${configuration}:/config/configuration.yaml:ro"
+        "${./homeassistant/themes}:/config/themes:ro"
+        "${./homeassistant/home-dash.yaml}:/config/home-dash.yaml:ro"
         "/etc/localtime:/etc/localtime:ro"
         "/run/dbus:/run/dbus:ro"
       ];
