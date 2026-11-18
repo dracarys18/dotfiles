@@ -39,17 +39,5 @@ in
         "127.0.0.1:2222:22"
       ];
     };
-
-    tangled-tunnel = {
-      image = "cloudflare/cloudflared:latest";
-      cmd = [
-        "tunnel"
-        "run"
-      ];
-      # TUNNEL_TOKEN: devices/aether/nix/secrets/tangled.env
-      environmentFiles = [ config.sops.secrets."tangled".path ];
-      extraOptions = [ "--pull=newer" ];
-      dependsOn = [ "tangled-knot" ];
-    };
   };
 }
