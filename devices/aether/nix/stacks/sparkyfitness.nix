@@ -47,7 +47,7 @@ in
 
   virtualisation.oci-containers.containers = {
     sparkyfitness-server = {
-      image = "codewithcj/sparkyfitness_server:latest";
+      image = "codewithcj/sparkyfitness_server@sha256:2f064604c2034fa5953cb3e17651aad32e8a9f8362895500cd5d188376215b3a";
       dependsOn = [ "postgres" ];
       environment = {
         SPARKY_FITNESS_DB_HOST = "postgres";
@@ -71,6 +71,7 @@ in
         "${d}/uploads:/app/uploads"
         "${d}/backups:/data/backups"
         "${d}/temp:/data/temp"
+        "${./sparkyfitness/foodPhotoEstimationService.ts}:/app/SparkyFitnessServer/services/foodPhotoEstimationService.ts:ro"
       ];
     };
 

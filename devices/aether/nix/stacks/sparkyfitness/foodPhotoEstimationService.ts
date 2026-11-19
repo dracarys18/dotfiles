@@ -1,0 +1,800 @@
+import chatRepository from '../models/chatRepository.js';
+import preferenceRepository from '../models/preferenceRepository.js';
+import { log } from '../config/logging.js';
+import {
+  dispatchAiRequest,
+  type DispatchErrorCategory,
+  type JsonSchemaNode,
+  type ProviderConfig,
+} from '../ai/providerDispatch.js';
+import { resolveAiNetworkPolicy } from '../utils/outboundUrlPolicy.js';
+import { attachFoodMatches } from './foodPhotoMatchService.js';
+import {
+  foodPhotoEstimateResponseSchema,
+  asPortionMacros,
+  sumPortionMacros,
+  ESTIMATE_MACRO_KEYS,
+  type FoodPhotoEstimateErrorCode,
+  type FoodPhotoEstimateResponse,
+} from '@workspace/shared';
+
+// Gemini-shaped schema for the structured estimate. The shared dispatch helper
+// rewrites it per provider (strips `additionalProperties` for Gemini's
+// `responseSchema`, applies `toStrictJsonSchema` for OpenAI/Anthropic strict
+// mode, sends it raw as Ollama's `format`). Typed as JsonSchemaNode so it
+// satisfies dispatchAiRequest's `jsonSchema` param without a cast; final
+// domain validation stays here via foodPhotoEstimateResponseSchema.
+const RESPONSE_SCHEMA: JsonSchemaNode = {
+  type: 'object',
+  properties: {
+    meal_summary: {
+      type: 'string',
+      description:
+        "Short, concise title of the dish or meal (2-4 words max, e.g. 'Paneer Kadai', 'Chicken Alfredo Pasta', 'Grilled Salmon with Rice'). Do NOT write sentences, paragraphs, or list all side garnishes.",
+    },
+    overall_confidence: {
+      type: 'string',
+      description:
+        'Overall confidence in the full estimate. Low when photo is unclear, items are ambiguous, or portions are hard to judge.',
+      enum: ['high', 'medium', 'low'],
+    },
+    confidence_reason: {
+      type: 'string',
+      description:
+        "Brief 1-sentence explanation of what drove the confidence rating, or empty string. Keep it concise (e.g. 'sauce ingredients unclear').",
+    },
+    items: {
+      type: 'array',
+      description:
+        'Individual food items identified in the meal, broken out separately.',
+      items: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            description:
+              "Specific food name only, as it would appear on a label or in a diary entry (never a full sentence or photo description), e.g. 'grilled chicken thigh', 'white jasmine rice', 'steamed broccoli'",
+          },
+          canonical_name: {
+            type: 'string',
+            description:
+              "The same food as a plain, generic, searchable name: drop preparation adjectives, brands, and quantities. 'grilled chicken thigh' -> 'chicken thigh'; '1 cup white jasmine rice' -> 'jasmine rice'; 'steamed broccoli florets' -> 'broccoli'. This is used to look the item up in a food database, so keep it to the noun the food would be filed under.",
+          },
+          estimated_grams: {
+            type: 'number',
+            description: 'Estimated weight of this item in grams',
+          },
+          portion_description: {
+            type: 'string',
+            description:
+              "Human-readable portion, e.g. '1 medium thigh', '1 cup cooked', 'about 1/2 plate'",
+          },
+          preparation: {
+            type: 'string',
+            description:
+              "How the item was prepared, e.g. 'grilled', 'pan-fried in oil', 'steamed', 'raw'. Empty string if not applicable.",
+          },
+          calories_kcal: {
+            type: 'number',
+            description: 'Estimated calories for this item',
+          },
+          protein_g: {
+            type: 'number',
+            description: 'Estimated protein in grams',
+          },
+          carbs_g: {
+            type: 'number',
+            description: 'Estimated total carbohydrates in grams',
+          },
+          fat_g: {
+            type: 'number',
+            description: 'Estimated total fat in grams',
+          },
+          fiber_g: {
+            type: 'number',
+            description: 'Estimated dietary fiber in grams',
+          },
+          sugar_g: {
+            type: 'number',
+            description: 'Estimated sugars in grams',
+          },
+          saturated_fat_g: {
+            type: 'number',
+            description:
+              'Estimated saturated fat in grams. Estimate from the typical profile of this food (animal fat vs plant oil) rather than defaulting to 0.',
+          },
+          polyunsaturated_fat_g: {
+            type: 'number',
+            description:
+              'Estimated polyunsaturated fat in grams. Estimate from the typical fat profile rather than defaulting to 0.',
+          },
+          monounsaturated_fat_g: {
+            type: 'number',
+            description:
+              'Estimated monounsaturated fat in grams. Estimate from the typical fat profile rather than defaulting to 0.',
+          },
+          trans_fat_g: {
+            type: 'number',
+            description:
+              'Estimated trans fat in grams. Usually 0 for whole foods; estimate for fried and processed items.',
+          },
+          cholesterol_mg: {
+            type: 'number',
+            description:
+              'Estimated cholesterol in milligrams. 0 for plant foods; estimate for animal products.',
+          },
+          sodium_mg: {
+            type: 'number',
+            description:
+              'Estimated sodium in milligrams, accounting for added salt and processing. Do not default to 0 for a seasoned or restaurant dish.',
+          },
+          potassium_mg: {
+            type: 'number',
+            description: 'Estimated potassium in milligrams.',
+          },
+          calcium_mg: {
+            type: 'number',
+            description: 'Estimated calcium in milligrams.',
+          },
+          iron_mg: {
+            type: 'number',
+            description: 'Estimated iron in milligrams.',
+          },
+          vitamin_a_mcg: {
+            type: 'number',
+            description: 'Estimated vitamin A in micrograms (RAE).',
+          },
+          vitamin_c_mg: {
+            type: 'number',
+            description: 'Estimated vitamin C in milligrams.',
+          },
+          item_confidence: {
+            type: 'string',
+            description:
+              "Confidence in this specific item's identification and portion estimate",
+            enum: ['high', 'medium', 'low'],
+          },
+          assumptions: {
+            type: 'array',
+            description:
+              "Key assumptions made for this item, e.g. 'assumed cooked in 1 tsp oil', 'assumed skinless', 'assumed whole milk'. Empty array if none.",
+            items: { type: 'string' },
+          },
+        },
+        required: [
+          'name',
+          'canonical_name',
+          'estimated_grams',
+          'portion_description',
+          'preparation',
+          'calories_kcal',
+          'protein_g',
+          'carbs_g',
+          'fat_g',
+          'fiber_g',
+          'sugar_g',
+          'saturated_fat_g',
+          'polyunsaturated_fat_g',
+          'monounsaturated_fat_g',
+          'trans_fat_g',
+          'cholesterol_mg',
+          'sodium_mg',
+          'potassium_mg',
+          'calcium_mg',
+          'iron_mg',
+          'vitamin_a_mcg',
+          'vitamin_c_mg',
+          'item_confidence',
+          'assumptions',
+        ],
+        propertyOrdering: [
+          'name',
+          'canonical_name',
+          'estimated_grams',
+          'portion_description',
+          'preparation',
+          'calories_kcal',
+          'protein_g',
+          'carbs_g',
+          'fat_g',
+          'fiber_g',
+          'sugar_g',
+          'saturated_fat_g',
+          'polyunsaturated_fat_g',
+          'monounsaturated_fat_g',
+          'trans_fat_g',
+          'cholesterol_mg',
+          'sodium_mg',
+          'potassium_mg',
+          'calcium_mg',
+          'iron_mg',
+          'vitamin_a_mcg',
+          'vitamin_c_mg',
+          'item_confidence',
+          'assumptions',
+        ],
+      },
+    },
+    totals: {
+      type: 'object',
+      description: 'Summed totals across all items',
+      properties: {
+        calories_kcal: { type: 'number' },
+        protein_g: { type: 'number' },
+        carbs_g: { type: 'number' },
+        fat_g: { type: 'number' },
+        fiber_g: { type: 'number' },
+        sugar_g: { type: 'number' },
+        total_grams: { type: 'number' },
+      },
+      required: [
+        'calories_kcal',
+        'protein_g',
+        'carbs_g',
+        'fat_g',
+        'fiber_g',
+        'sugar_g',
+        'total_grams',
+      ],
+      propertyOrdering: [
+        'calories_kcal',
+        'protein_g',
+        'carbs_g',
+        'fat_g',
+        'fiber_g',
+        'sugar_g',
+        'total_grams',
+      ],
+    },
+    user_weight_reconciliation: {
+      type: 'string',
+      description:
+        'If the user provided a total weight, explain how it was distributed across items or note any discrepancy with the visual estimate. Empty string if no weight was provided.',
+    },
+    clarifying_questions: {
+      type: 'array',
+      description:
+        "Up to 3 questions that would most improve accuracy if the user answered them, e.g. 'Was the chicken cooked with oil or butter?'. Empty array if confidence is high.",
+      items: { type: 'string' },
+    },
+  },
+  required: [
+    'meal_summary',
+    'overall_confidence',
+    'confidence_reason',
+    'items',
+    'totals',
+    'user_weight_reconciliation',
+    'clarifying_questions',
+  ],
+  propertyOrdering: [
+    'meal_summary',
+    'overall_confidence',
+    'confidence_reason',
+    'items',
+    'totals',
+    'user_weight_reconciliation',
+    'clarifying_questions',
+  ],
+};
+
+// Anthropic tool name / OpenAI json_schema name passed to the dispatch helper.
+// The helper keys both its request builder and its tool_use extractor off this
+// single value, so it only needs to be internally consistent.
+const SCHEMA_NAME = 'food_photo_estimate';
+
+// Maps every dispatch error category back to the food-photo error code the
+// route already knows how to map to an HTTP status. Declared with `satisfies`
+// so a future new DispatchErrorCategory is a compile error here, not a silent
+// `undefined`.
+const DISPATCH_ERROR_TO_CODE = {
+  unsupported_provider: 'UNSUPPORTED_PROVIDER',
+  api_key_missing: 'API_KEY_MISSING',
+  custom_url_missing: 'NO_AI_CONFIGURED',
+  unsupported_media: 'UNSUPPORTED_MIME_TYPE',
+  image_too_large: 'IMAGE_TOO_LARGE',
+  timeout: 'TIMEOUT',
+  upstream_error: 'UPSTREAM_ERROR',
+  private_network_forbidden: 'PRIVATE_NETWORK_FORBIDDEN',
+  refused: 'CONTENT_BLOCKED',
+  truncated: 'PARSE_ERROR',
+  no_content: 'CONTENT_BLOCKED',
+  parse_error: 'PARSE_ERROR',
+} satisfies Record<DispatchErrorCategory, FoodPhotoEstimateErrorCode>;
+
+const languageDisplayNames = new Intl.DisplayNames(['en'], {
+  type: 'language',
+});
+
+function resolveLanguageLabel(rawLanguage?: string | null): string {
+  const trimmed = rawLanguage?.trim();
+  if (!trimmed) return 'English';
+  const tag = trimmed.replaceAll('_', '-');
+  if (/^en(?:-[a-z0-9]+)*$/i.test(tag)) return 'English';
+  try {
+    const displayName = languageDisplayNames.of(tag);
+    if (displayName && displayName.toLowerCase() !== tag.toLowerCase()) {
+      return `${displayName} (${tag})`;
+    }
+  } catch {
+    // Fall through to English when Intl.DisplayNames rejects a non-BCP47 tag.
+  }
+  return 'English';
+}
+
+function buildPrompt(
+  description: string,
+  weight: string,
+  imageCount: number,
+  language?: string | null
+): string {
+  const multiImage = imageCount > 1;
+  const languageLabel = resolveLanguageLabel(language);
+  const intro = multiImage
+    ? `You are a nutrition estimation assistant. Analyze the ${imageCount} provided photos and return
+structured nutrition data. The photos all show ONE meal, not separate meals. They may include
+several angles of the same dish plus supporting context such as a menu or item description, or the
+packaging or nutrition label of an ingredient. Use every photo together to identify items and
+portions, prefer label or menu text when it is more specific than the plate, and do not count the
+same item twice when it appears in more than one photo.`
+    : `You are a nutrition estimation assistant. Analyze the meal photo and return
+structured nutrition data.`;
+  const visualSource = multiImage ? 'photos' : 'image';
+  return `${intro}
+
+User description (optional): "${description}"
+
+User-provided total weight (optional): "${weight}"
+
+Rules:
+
+  - Weigh before you count. For every item, first estimate its weight in grams
+    from a visible scale reference (plate diameter, utensil length, fingers,
+    packaging), then derive calories from that weight and the typical
+    composition of the dish. Never report calories without a gram weight.
+  - With no visible reference assume a 26 cm dinner plate, a 14 cm side plate
+    and a 300 ml bowl, and record that assumption.
+  - Indian home cooking: 8-10 g oil per serving of a dry sabzi, 12-15 g for a
+    curry or dal tadka, 5 g ghee per roti or paratha. Rice, dal and sabzi are
+    served at 150-200 g per bowl unless the bowl is clearly larger.
+  - Anchor on the closest dish you actually know, in kcal/g cooked: plain rice
+    1.3, biryani or pulao 1.5-1.8, roti 3.0, paratha 3.3, dosa 2.2, idli 1.5,
+    dal 1.0, vegetable sabzi 1.2, paneer dish 2.0, chicken curry 1.3.
+  - Pick the single best number, never a range. Round calories to the nearest
+    5 and grams to the nearest 5.
+  - If the user provided a description, treat it as authoritative over what you
+    see in the ${visualSource} when they conflict.
+  - If the user provided a total weight, distribute it across items
+    proportionally to your visual estimate, then recalculate nutrition.
+  - Break mixed dishes into component ingredients when reasonable (e.g. a
+    burrito → tortilla, rice, beans, meat, cheese, salsa).
+  - The "name" field must be ONLY the food name, as it would appear on a label
+    or in a diary entry — never a sentence or a description of the ${visualSource}.
+    Include the brand only when it is printed on the food's own packaging (not on
+    mugs, plates, or restaurant decor). Put plating details and context in
+    "portion_description" and "assumptions" instead.
+  - Give every item a canonical_name as well as its display name: the plain
+    generic food noun, with preparation adjectives, brands, and quantities
+    removed. It is used to look the item up in a food database.
+  - Write all user-facing text fields ("meal_summary", "confidence_reason",
+    item "name", "canonical_name", "portion_description", "preparation",
+    "assumptions", "user_weight_reconciliation", and "clarifying_questions")
+    in ${languageLabel}, including foods whose common name you know in English.
+    Keep enum fields ("overall_confidence" and "item_confidence") in English ("high", "medium", "low").
+  - Populate the micronutrients (saturated/poly/mono/trans fat, cholesterol,
+    sodium, potassium, calcium, iron, vitamin A, vitamin C) from the typical
+    composition of each food. Estimate them; do not default them to 0 just
+    because they are not visible. 0 is only correct when it is actually true
+    (cholesterol in a plant food, trans fat in a whole food). Sodium in
+    particular is rarely 0 in a seasoned, restaurant or processed dish.
+  - meal_summary MUST be a concise 2-4 word dish title (e.g. 'Paneer Kadai', 'Chicken Alfredo Pasta'). Never write sentences, paragraphs, or visual descriptions for meal_summary.
+  - Keep confidence_reason concise (1 short sentence maximum, or empty string).
+  - Be explicit about assumptions (oil used, milk type, skin on/off).
+  - Lower your confidence when portions are ambiguous or ingredients hidden.
+  - Only ask clarifying questions that would materially change the estimate.`;
+}
+
+export interface PhotoImage {
+  base64: string;
+  mimeType: string;
+}
+
+export interface EstimateFoodPhotoNutritionInput {
+  /** One or more images for a single estimate. Preferred over base64Image/mimeType. */
+  images?: PhotoImage[];
+  /** Legacy single-image field; use images[]. Still accepted for backward compatibility. */
+  base64Image?: string;
+  /** Legacy single-image field; use images[]. Still accepted for backward compatibility. */
+  mimeType?: string;
+  userId: string;
+  serviceConfigId?: string;
+  description?: string;
+  weightSlot?: string;
+  actorIsAdmin?: boolean;
+}
+
+function resolveImages(input: EstimateFoodPhotoNutritionInput): PhotoImage[] {
+  const raw =
+    input.images && input.images.length > 0
+      ? input.images
+      : input.base64Image && input.mimeType
+        ? [{ base64: input.base64Image, mimeType: input.mimeType }]
+        : [];
+  // The dispatch helper normalizes 'image/jpg' → 'image/jpeg' per provider, so
+  // we only filter here and pass { base64, mimeType } straight through.
+  return raw.filter(
+    (img): img is PhotoImage =>
+      !!img &&
+      typeof img.base64 === 'string' &&
+      typeof img.mimeType === 'string'
+  );
+}
+
+function ensureTotals(obj: Record<string, unknown>): Record<string, unknown> {
+  if (Array.isArray(obj.items)) {
+    const items = obj.items as Array<Record<string, unknown>>;
+    for (const item of items) {
+      if (typeof item === 'object' && item !== null) {
+        if (typeof item.assumptions === 'string') {
+          item.assumptions = item.assumptions.trim()
+            ? [item.assumptions.trim()]
+            : [];
+        } else if (!Array.isArray(item.assumptions)) {
+          item.assumptions = [];
+        }
+        if (!item.item_confidence) {
+          item.item_confidence = 'medium';
+        }
+        if (item.portion_description === undefined) {
+          item.portion_description = '';
+        }
+        if (item.preparation === undefined) {
+          item.preparation = '';
+        }
+      }
+    }
+    if (!obj.totals || typeof obj.totals !== 'object') {
+      let calories = 0;
+      let protein = 0;
+      let carbs = 0;
+      let fat = 0;
+      let fiber = 0;
+      let sugar = 0;
+      let totalGrams = 0;
+      for (const item of items) {
+        calories += Number(item.calories_kcal) || 0;
+        protein += Number(item.protein_g) || 0;
+        carbs += Number(item.carbs_g) || 0;
+        fat += Number(item.fat_g) || 0;
+        fiber += Number(item.fiber_g) || 0;
+        sugar += Number(item.sugar_g) || 0;
+        totalGrams += Number(item.estimated_grams) || 0;
+      }
+      obj.totals = {
+        calories_kcal: Math.round(calories * 10) / 10,
+        protein_g: Math.round(protein * 10) / 10,
+        carbs_g: Math.round(carbs * 10) / 10,
+        fat_g: Math.round(fat * 10) / 10,
+        fiber_g: Math.round(fiber * 10) / 10,
+        sugar_g: Math.round(sugar * 10) / 10,
+        total_grams: Math.round(totalGrams * 10) / 10,
+      };
+    }
+    if (obj.user_weight_reconciliation === undefined) {
+      obj.user_weight_reconciliation = '';
+    }
+    if (!Array.isArray(obj.clarifying_questions)) {
+      obj.clarifying_questions = [];
+    }
+    if (!obj.overall_confidence) {
+      obj.overall_confidence = 'medium';
+    }
+    if (obj.confidence_reason === undefined) {
+      obj.confidence_reason = '';
+    }
+    if (typeof obj.meal_summary === 'string') {
+      obj.meal_summary = cleanMealSummary(obj.meal_summary);
+    } else if (items.length > 0) {
+      obj.meal_summary = cleanMealSummary(
+        items
+          .slice(0, 3)
+          .map((i) => String(i.name || ''))
+          .filter(Boolean)
+          .join(', ') || 'Meal'
+      );
+    }
+  }
+  return obj;
+}
+
+function normalizeEstimatePayload(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null) return raw;
+  if (Array.isArray(raw)) {
+    if (raw.length === 1 && typeof raw[0] === 'object' && raw[0] !== null) {
+      return normalizeEstimatePayload(raw[0]);
+    }
+    if (
+      raw.every(
+        (item) => typeof item === 'object' && item !== null && 'name' in item
+      )
+    ) {
+      return ensureTotals({ items: raw });
+    }
+    return raw;
+  }
+  const obj = { ...(raw as Record<string, unknown>) };
+  if ('meal_summary' in obj || 'items' in obj) {
+    return ensureTotals(obj);
+  }
+  const wrapperKeys = [
+    'food_photo_estimate',
+    'response',
+    'data',
+    'result',
+    'estimate',
+    'output',
+  ];
+  for (const key of wrapperKeys) {
+    if (obj[key] && typeof obj[key] === 'object') {
+      return normalizeEstimatePayload(obj[key]);
+    }
+  }
+  const keys = Object.keys(obj);
+  if (
+    keys.length === 1 &&
+    typeof obj[keys[0]] === 'object' &&
+    obj[keys[0]] !== null
+  ) {
+    return normalizeEstimatePayload(obj[keys[0]]);
+  }
+  return ensureTotals(obj);
+}
+
+// The vision model writes ingredient names in lower case ("penne pasta").
+// That name is what the review card, the meal builder, and every food created
+// from the estimate end up showing, so title-case it once here instead of in
+// each client. `canonical_name` is deliberately left alone — it is the
+// food-database search term, not display text.
+const TITLE_CASE_MINOR_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'at',
+  'de',
+  'in',
+  'of',
+  'on',
+  'or',
+  'the',
+  'to',
+  'with',
+  'without',
+]);
+
+function titleCaseFoodName(value: string): string {
+  let wordIndex = 0;
+  return value
+    .split(/(\s+)/)
+    .map((part) => {
+      if (part === '' || /^\s+$/.test(part)) return part;
+      const isFirstWord = wordIndex === 0;
+      wordIndex += 1;
+      // A word the model already capitalised (a brand, an acronym) is left
+      // exactly as written.
+      if (/\p{Lu}/u.test(part)) return part;
+      if (
+        !isFirstWord &&
+        TITLE_CASE_MINOR_WORDS.has(part.replace(/[^a-z]/g, ''))
+      ) {
+        return part;
+      }
+      // Capitalise after a hyphen or slash too: "sun-dried" -> "Sun-Dried".
+      return part.replace(
+        /(^|[-/])(\p{Ll})/gu,
+        (_match, separator: string, letter: string) =>
+          separator + letter.toUpperCase()
+      );
+    })
+    .join('');
+}
+
+export function cleanMealSummary(summary?: string | null): string {
+  if (!summary || typeof summary !== 'string') return 'Meal';
+  let s = summary.trim();
+  // Remove markdown formatting / wrapping quotes
+  s = s.replace(/^["'`]+|["'`]+$/g, '').trim();
+  // If multiple sentences, take only the first sentence
+  const sentenceMatch = s.match(/^([^.!?\n]+)/);
+  if (sentenceMatch) {
+    s = sentenceMatch[1].trim();
+  }
+  // Strip leading articles like "A ", "An ", "The "
+  s = s.replace(/^(a|an|the)\s+/i, '');
+
+  // Strip narrative / visual descriptive clauses
+  s = s.replace(
+    /,\s*(featuring|garnished with|topped with|seasoned with|mixed with|served with|drizzled with|accompanied by|with a side of|in a|with chunks of).*/i,
+    ''
+  );
+
+  // If still long (> 40 chars) and contains " with ... and ...", simplify secondary sides
+  if (s.length > 40 && /\s+with\s+/i.test(s)) {
+    const parts = s.split(/\s+with\s+/i);
+    const mainDish = parts[0].trim();
+    if (mainDish.length >= 3) {
+      const sides = parts[1].split(/\s+and\s+/i);
+      if (sides.length > 1) {
+        if (mainDish.length > 25) {
+          s = mainDish;
+        } else {
+          s = `${mainDish} with ${sides[0].trim()}`;
+        }
+      }
+    }
+  }
+
+  // Limit word count to at most 4 words
+  const words = s.split(/\s+/);
+  if (words.length > 4) {
+    s = words.slice(0, 4).join(' ');
+  }
+
+  // Remove any trailing commas or punctuation
+  s = s.replace(/[,;:\s-]+$/, '').trim();
+  if (s.length > 0) {
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  return s || 'Meal';
+}
+
+function titleCaseItemNames(
+  estimate: FoodPhotoEstimateResponse
+): FoodPhotoEstimateResponse {
+  return {
+    ...estimate,
+    meal_summary: cleanMealSummary(estimate.meal_summary),
+    items: estimate.items.map((item) => ({
+      ...item,
+      name: titleCaseFoodName(item.name),
+    })),
+  };
+}
+
+export type EstimateFoodPhotoNutritionResult =
+  | { success: true; estimate: FoodPhotoEstimateResponse }
+  | { success: false; code: FoodPhotoEstimateErrorCode; error: string };
+
+/**
+ * Fills the totals' micronutrients by summing the items.
+ *
+ * The model is asked for micronutrients per ITEM but not in `totals` — adding
+ * eleven more numbers to sum by hand is a reliability liability on a call that
+ * already returns a lot of structure, and both clients derive their own totals
+ * from the rows anyway. `sparky_log_food_photo` reads `estimate.totals`
+ * directly, though, so the server sums them here instead of leaving that path
+ * with zeros. The core macros are left exactly as the model reported them.
+ */
+function withDerivedTotalMicros(
+  estimate: FoodPhotoEstimateResponse
+): FoodPhotoEstimateResponse {
+  const items = estimate.items ?? [];
+  if (items.length === 0) return estimate;
+  const summed = sumPortionMacros(
+    items.map((item) => ({ macros: asPortionMacros(item) }))
+  );
+  const totals = { ...estimate.totals };
+  for (const key of ESTIMATE_MACRO_KEYS) {
+    if (key in estimate.totals) continue;
+    totals[key] = summed[key];
+  }
+  return { ...estimate, totals };
+}
+
+async function estimateFoodPhotoNutrition(
+  input: EstimateFoodPhotoNutritionInput
+): Promise<EstimateFoodPhotoNutritionResult> {
+  const { userId, description = '', weightSlot = '' } = input;
+  const images = resolveImages(input);
+  if (images.length === 0) {
+    return {
+      success: false,
+      code: 'INVALID_REQUEST',
+      error: 'At least one image is required.',
+    };
+  }
+
+  const aiService = input.serviceConfigId
+    ? await chatRepository.getAiServiceSettingForBackend(
+        input.serviceConfigId,
+        userId
+      )
+    : await (async () => {
+        const setting =
+          await chatRepository.getActiveVisionAiServiceSetting(userId);
+        return setting
+          ? chatRepository.getAiServiceSettingForBackend(setting.id, userId)
+          : null;
+      })();
+
+  if (!aiService) {
+    return {
+      success: false,
+      code: 'NO_AI_CONFIGURED',
+      error: 'No AI service configured.',
+    };
+  }
+
+  let userLanguage: string | null | undefined;
+  try {
+    const prefs = await preferenceRepository.getUserPreferences(userId);
+    userLanguage = prefs?.language;
+  } catch (err) {
+    log(
+      'warn',
+      `Food-photo estimation: failed to load language preference for user ${userId}, defaulting to English`,
+      err
+    );
+  }
+
+  // Dispatch reads everything from the decrypted backend detail. The helper
+  // enforces the supported-provider, api-key, custom-url, and HEIC checks and
+  // reports each as a category we map back to a food-photo error code.
+  const provider: ProviderConfig = {
+    service_type: aiService.service_type,
+    api_key: aiService.api_key ?? undefined,
+    model_name: aiService.model_name ?? undefined,
+    custom_url: aiService.custom_url ?? undefined,
+  };
+
+  const result = await dispatchAiRequest({
+    provider,
+    networkPolicy: await resolveAiNetworkPolicy(
+      aiService,
+      Boolean(input.actorIsAdmin)
+    ),
+    prompt: buildPrompt(description, weightSlot, images.length, userLanguage),
+    images,
+    jsonSchema: RESPONSE_SCHEMA,
+    schemaName: SCHEMA_NAME,
+  });
+
+  if (!result.ok) {
+    const code = DISPATCH_ERROR_TO_CODE[result.category];
+    log(
+      code === 'CONTENT_BLOCKED' ? 'warn' : 'error',
+      `Food-photo estimation: ${provider.service_type} failed for user ${userId} (${result.category}): ${result.detail}`
+    );
+    return { success: false, code, error: result.detail };
+  }
+
+  const normalized = normalizeEstimatePayload(result.json);
+  const parsed = foodPhotoEstimateResponseSchema.safeParse(normalized);
+  if (!parsed.success) {
+    log(
+      'error',
+      `Food-photo estimation: ${provider.service_type} JSON failed schema validation for user ${userId}. Raw response: ${result.text.slice(0, 2000)}`,
+      parsed.error.issues
+    );
+    return {
+      success: false,
+      code: 'PARSE_ERROR',
+      error: 'AI service returned an unexpected response shape.',
+    };
+  }
+
+  // Enrich with food-database matches. Additive only: existing fields, and
+  // therefore what an older client displays, are never touched. A matching
+  // failure is swallowed inside the service so it can never cost the user an
+  // estimate they already paid an AI call for.
+  const enriched = await attachFoodMatches(
+    userId,
+    withDerivedTotalMicros(parsed.data)
+  );
+  // After matching, so the search terms the matcher sees are the model's own.
+  return { success: true, estimate: titleCaseItemNames(enriched) };
+}
+
+export { estimateFoodPhotoNutrition };
+export default {
+  estimateFoodPhotoNutrition,
+};
