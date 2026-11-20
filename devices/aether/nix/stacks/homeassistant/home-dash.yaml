@@ -31,13 +31,13 @@ views:
             icon: mdi:lightbulb-group
             state_content: state
           - type: tile
-            entity: light.wiz_rgbw_tunable_0d4612
-            name: WiZ 0D4612
+            entity: light.wiz_rgbw_tunable_74ba34
+            name: Desk lamp
             features:
               - type: light-brightness
           - type: tile
-            entity: light.wiz_rgbw_tunable_6507e4
-            name: WiZ 6507E4
+            entity: light.wiz_rgbw_tunable_fcb326
+            name: Stand lamp
             features:
               - type: light-brightness
       - type: grid

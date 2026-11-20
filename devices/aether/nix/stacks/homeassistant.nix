@@ -4,6 +4,15 @@
 let
   d = "/var/lib/stacks/homeassistant";
 
+  pywizlight = pkgs.runCommand "pywizlight-0.6.3-signed" { } ''
+    mkdir -p $out
+    tar xzf ${pkgs.fetchurl {
+      url = "https://files.pythonhosted.org/packages/source/p/pywizlight/pywizlight-0.6.3.tar.gz";
+      hash = "sha256-ddobuuMhzVhlaTPox/oDXQywGSbqb/OT5dXoMqSPnYY=";
+    }} --strip-components=1 -C $out
+    patch -d $out -p1 < ${./homeassistant/pywizlight-signing.patch}
+  '';
+
   configuration = pkgs.writeText "configuration.yaml" ''
     homeassistant:
       external_url: "https://has.karthihegde.dev"
@@ -26,8 +35,8 @@ let
         name: All lights
         unique_id: all_lights
         entities:
-          - light.wiz_rgbw_tunable_0d4612
-          - light.wiz_rgbw_tunable_6507e4
+          - light.wiz_rgbw_tunable_74ba34
+          - light.wiz_rgbw_tunable_fcb326
 
     sun:
     person:
@@ -69,16 +78,23 @@ in
     "Z ${d}/matter-data 0755 1000 1000 -"
   ];
 
+  sops.secrets."homeassistant/udp_signing_key" = {
+    sopsFile = ../secrets/homeassistant.yaml;
+    key = "udp_signing_key";
+    mode = "0400";
+  };
+
   sops.templates."homeassistant.env" = {
     restartUnits = [ "podman-homeassistant.service" ];
     content = ''
       RECORDER_DB_URL=postgresql://homeassistant:${config.sops.placeholder."postgres-apps/homeassistant_password"}@127.0.0.1:5432/homeassistant
+      WIZ_SIGNING_KEY=${config.sops.placeholder."homeassistant/udp_signing_key"}
     '';
   };
 
   virtualisation.oci-containers.containers = {
     homeassistant = {
-      image = "ghcr.io/home-assistant/home-assistant:stable";
+      image = "ghcr.io/home-assistant/home-assistant@sha256:493a07e8f6530fc640223f4a0a5248f20a61ca2f718bb1d31efbf08a2c5ea28f";
       environment.TZ = "Asia/Kolkata";
       environmentFiles = [ config.sops.templates."homeassistant.env".path ];
       volumes = [
@@ -86,6 +102,7 @@ in
         "${configuration}:/config/configuration.yaml:ro"
         "${./homeassistant/themes}:/config/themes:ro"
         "${./homeassistant/home-dash.yaml}:/config/home-dash.yaml:ro"
+        "${pywizlight}/pywizlight:/usr/local/lib/python3.14/site-packages/pywizlight:ro"
         "/etc/localtime:/etc/localtime:ro"
         "/run/dbus:/run/dbus:ro"
       ];

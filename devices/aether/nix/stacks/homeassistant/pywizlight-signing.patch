@@ -1,0 +1,44 @@
+--- a/pywizlight/bulb.py
++++ b/pywizlight/bulb.py
+@@ -1,9 +1,13 @@
+ """pywizlight integration."""
+ 
+ import asyncio
++import base64
+ import contextlib
++import hashlib
++import hmac
+ import json
+ import logging
++import os
+ import time
+ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+ 
+@@ -545,6 +549,8 @@
+         """Create instance with the IP address of the bulb."""
+         self.ip = ip
+         self.port = port
++        signing_key = os.environ.get("WIZ_SIGNING_KEY")
++        self.signing_key = bytes.fromhex(signing_key) if signing_key else None
+         self.state: Optional[PilotParser] = None
+         self.mac = mac
+         self.bulbtype: Optional[BulbType] = None
+@@ -934,6 +940,18 @@
+     async def send(self, msg_dict: Dict) -> BulbResponse:
+         """Serialize a dict to json and send it to device over UDP."""
+         self.history.message(HISTORY_SEND, msg_dict)
++        if self.signing_key:
++            params = dict(msg_dict.get("params", {}))
++            params["sigTs"] = int(time.time())
++            digest = hmac.new(
++                self.signing_key, to_wiz_json(params).encode("utf-8"), hashlib.sha256
++            ).digest()
++            msg_dict = {
++                "method": msg_dict["method"],
++                "env": "pro",
++                "params": params,
++                "hmac": base64.b64encode(digest).decode("ascii"),
++            }
+         message = to_wiz_json(msg_dict)
+         await self._ensure_connection()
+         assert self.transport is not None
