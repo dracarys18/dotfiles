@@ -65,7 +65,41 @@ let
     history:
     logbook:
 
-    automation: !include automations.yaml
+    automation:
+      - id: "1776013654348"
+        alias: Good Morning
+        triggers:
+          - trigger: time
+            at: "06:30:00"
+        actions:
+          - action: light.turn_on
+            target:
+              entity_id: light.wiz_rgbw_tunable_74ba34
+            data:
+              brightness_pct: 50
+              effect: Warm white
+          - action: light.turn_on
+            target:
+              entity_id: light.wiz_rgbw_tunable_fcb326
+            data:
+              brightness_pct: 100
+              effect: Warm white
+        mode: single
+      - id: "1782757716769"
+        alias: Good Night
+        triggers:
+          - trigger: time
+            at: "23:00:00"
+        actions:
+          - action: light.turn_on
+            target:
+              entity_id:
+                - light.wiz_rgbw_tunable_74ba34
+                - light.wiz_rgbw_tunable_fcb326
+            data:
+              brightness_pct: 20
+        mode: single
+
     script: !include scripts.yaml
     scene: !include scenes.yaml
   '';
