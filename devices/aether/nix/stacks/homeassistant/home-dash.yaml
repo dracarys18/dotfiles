@@ -156,23 +156,12 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Router
+            heading: Network
             icon: mdi:router-network
           - type: tile
-            entity: binary_sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_wan_status
-            name: WAN link
-          - type: tile
-            entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_external_ip
+            entity: sensor.public_ip
             name: Public address
             icon: mdi:ip-network-outline
-          - type: history-graph
-            title: Throughput (6 h)
-            hours_to_show: 6
-            entities:
-              - entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_download_speed
-                name: Down
-              - entity: sensor.archer_c64_ac1200_mu_mimo_wi_fi_router_upload_speed
-                name: Up
           - type: heading
             heading: Devices
             icon: mdi:devices
@@ -189,6 +178,7 @@ views:
           - type: entities
             title: Presence
             entities:
+              - entity: person.karthikey_hegde
               - entity: device_tracker.pixel_7
               - entity: device_tracker.galaxy_watch_ultra_snsz
               - entity: device_tracker.ipad_2

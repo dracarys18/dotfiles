@@ -62,6 +62,13 @@ let
                   and s.start_ts < extract(epoch from (date_trunc('month', now() at time zone 'Asia/Kolkata') at time zone 'Asia/Kolkata'))
                 order by s.start_ts desc limit 1) b
 
+    rest:
+      - resource: "https://api.ipify.org?format=json"
+        scan_interval: 600
+        sensor:
+          - name: Public IP
+            value_template: "{{ value_json.ip }}"
+
     history:
     logbook:
 
