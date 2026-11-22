@@ -1,10 +1,7 @@
-# CLI tools for the everyday shell. Deliberately not the Mac's list: no Rust or
-# Go toolchain, no zig/opam/jdk, nothing GUI. A server needs the small stuff.
 { pkgs, ... }:
 
 {
   home.packages = with pkgs; [
-    # search and text
     ripgrep
     fd
     jq
@@ -12,7 +9,6 @@
     glow
     tokei
 
-    # inspection
     btop
     ncdu
     tree
@@ -20,7 +16,6 @@
     file
     less
 
-    # transfer and archives
     rsync
     unzip
     zip
@@ -28,7 +23,6 @@
     wget
     openssl
 
-    # git and forge
     gh
     git
     delta

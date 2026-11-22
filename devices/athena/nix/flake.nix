@@ -3,18 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
-    # rust toolchains pinned per version (replaces rustup)
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # build any crates.io crate without hand-written hashes (replaces cargo install)
     crates-nix.url = "github:uttarayan21/crates.nix";
-    # local workspace, built in the store so it links Nix's libraries instead of
-    # whatever Homebrew happened to have installed (that is how the old
-    # ~/.cargo/bin/hades ended up broken on libzstd)
-    # a path input, not git: the workspace is a live dev checkout with
-    # uncommitted changes, and a path input copies it (15 MB) as-is
     hades = {
       url = "path:/Users/karthihegde/Projects/hades";
       flake = false;
@@ -27,74 +20,46 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # catppuccin for tmux. Held at the 2024-09 revision: v2's cpu/battery
-    # modules render #{cpu_percentage}, which the nixpkgs cpu/battery plugins
-    # never interpolate, so the bar loses both. This revision embeds the
-    # plugins' script calls in status-right itself, which works.
     tmux-catppuccin = {
       url = "github:catppuccin/tmux/1612a23174a6771ac466312eb156f83b8b89d907";
       flake = false;
     };
-    # TODO(macOS 27): temporary, see darwin/yabai.nix for when and how to remove.
-    # yabai 7.1.25 + macOS 27 scripting-addition patterns (upstream has no macOS
-    # 27 support yet: asmvik/yabai#2802), pinned to a reviewed commit. The beta
-    # 6 build this started on patches a Dock that no longer exists: space
-    # create/focus/destroy silently did nothing on 27.2.1, so the pin moved to
-    # the commit that follows the Dock into WindowManager.app.
     yabai-macos27 = {
       url = "github:AhsanFazal/yabai/ad8d5adfdc39c76399599ae79a264f2525f6ca5e";
       flake = false;
     };
-    # kubectl abbreviations for fish
     kubectl-aliases = {
       url = "github:ahmetb/kubectl-aliases";
       flake = false;
     };
-    # Neovim configured in Nix
     nixvim = {
       url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # markdown preview plugin
     vellum = {
       url = "github:blackhat-7/vellum.nvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # catppuccin's own theme for every app that has one
     catppuccin = {
       url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Sonora, a native music streaming client (Rust + GPUI). No Homebrew cask
-    # for it, so it comes from upstream's flake: the release DMG is wrapped into
-    # the store and home-manager links Sonora.app into ~/Applications.
     sonora = {
       url = "github:sonorahq/sonora";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
     };
-    # Apple Intelligence off and its models deleted (darwin/intelligence.nix).
-    # Keeps its own nixpkgs: pared needs Swift 6.2.4, 26.05 has 5.10.
-    # Pinned: 2.2.0 doesn't compile (Swift can't type-check an expression in
-    # Sources/Pared/gui/runner.swift); move to a newer tag once that's fixed.
     pared.url = "github:4evy/pared/2.1.0";
-    # private repo, fetched over SSH; `make switch` fetches it as you first,
-    # because root (which runs the switch) can't use your 1Password SSH agent
     uji = {
       url = "git+ssh://git@github.com/uji-labs/uji";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # typed options for its plugins (home/programs/uji)
     uji-plugins.url = "git+ssh://git@github.com/uji-labs/uji-plugins";
-    # SOPS-encrypted secrets, age key on this Mac (darwin/secrets.nix)
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Homebrew itself, pinned and installed by Nix instead of whatever the
-    # upstream installer left in /opt/homebrew (darwin/homebrew.nix)
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # taps pinned as flake inputs, so `brew` can't drift from the lockfile
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
@@ -119,7 +84,6 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              # files already in the way get renamed instead of failing the switch
               home-manager.backupFileExtension = "before-nix";
               home-manager.extraSpecialArgs = { inherit inputs withUji; };
               home-manager.users.karthihegde = import ./home;
@@ -128,10 +92,7 @@
         };
     in
     {
-      # named `mac`, not by hostname, so any Mac can switch to it: `make switch`
       darwinConfigurations.mac = mkMac { withUji = true; };
-      # first switch on a fresh Mac: uji needs SSH keys from 1Password, which
-      # this switch is what installs
       darwinConfigurations.mac-bootstrap = mkMac { withUji = false; };
     };
 }

@@ -1,12 +1,3 @@
-# Vesktop is Vencord's Discord client, so its theme is a CSS file: QuickCSS.
-# Vencord injects QuickCSS after the theme plugins, so these variables win over
-# the catppuccin Discord theme without disabling it. Both the current Discord
-# variables (--bg-*) and the legacy ones (--background-*) are set, because the
-# bundled client still uses a mix of the two.
-#
-# The file is a store copy, not `writable`: home/themes.nix is the source of
-# truth, so edits go there and land after `make switch`, not in the in-app CSS
-# editor.
 { ... }:
 
 let
@@ -20,7 +11,6 @@ in
     .theme-midnight,
     html,
     body {
-      /* surfaces */
       --background-primary: ${theme.bg};
       --background-secondary: ${theme.bg};
       --background-secondary-alt: ${theme.bg};
@@ -38,7 +28,6 @@ in
       --bg-surface-higher: ${theme.bgAlt};
       --bg-surface-lower: ${theme.bg};
 
-      /* interaction states */
       --background-mentioned: rgba(255, 255, 255, 0.04);
       --background-mentioned-hover: rgba(255, 255, 255, 0.06);
       --background-message-hover: rgba(255, 255, 255, 0.03);
@@ -46,19 +35,16 @@ in
       --background-modifier-accent: rgba(255, 255, 255, 0.06);
       --background-modifier-selected: rgba(255, 255, 255, 0.08);
 
-      /* text */
       --text-normal: ${theme.fg};
       --text-muted: ${theme.fgMuted};
       --text-link: ${theme.accent};
 
-      /* keep the catppuccin accent instead of blurple */
       --brand-experiment: ${theme.accent};
       --brand-experiment-560: ${theme.accent};
       --brand-experiment-600: ${theme.accent};
       --interactive-active: ${theme.fg};
       --interactive-muted: ${theme.fgMuted};
 
-      /* dividers/borders */
       --border-subtle: ${theme.border};
       --border-strong: ${theme.border};
     }

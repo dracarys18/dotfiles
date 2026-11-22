@@ -3,9 +3,7 @@
 let
   uid = "501"; # `id -u`
 
-  # launchd agents in your session
   agents = [
-    # Siri
     "com.apple.campo"
     "com.apple.Siri.agent"
     "com.apple.assistantd"
@@ -18,13 +16,10 @@ let
     "com.apple.sirittsd"
     "com.apple.SiriTTSTrainingAgent"
     "com.apple.corespeechd"
-    # macOS 27 additions: the context service the assistant reads the screen
-    # with, the Control Center item, and Apple Intelligence's request router
     "com.apple.siri.context.service"
     "com.apple.notificationcenterui.siri"
     "com.apple.intelligentroutingd"
 
-    # Apple Intelligence
     "com.apple.generativeexperiencesd"
     "com.apple.GenerativeFunctions.agentstored"
     "com.apple.intelligencecontextd"
@@ -40,7 +35,6 @@ let
     "com.apple.textunderstandingd"
     "com.apple.ContextStoreAgent"
 
-    # suggestions and on-device analysis
     "com.apple.suggestd"
     "com.apple.knowledge-agent"
     "com.apple.knowledgeconstructiond"
@@ -54,7 +48,6 @@ let
     "com.apple.photoanalysisd"
     "com.apple.mediaanalysisd"
 
-    # analytics and diagnostics
     "com.apple.analyticsagent"
     "com.apple.geoanalyticsd"
     "com.apple.inputanalyticsd"
@@ -73,7 +66,6 @@ let
     "com.apple.betaenrollmentagent"
     "com.apple.triald"
 
-    # ads, promotions and Apple apps' helpers
     "com.apple.ap.adprivacyd"
     "com.apple.ap.promotedcontentd"
     "com.apple.amsengagementd"
@@ -87,15 +79,13 @@ let
     "com.apple.progressd"
     "com.apple.shazamd"
     "com.apple.helpd"
-    "com.apple.rcd" # the play key opening Music
+    "com.apple.rcd"
 
-    # Mail
     "com.apple.email.maild"
     "com.apple.icloudmailagent"
     "com.apple.mdworker.mail"
   ];
 
-  # system-wide launchd daemons
   daemons = [
     "com.apple.analyticsd"
     "com.apple.audioanalyticsd"
@@ -123,11 +113,6 @@ let
     "com.apple.InstallerDiagnostics.installerdiagwatcher"
   ];
 
-  # Siri's extensions, which are neither launchd jobs nor covered by anything
-  # else: they are elected per user, and while an extension is running it lives
-  # in the same process list as the assistant and outlives the settings pane
-  # that spawned it. Includes the metrics, analytics and upload workers, voice
-  # assets and the app-intent extensions, so nothing Siri-shaped can be hosted.
   plugins = [
     "com.apple.aiml.siri.SiriLogProcessor"
     "com.apple.lighthouse.SiriCoreMetricsWorker"
@@ -161,13 +146,6 @@ let
     "com.apple.unilog.SiriUploadWorker"
   ];
 
-  # launchctl has no declarative form, so the lists above are applied by this
-  #
-  #   debloat [UID]          disable everything now (UID defaults to you)
-  #   debloat --boot UID     what the boot daemon runs
-  #   debloat --plugins      only the plug-in elections (runs as you)
-  #   debloat --undo [UID]   re-enable everything; also remove this module
-  #                          from darwin/default.nix or the next switch disables them again
   debloat = pkgs.writeShellApplication {
     name = "debloat";
     text = ''
@@ -207,9 +185,6 @@ let
 
       case "''${1:-}" in
           --boot)
-              # launchd brings some of these back at boot and at login, so apply
-              # now and once more after the user's session is up. The wait is
-              # skipped when the session already exists (the hourly re-run).
               disable_all "gui/$2"
               if ! launchctl print "gui/$2" >/dev/null 2>&1; then
                   until launchctl print "gui/$2" >/dev/null 2>&1; do
@@ -237,7 +212,6 @@ let
               ;;
           *)
               disable_all "gui/''${1:-$(id -u)}"
-              # elections are per user; as root this would write root's own
               [ "$(id -u)" -eq 0 ] || ignore_plugins
               echo "  disabled ''${#AGENTS[@]} agents and ''${#DAEMONS[@]} daemons"
               ;;
@@ -246,11 +220,8 @@ let
   };
 in
 {
-  # `debloat --undo` on the command line turns everything back on
   environment.systemPackages = [ debloat ];
 
-  # Siri, Apple Intelligence, analytics and telemetry stay off. Applied on every
-  # switch (below) and again at boot and login, since launchd re-enables some.
   launchd.daemons.debloat.serviceConfig = {
     ProgramArguments = [
       "${debloat}/bin/debloat"
@@ -260,10 +231,6 @@ in
     RunAtLoad = true;
   };
 
-  # The plug-in elections have to be written by the user whose extensions they
-  # are, which the root daemon above is not, so they get their own user agent.
-  # Like the launchd overrides these are stored, not re-derived: one pass at
-  # login holds until the next macOS update clears them.
   launchd.user.agents.siri-plugins = {
     serviceConfig = {
       ProgramArguments = [ "${debloat}/bin/debloat" "--plugins" ];

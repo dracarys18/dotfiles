@@ -38,8 +38,6 @@ password = "@BLUESKY_PASSWORD@"
 type = "ollama"
 enabled = true
 [platforms.embedder.settings]
-#base_url = "https://api.cloudflare.com/client/v4/accounts/c7c04c6c39420e26c4dfd78bba3f56f0/ai/v1"
-#embedding_model = "@cf/baai/bge-m3"
 embedding_model = "bge-m3"
 
 [platforms.reranker]

@@ -1,4 +1,3 @@
-# LiteLLM proxy as a provider, with its models read from /model/info at start
 {
   programs.uji.pluginFiles.litellm = ''
     local BASE_URL = os.getenv("LITELLM_BASE_URL") or "http://localhost:4000"

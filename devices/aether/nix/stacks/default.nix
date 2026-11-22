@@ -1,5 +1,3 @@
-# One module per stack from the old ~/Projects, same container names as the
-# compose files so service-to-service hostnames keep resolving.
 {
   imports = [
     ./adguardhome.nix

@@ -1,7 +1,6 @@
 {
   programs.uji = {
     enable = true;
-    # this policy and these keys replace uji's own
     defaults = false;
 
     toolPolicy = {
@@ -12,8 +11,6 @@
 
     keymaps.normal."<C-e>".command = "effort";
 
-    # the checkout from `make uji` instead of the flake's copy, so plugin
-    # edits apply without a switch
     packs.uji-plugins.dir = "~/Projects/uji-plugins";
 
     plugins = {
@@ -25,7 +22,6 @@
       };
       websearch = {
         enable = true;
-        # my own SearXNG, on the tailnet
         settings = {
           backend = "searxng";
           url = "https://search.karthihegde.dev";

@@ -1,9 +1,6 @@
 { pkgs, inputs, ... }:
 
 let
-  # pinned to the last revision whose status modules embed the battery/cpu
-  # plugin scripts; v2 moved to #{cpu_percentage}, which those plugins only
-  # interpolate inside status-right, so the bar loses both
   catppuccin = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "catppuccin";
     version = "0-unstable-pinned";
@@ -16,8 +13,6 @@ in
     prefix = "C-s";
     keyMode = "vi";
     mouse = true;
-    # keep tmux's own defaults: home-manager would otherwise add tmux-sensible
-    # and switch the terminal to "screen"
     sensibleOnTop = false;
     terminal = "tmux-256color";
     clock24 = true;
@@ -26,7 +21,6 @@ in
       {
         plugin = catppuccin;
         extraConfig = ''
-          # `flavor`, not `flavour`: the old spelling warns on every start
           set -g @catppuccin_flavor "mocha"
           set -g @catppuccin_status_modules_right "battery cpu date_time"
           set -g @catppuccin_pane_default_text "#W"
@@ -50,11 +44,8 @@ in
       bind-key n command-prompt 'rename-window "%%"'
       bind-key N command-prompt 'rename-session "%%"'
 
-      # true color in Ghostty
       set -sa terminal-features ',xterm-ghostty:RGB'
 
-      # vellum.nvim draws its preview through the terminal's graphics
-      # protocol; tmux drops those sequences unless it is told to pass them on
       set -g allow-passthrough on
 
       set -g extended-keys on

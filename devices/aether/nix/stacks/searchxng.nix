@@ -1,5 +1,3 @@
-# ~/Projects/searchxng — the compose file published ${SEARXNG_PORT:-8080},
-# which was 6996 on the old box
 { config, ... }:
 
 let
@@ -24,10 +22,6 @@ in
         "${d}/core-data:/var/cache/searxng"
       ];
       ports = [ "127.0.0.1:${port}:${port}" ];
-      # settings.yml is the live config migrated from archmaestro, kept in
-      # ${d}/core-config so it can be edited without a rebuild. It was missing
-      # when this module was written, so the unit started disabled; now it is
-      # present and the container starts with the rest at boot.
     };
 
     searxng-valkey = {

@@ -1,10 +1,3 @@
-# llama.cpp server for local agents: one OpenAI-compatible endpoint on
-# 127.0.0.1:8080, the model resident, and the server sleeping (model unloaded)
-# after 30 minutes idle — the next request reloads it.
-#
-# The GGUF is pinned in Nix, so `make switch` fetches it once (~2.7 GB) and the
-# store keeps it; bump url + hash to move to a new build. Keeping the file
-# outside the store instead is just a matter of pointing -m at a plain path.
 { pkgs, ... }:
 
 let
@@ -29,14 +22,11 @@ in
         "127.0.0.1"
         "--port"
         "8080"
-        # the API's model id this otherwise the store filename
         "--alias"
         "qwen3.5-4b-q4_k_m"
         "--ctx-size"
         "8192"
-        "--no-ui" # this build deprecates --no-webui in favour of --no-ui
-        # tool calling: CodeCompanion's inline interaction edits the buffer
-        # through the edit_file tool, which needs the model's tool template
+        "--no-ui"
         "--jinja"
         "--sleep-idle-seconds"
         "1800"

@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
-# Rebuild the knot2 image on the box. Run as root:
-#   sudo /etc/tangled-build.sh
-# The container in tangled.nix uses localhost/knot2:latest, and its CMD is
-# overridden there because the image's own CMD passes the config path as a
-# subcommand. This script re-creates that image from the upstream core repo,
-# patching the three things master's Containerfile gets wrong today:
-#   1. it COPYs knot2/lexicons, which is not in the repo (the crate reads the
-#      root lexicons/ directory instead)
-#   2. cargo's git fetch needs the git CLI, but the image does not install git
-#   3. the default libgit2 fetch of the jacquard dependency stalls; use the
-#      git CLI, disable HTTP multiplexing and add retries
 set -euo pipefail
 
 src=/var/lib/stacks/tangled/src

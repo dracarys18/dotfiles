@@ -1,9 +1,7 @@
 {
-  # lspconfig supplies each server's defaults (command, filetypes, root markers)
   plugins.lspconfig.enable = true;
   plugins.lspsaga.enable = true;
 
-  # servers start through Neovim's own vim.lsp API; Nix installs each one
   lsp.servers = {
     lua_ls = {
       enable = true;
@@ -50,7 +48,6 @@
     bashls.enable = true;
     ts_ls.enable = true;
     terraformls.enable = true;
-    # from your opam switch, so it matches the OCaml compiler in use
     ocamllsp = {
       enable = true;
       package = null;

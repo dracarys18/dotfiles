@@ -4,15 +4,11 @@
   programs.fish = {
     enable = true;
 
-    # only in interactive shells, like the old config.fish
     interactiveShellInit = ''
       set -g fish_greeting
 
-      # tmux keeps its server socket in $TMUX_TMPDIR; the default is /tmp, which
-      # gets cleared often enough to strand running sessions
       set -gx TMUX_TMPDIR $HOME/.local/state
 
-      # Homebrew only holds GUI apps and a few macOS tools; Nix paths come first
       fish_add_path -g --append /opt/homebrew/bin
       fish_add_path -g --append /opt/homebrew/sbin
       fish_add_path -g $HOME/.local/bin
@@ -21,12 +17,9 @@
           source $HOME/.opam/opam-init/init.fish >/dev/null 2>&1
       end
 
-      # up/down search history by the prefix already typed
       bind up history-prefix-search-backward
       bind down history-prefix-search-forward
 
-      # Secrets from sops-nix (darwin/secrets.nix), decrypted into /run/secrets
-      # at switch and at boot; only export the ones that are there
       for secret in litellm/api_key:LITELLM_API_KEY litellm/base_url:LITELLM_BASE_URL
           set -l parts (string split : $secret)
           if test -r /run/secrets/$parts[1]
@@ -35,9 +28,6 @@
       end
     '';
 
-    # Homebrew is managed by Nix (darwin/homebrew.nix); anything installed by
-    # hand is removed on the next switch anyway, so refuse it up front.
-    # Read-only commands still work, and Nix calls brew by its full path.
     functions.brew = {
       wraps = "brew";
       description = "Homebrew, minus the commands Nix owns";
@@ -54,8 +44,6 @@
       '';
     };
 
-    # Same for tools that install globally outside Nix. Building your own
-    # local code (`cargo install --path`, `go install ./...`) still works.
     functions.__nix_managed = {
       description = "Explain that a tool belongs in Nix";
       body = ''
@@ -82,7 +70,6 @@
       wraps = "go";
       description = "go, minus installing published tools";
       body = ''
-        # `go install pkg@version` fetches a published tool; local packages are fine
         if test "$argv[1]" = install
             and string match -q -- '*@*' $argv[2..-1]
             __nix_managed "go install"
@@ -108,8 +95,6 @@
       '';
     };
 
-    # Apple's pip3 installs into the Xcode 3.9 user site (~/Library/Python);
-    # python is uv's alone now, so point installs at uv instead
     functions.pip3 = {
       wraps = "pip3";
       description = "pip3, redirected to uv";
@@ -126,9 +111,6 @@
       '';
     };
 
-    # Tailscale exit node. `vpn on` checks that traffic actually flows and
-    # reverts if it doesn't — a selected node that doesn't forward takes the
-    # whole connection down, which is exactly what it did once already.
     functions.vpn = {
       description = "Turn the tailscale exit node on or off";
       body = ''
@@ -166,22 +148,17 @@
       pdf = "mupdf-gl -I";
       loc = "tokei";
       sshat = "ssh aether";
-      # yabai/skhd are nix-darwin services here, so their own
-      # `--restart-service` looks for plists that don't exist
       yabai-restart = ''launchctl kickstart -k gui/(id -u)/org.nixos.yabai'';
       skhd-restart = ''launchctl kickstart -k gui/(id -u)/org.nixos.skhd'';
     };
   };
 
-  # fish's module asks for man-page caches, but on macOS the system's own man
-  # is used (programs.man.package is null), so they'd do nothing but warn
   programs.man.generateCaches = false;
 
   home.sessionVariables = {
     ANTHROPIC_SMALL_FAST_MODEL = "claude-sonnet-4-6";
   };
 
-  # kubectl abbreviations (`k`, `kgp`…), pinned from ahmetb/kubectl-aliases
   xdg.configFile."fish/conf.d/kubectl_aliases.fish".source =
     "${inputs.kubectl-aliases}/.kubectl_aliases.fish";
 }

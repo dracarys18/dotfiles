@@ -1,7 +1,3 @@
-# Which keys sops encrypts with. The matching private key is on this Mac at
-# ~/Library/Application Support/sops/age/keys.txt (back it up somewhere safe, or
-# the secrets are unrecoverable); the same file also lets a future machine
-# decrypt these.
 keys:
   - &karthikey age19ryxahut8r5sq2s0489pdhhcu30nfczvhjh3mwdjya7thg2w9pnqj40qy6
 
@@ -10,7 +6,6 @@ creation_rules:
     key_groups:
       - age:
           - *karthikey
-  # one dotenv file per stack, decrypted by sops-nix into /run/secrets/<stack>
   - path_regex: (^|/)secrets/.*\.env$
     key_groups:
       - age:

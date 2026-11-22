@@ -14,7 +14,6 @@ ui:
   dashboard-subheading: "every service, probed every five minutes"
   custom-css: |
     footer { display: none; }
-    #gatus-uptime-banner {
       display: inline-flex;
       align-items: baseline;
       gap: 0.5rem;
@@ -26,17 +25,11 @@ ui:
       font-size: 0.875rem;
       line-height: 1.25rem;
     }
-    #gatus-uptime-banner .label { color: hsl(var(--muted-foreground)); }
-    #gatus-uptime-banner .value {
       font-size: 1.125rem;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
       color: hsl(var(--muted-foreground));
     }
-    #gatus-uptime-banner .count { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
-    #gatus-uptime-banner[data-health="good"] .value { color: #16a34a; }
-    #gatus-uptime-banner[data-health="warn"] .value { color: #d97706; }
-    #gatus-uptime-banner[data-health="bad"] .value { color: #dc2626; }
     .gatus-hostname-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
     .gatus-hostname-link:hover { color: hsl(var(--foreground)); }
 

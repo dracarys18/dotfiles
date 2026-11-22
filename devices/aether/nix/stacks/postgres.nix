@@ -146,7 +146,6 @@ in
     content = lib.concatMapStrings appSql apps;
   };
 
-  # idempotent, so it provisions a fresh cluster and reconciles an existing one
   systemd.services.postgres-apps = {
     wantedBy = [ "multi-user.target" ];
     requires = [ "podman-postgres.service" ];

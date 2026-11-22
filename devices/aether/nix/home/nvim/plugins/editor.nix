@@ -15,7 +15,6 @@
       enable = true;
       settings = {
         size = 70;
-        # a Lua expression in nixvim, hence the [[ ]] string quotes
         open_mapping = "[[<c-\\>]]";
         hide_numbers = true;
         shade_terminals = true;
@@ -37,7 +36,6 @@
       };
     };
 
-    # tpope
     commentary.enable = true;
     repeat.enable = true;
     vim-surround.enable = true;

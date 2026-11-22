@@ -30,6 +30,42 @@ identity_providers:
           - 'name'
 @OIDC_POLICIES@
     clients:
+      - client_id: 'radarr'
+        client_name: 'Radarr'
+        client_secret: '@RADARR_CLIENT_SECRET@'
+        public: false
+        authorization_policy: 'radarr'
+        token_endpoint_auth_method: 'client_secret_post'
+        require_pkce: false
+        redirect_uris:
+          - 'https://radarr.karthihegde.dev/signin-oidc'
+          - 'http://radarr.karthihegde.dev/signin-oidc'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+      - client_id: 'sonarr'
+        client_name: 'Sonarr'
+        client_secret: '@SONARR_CLIENT_SECRET@'
+        public: false
+        authorization_policy: 'sonarr'
+        token_endpoint_auth_method: 'client_secret_post'
+        require_pkce: false
+        redirect_uris:
+          - 'https://sonarr.karthihegde.dev/signin-oidc'
+          - 'http://sonarr.karthihegde.dev/signin-oidc'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
       - client_id: 'jellyfin'
         client_name: 'Jellyfin'
         client_secret: '@JELLYFIN_CLIENT_SECRET@'

@@ -1,4 +1,3 @@
-# ~/Projects/homeassistant — both services need the host network
 { config, pkgs, ... }:
 
 let

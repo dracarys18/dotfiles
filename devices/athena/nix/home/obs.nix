@@ -1,5 +1,3 @@
-# OBS: settings snapshot, `obs-save`, and the camera watcher that runs OBS
-# only while an app uses its virtual camera.
 {
   config,
   lib,
@@ -8,8 +6,6 @@
 }:
 
 let
-  # Needs Swift 6 (nixpkgs has 5.10), so it's built with Apple's swiftc;
-  # Nix's build sandbox is off on macOS, so the Xcode toolchain is reachable.
   autocam = pkgs.stdenvNoCC.mkDerivation {
     name = "obs-autocam";
     src = ../../obs/autocam.swift;
@@ -21,8 +17,6 @@ let
     installPhase = "mkdir -p $out/bin && cp obs-autocam $out/bin/";
   };
 
-  # obs-save: copy OBS settings into the repo with stream keys and logins
-  # blanked. OBS replaces its files on every save, so they can't be links.
   obsSave = pkgs.writeShellApplication {
     name = "obs-save";
     runtimeInputs = with pkgs; [
@@ -38,16 +32,12 @@ let
       rm -rf "$DST"
       mkdir -p "$DST"
       cp "$SRC/global.ini" "$SRC/user.ini" "$DST/"
-      # profiles and scene collections, without OBS's own .bak copies
       (cd "$SRC" && find basic -type f \( -name '*.ini' -o -name '*.json' \) -print0) |
           while IFS= read -r -d ''' f; do
               mkdir -p "$DST/$(dirname "$f")"
               cp "$SRC/$f" "$DST/$f"
           done
 
-      # Blank the secrets: stream keys and tokens in JSON, and the Token=,
-      # RefreshToken= and *Password= lines (account logins) in INI files.
-      # OBS may start a file with a byte order mark; drop it.
       find "$DST" -type f -name '*.json' -print0 | while IFS= read -r -d ''' f; do
           sed '1s/^\xEF\xBB\xBF//' "$f" | jq --indent 4 --ascii-output '
               walk(if type == "object" then with_entries(
@@ -64,8 +54,6 @@ let
     '';
   };
 
-  # the watcher talks to OBS over obs-websocket, so make sure it's on, with a
-  # password (24 random bytes, URL-safe base64)
   enableWebsocket = pkgs.writeShellApplication {
     name = "obs-websocket-enable";
     runtimeInputs = with pkgs; [
@@ -104,9 +92,6 @@ in
     };
   };
 
-  # Copy the repo snapshot in for files OBS doesn't have yet (a fresh Mac);
-  # files OBS already has are never touched. Then turn obs-websocket on,
-  # unless OBS is running (it would overwrite the file when it quits).
   home.activation.obsSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     obsDir="$HOME/Library/Application Support/obs-studio"
     (

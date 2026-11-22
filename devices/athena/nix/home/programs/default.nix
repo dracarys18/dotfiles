@@ -1,4 +1,3 @@
-# One file per tool, using home-manager's module for it
 {
   imports = [
     ./1password.nix

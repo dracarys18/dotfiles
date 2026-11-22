@@ -1,8 +1,3 @@
-# ~/Projects/cartero — compose put `tunnel` and `reader` behind profiles, so
-# they are declared with autoStart = false: present, started by hand when wanted.
-#
-# config.toml, myfeed.opml and the templates are checked in under ./cartero and
-# mounted out of the store; only postgres/redis/data are runtime state.
 { config, ... }:
 
 let
@@ -18,8 +13,6 @@ in
     "d ${d}/data 0755 root root -"
   ];
 
-  # the checked-in config.toml carries @PLACEHOLDER@ markers; the four values it
-  # needs live in sops and are substituted into the rendered copy
   sops.secrets = {
     "cartero-config/jev_api_key" = {
       sopsFile = ../secrets/cartero-config.yaml;
@@ -137,8 +130,6 @@ in
         "cartero-redis"
         "flaresolverr"
       ];
-      # no --dns here: overriding the resolver drops podman's internal one, so
-      # the container cannot resolve postgres/cartero-redis by name
       extraOptions = [
         "--pull=newer"
         "--add-host=host.docker.internal:host-gateway"
@@ -169,8 +160,6 @@ in
       ];
       environmentFiles = [ config.sops.secrets."cartero".path ];
       extraOptions = [ "--pull=newer" ];
-      # news.karthihegde.dev is this tunnel's public hostname; the ingress rule
-      # in Cloudflare targets http://cartero:8080, which podman's DNS resolves
       autoStart = true;
     };
 

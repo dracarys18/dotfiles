@@ -11,7 +11,6 @@
     timeoutlen = 700;
     guifont = "Hasklug Nerd Font Mono,Hack Nerd Font,NotoEmoji Nerd Font:h11";
 
-    # undo history in Neovim's default ~/.local/state/nvim/undo
     undofile = true;
 
     autoread = true;
@@ -36,7 +35,6 @@
     list = true;
   };
 
-  # reload buffers changed on disk
   autoGroups.AutoRead.clear = true;
   autoCmd = [
     {

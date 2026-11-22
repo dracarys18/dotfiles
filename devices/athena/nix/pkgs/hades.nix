@@ -1,10 +1,3 @@
-# ~/Projects/hades, built from the workspace's own Cargo.lock. The `hades`
-# binary lives in crates/hades, so only that member is built.
-#
-# Two things make this heavier than a normal crate: `inkwell` comes from git
-# (so it needs an outputHash) and it binds LLVM 21 through llvm-sys 211, which
-# wants a single prefix holding bin/llvm-config *and* lib/libLLVM — nixpkgs
-# splits those across the dev/lib outputs, hence the symlinkJoin.
 {
   lib,
   rustPlatform,
@@ -43,7 +36,6 @@ rustPlatform.buildRustPackage {
     "hades"
   ];
 
-  # exactly what libLLVM-21 records as its own dependencies
   buildInputs = [
     llvmPrefix
     llvmPackages_21.libclang
@@ -54,7 +46,6 @@ rustPlatform.buildRustPackage {
   LIBCLANG_PATH = "${llvmPackages_21.libclang.lib}/lib";
   LLVM_SYS_211_PREFIX = "${llvmPrefix}";
 
-  # the workspace's tests need services the sandbox has no time for
   doCheck = false;
 
   meta = {

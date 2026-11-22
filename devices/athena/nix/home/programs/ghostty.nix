@@ -1,9 +1,3 @@
-# Ghostty is a cask (darwin/homebrew.nix): upstream's signed bundle in
-# /Applications, updated by brew. Nix only writes the config file, so there is
-# no wrapper and no store-path bundle. catppuccin.ghostty is left off in
-# ../catppuccin.nix for the same reason — it themes programs.ghostty, which is
-# a Nix package — so the theme is picked by name from Ghostty's own bundled
-# themes, and the mocha crust background is set explicitly.
 { ... }:
 
 {

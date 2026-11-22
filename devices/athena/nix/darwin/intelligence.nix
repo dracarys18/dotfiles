@@ -1,5 +1,3 @@
-# Apple Intelligence off, its models deleted and blocked from downloading
-# again, with pared (github.com/4evy/pared). debloat.nix stops its services.
 {
   config,
   pkgs,
@@ -16,16 +14,11 @@ in
 {
   imports = [ inputs.pared.darwinModules.default ];
 
-  # Every feature off; `features.<name> = true` keeps one (`pared features`
-  # lists them). Activation deletes the models of every feature that's off.
   programs.pared = {
     enable = true;
     package = inputs.pared.packages.${pkgs.stdenv.hostPlatform.system}.pared;
   };
 
-  # The profile locks the features off and blocks the downloads, but macOS
-  # only installs a profile after a click in System Settings. Open it while
-  # it isn't installed, and once more each time it changes.
   system.activationScripts.postActivation.text = ''
     opened=/var/db/pared/opened-profile.sha256
     sum=$(/usr/bin/shasum -a 256 ${profile} | /usr/bin/cut -d' ' -f1)

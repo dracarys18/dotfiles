@@ -1,13 +1,3 @@
-# Secrets: `secrets/secrets.yaml` is SOPS-encrypted; sops-nix decrypts it at
-# activation and at boot into /run/secrets, readable only by the owners listed
-# here. The age private key lives outside the store at
-# ~/Library/Application Support/sops/age/keys.txt (where sops looks on macOS) —
-# without it nothing can be decrypted.
-#
-#   sops devices/athena/nix/secrets/secrets.yaml     # edit (set EDITOR if it complains)
-#
-# Add a secret: put it in that file, list it here with an owner, then use
-# /run/secrets/<name> (owner and mode are per secret).
 { inputs, ... }:
 
 {
@@ -26,8 +16,6 @@
         owner = "karthihegde";
         mode = "0400";
       };
-      # DeepSeek API key for CodeCompanion's inline interaction
-      # (home/nvim/plugins/ai.nix reads /run/secrets/deepseek/api_key)
       "deepseek/api_key" = {
         owner = "karthihegde";
         mode = "0400";

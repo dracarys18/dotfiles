@@ -1,12 +1,3 @@
-# The network policy from the archmaestro post-mortem: nothing is reachable
-# from the internet except torrent peers and tailscale's own port. The LAN and
-# the tailnet get everything; everything else is refused.
-#
-# NixOS's iptables firewall only builds an INPUT chain (nixos-fw) and never
-# touches FORWARD, so a container that publishes on 0.0.0.0 is invisible to it
-# — podman DNATs the packet straight through. That is why every stack publishes
-# on 127.0.0.1, and why AdGuard Home and Home Assistant run with host
-# networking: their ports land on INPUT, where this policy can scope them.
 {
   config,
   lib,
@@ -14,11 +5,6 @@
 }:
 
 let
-  # the LAN, IPv4 and IPv6. The v4 subnet is read back from the interface
-  # config, so the address is written once (configuration.nix). The v6 prefix
-  # comes from the router's RA and cannot be known at eval time; it changes if
-  # the ISP renumbers, and only this line needs updating then.
-  # iptables masks the host bits, so 192.168.0.179/24 is added as 192.168.0.0/24
   lanV4 =
     let
       a = lib.head config.networking.interfaces.lan0.ipv4.addresses;
@@ -30,70 +16,32 @@ in
   networking.firewall = {
     enable = true;
 
-    # tailscale0 carries only tailnet traffic; lo is trusted by default
     trustedInterfaces = [ "tailscale0" ];
 
-    # the only ports the whole internet may reach
     allowedTCPPorts = [ 6881 ];
     allowedUDPPorts = [
-      6881 # qbittorrent peers
-      41641 # tailscale
+      6881
+      41641
     ];
 
-    # everything the LAN is allowed to reach except ssh, which is tailnet-only:
-    # DNS, caddy, home assistant, matter. Listed as sources rather than ports
-    # because the LAN and the WAN share one interface, so a port list cannot
-    # tell them apart.
-    # extraCommands (not extraInputRules) is the iptables backend's hook: it is
-    # spliced into the nixos-fw chain just before the final reject
     extraCommands = ''
-      # ssh is tailnet-only. This must come before the DNS exceptions below,
-      # since nixos-fw is first-match. The cost is real: with tailscaled down
-      # there is no remote way into a headless box.
       iptables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
       ip6tables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
 
-      # Home Assistant opens 18555/tcp and nothing claims it: not in its
-      # config, not in its log, and it accepts a connection then says nothing.
-      # Like any unlisted port the LAN and the WAN already cannot reach it, but
-      # the tailnet could, and not because of trustedInterfaces as first
-      # assumed: rules added to nixos-fw are never reached from tailscale0,
-      # because tailscaled's own ts-input chain accepts that interface higher
-      # up. The raw table runs before every filter chain, so the drop lands
-      # ahead of ts-input however often tailscaled rebuilds it. Loopback is
-      # left alone in case an integration is talking to itself over it. -C
-      # first: a firewall reload does not flush the raw table, so a plain -A
-      # would stack a copy on every switch.
       iptables -t raw -C PREROUTING ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
         || iptables -t raw -I PREROUTING 1 ! -i lo -p tcp --dport 18555 -j DROP
       ip6tables -t raw -C PREROUTING ! -i lo -p tcp --dport 18555 -j DROP 2>/dev/null \
         || ip6tables -t raw -I PREROUTING 1 ! -i lo -p tcp --dport 18555 -j DROP
 
-      # the LAN gets DNS and nothing else. A blanket accept used to be here,
-      # but the only thing it was carrying was resolver traffic from two LAN
-      # devices: every *.karthihegde.dev record points at a tailnet address, so
-      # an off-tailnet client cannot reach the web services regardless, and
-      # ollama and the proxies are bound to loopback or the podman bridge.
       iptables -A nixos-fw -s ${lanV4} -p udp --dport 53 -j nixos-fw-accept
       iptables -A nixos-fw -s ${lanV4} -p tcp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s ${lanV6} -p udp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s ${lanV6} -p tcp --dport 53 -j nixos-fw-accept
       ip6tables -A nixos-fw -s fe80::/10 -p udp --dport 53 -j nixos-fw-accept
-      # TCP too: a truncated answer (EDNS is off for some clients) sends the
-      # query back over TCP, and a link-local client would otherwise time out
       ip6tables -A nixos-fw -s fe80::/10 -p tcp --dport 53 -j nixos-fw-accept
 
-      # SSDP: HA's upnp integration learns the router through multicast, and
-      # every reply comes back from the gateway's port 1900. Without this the
-      # IGD entities work only until the next reboot, because the discovered
-      # device list is in memory and re-discovery is rejected.
       iptables -A nixos-fw -s ${lanV4} -p udp --sport 1900 -j nixos-fw-accept
 
-      # mDNS: Matter (matter-server), zeroconf and every discovery-based
-      # integration live on multicast 5353. Matter nodes are found by mDNS, so
-      # without this a node keeps working only until its cached session expires
-      # and then never comes back. Both directions: queries arrive on 5353 and
-      # unicast answers leave from 5353.
       iptables -A nixos-fw -s ${lanV4} -p udp --dport 5353 -j nixos-fw-accept
       iptables -A nixos-fw -s ${lanV4} -p udp --sport 5353 -j nixos-fw-accept
       ip6tables -A nixos-fw -s ${lanV6} -p udp --dport 5353 -j nixos-fw-accept
@@ -101,27 +49,15 @@ in
       ip6tables -A nixos-fw -s ${lanV6} -p udp --sport 5353 -j nixos-fw-accept
       ip6tables -A nixos-fw -s fe80::/10 -p udp --sport 5353 -j nixos-fw-accept
 
-      # containers reach host services over the podman bridge, which no other
-      # rule covers — cartero's embedder was timing out on 10.88.0.1:11434
-      # because of exactly that, and karakeep's oidc discovery times out on
-      # 443 the same way. Opened per port rather than by trusting podman0, so
-      # a compromised container cannot reach every host port. Packets from a
-      # container to anywhere else are forwarded, not input, so this only ever
-      # covers traffic addressed to the host itself.
       iptables -A nixos-fw -i podman0 -s 10.88.0.0/16 -p tcp -m multiport --dports 443,11434 -j nixos-fw-accept
 
     '';
 
-    # tailscale sends from the tailnet address over an interface that the
-    # router never sees, so a strict reverse-path check would drop it
     checkReversePath = "loose";
 
     logRefusedConnections = false;
   };
 
-  # the live box answered password logins from the internet for a while
-  # sshd would otherwise add 22 to allowedTCPPorts, i.e. open to the world; the
-  # tailnet interface is now the only way in
   services.openssh.openFirewall = false;
 
   services.openssh.settings = {

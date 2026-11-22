@@ -1,7 +1,3 @@
-# settings.nix denies `rm -rf` outright, which also stopped the agent from
-# clearing scratch files. A before_tool hook runs before the policy and
-# overrides it, so allow it when every target is under /tmp (and nothing can
-# climb out with `..`); anything else falls through to the deny rule.
 { ... }:
 
 {

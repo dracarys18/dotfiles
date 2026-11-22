@@ -1,7 +1,3 @@
-# Durable task list. It lives in this plugin, not in the message stream, so
-# compaction cannot lose it: uji.context.add re-injects it into the system
-# prompt every turn, so the model still sees its remaining work after the
-# transcript it was written in has been summarised away.
 {
   programs.uji.pluginFiles.todo = ''
     local STATUS = { pending = " ", doing = "~", done = "x" }

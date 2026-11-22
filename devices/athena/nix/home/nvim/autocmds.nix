@@ -1,6 +1,5 @@
 {
   autoCmd = [
-    # persist folds/views across sessions
     {
       event = [
         "BufWinLeave"

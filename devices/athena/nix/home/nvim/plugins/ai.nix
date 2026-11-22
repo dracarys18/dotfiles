@@ -1,11 +1,3 @@
-# AI completion for Neovim, two separate things:
-#
-#  * minuet-ai.nvim — ghost-text inline suggestions while typing, served by the
-#    local llama.cpp server (home/llama-cpp.nix). It plugs into blink.cmp as a
-#    source; blink's ghost_text renders the suggestion inline (see completion.nix).
-#  * codecompanion.nvim — prompt-driven inline edits: select code, run
-#    :CodeCompanion <prompt>, and the model rewrites it through the edit_file
-#    tool. Accept with g2, reject with g3.
 { pkgs, ... }:
 
 {

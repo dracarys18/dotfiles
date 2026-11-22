@@ -8,11 +8,6 @@
 let
   d = "/var/lib/stacks/gatus";
 
-  # the dashboard gains one script: it totals the 30d uptime of every endpoint
-  # under the heading and turns each card's hostname into a link. patching the
-  # checked-in web/static (no npm step: the bundle is committed upstream) keeps
-  # caddy out of it — no response rewriting, no plugin, nothing to keep in sync
-  # at the proxy.
   gatus = pkgs.gatus.overrideAttrs (old: {
     postPatch = ''
       substituteInPlace web/static/index.html \
@@ -32,7 +27,6 @@ in
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/data 0700 gatus gatus -"
-    # the db was written by root while gatus ran as a container; Z takes it over
     "Z ${d}/data 0700 gatus gatus -"
   ];
 

@@ -12,10 +12,6 @@
     ./stacks
   ];
 
-  # every stack runs rootful (system-level) podman: adguardhome needs :53.
-  # nixpkgs creates the default network with dns_enabled = false, so containers
-  # cannot resolve each other by name (cartero asking for cartero-postgres-1
-  # gets ENOTFOUND) — every stack that talks to a sibling relies on this
   virtualisation.podman = {
     enable = true;
     defaultNetwork.settings.dns_enabled = true;
@@ -23,12 +19,6 @@
   };
   virtualisation.oci-containers.backend = "podman";
 
-  # On a first activation the podman units start before systemd-tmpfiles has
-  # created /var/lib/stacks/**, so each container dies with
-  # "statfs <path>: no such file or directory" and hits start-limit-hit. Create
-  # every bind-mount source in the unit itself; named volumes are podman's job.
-  # Sources that already exist are left alone: some are not directories at all
-  # (/run/podman/podman.sock, /etc/localtime), and mkdir -p fails on those.
   systemd.services = lib.mapAttrs' (
     name: container:
     lib.nameValuePair "podman-${name}" {
@@ -43,21 +33,10 @@
     }
   ) config.virtualisation.oci-containers.containers
   // {
-    # systemd deletes RuntimeDirectory=/run/tailscale when a unit stops, and on
-    # a restart that deletion can land *after* the new daemon has bound its
-    # socket, leaving tailscaled running with no control socket
     tailscaled.serviceConfig.RuntimeDirectoryPreserve = "yes";
 
-    # the media stack's container is itself named "tailscale", and nixpkgs
-    # gives every container RuntimeDirectory=/run/<name> — the same path the
-    # daemon keeps its control socket in, so stopping that container deleted it
     "podman-tailscale".serviceConfig.RuntimeDirectory = lib.mkForce "podman-tailscale";
 
-    # ollama listens on the podman bridge so containers can reach it as
-    # host.docker.internal, but that bridge is created by netavark when the
-    # first container starts, which is later than ollama wants to bind — so the
-    # first attempt fails with "cannot assign requested address" and the unit
-    # dies. Retrying until the bridge exists also covers podman recreating it.
     ollama = {
       unitConfig.StartLimitIntervalSec = 0;
       serviceConfig = {
@@ -66,9 +45,6 @@
       };
     };
 
-    # the DIMMs forget their colour when the PSU is unplugged, so re-apply "off"
-    # at every boot. Devices 0 and 1 are the two DRAM modules; if enumeration
-    # order ever changes the worst case is that the board headers go dark.
     openrgb-ram = {
       description = "switch off the Corsair DIMM RGB";
       wantedBy = [ "multi-user.target" ];
@@ -86,13 +62,6 @@
   networking.hostName = "aether";
   time.timeZone = "Asia/Kolkata";
 
-  # AdGuard binds this address explicitly (stacks/adguardhome.nix), so a DHCP
-  # lease that moved would take DNS down with it. Pinned here instead of as a
-  # router reservation so the address is part of the config.
-  #
-  # The name is pinned to the MAC rather than used as enp4s0/enp5s0: predictable
-  # names encode the PCIe bus number, and fitting a second NVMe renumbered the
-  # bus once already, which left the box with no IPv4 at all
   systemd.network.links."10-lan" = {
     matchConfig.MACAddress = "30:56:0f:85:2e:07";
     linkConfig.Name = "lan0";
@@ -112,43 +81,9 @@
     "1.0.0.1"
   ];
 
-  # This ISP hijacks plain UDP DNS, not just its own resolver: a query sent to
-  # j.root-servers.net for x1337x.cc came back in 2 ms with 202.83.21.15, which
-  # that server does not answer for, while the same lookup over TLS gives
-  # Cloudflare's 104.21.83.238. Every destination on 53/udp is answered by the
-  # ISP, so resolve over TLS, where an injected answer cannot be authenticated.
-  #
-  # unbound lived here for a while and is deliberately gone: as a DoT forwarder
-  # it only added a hop in front of resolved, and as a recursive resolver
-  # (tcp-upstream does dodge the hijack — the interception is UDP-only) it cost
-  # a fresh TCP connection per authoritative server, ~600ms on a cold name.
-  # resolved does the same job with fewer moving parts.
-  #
-  # DNSSEC is validated here rather than trusted to Cloudflare: the uplink is
-  # encrypted end to end and the box has a root trust anchor from systemd, so a
-  # bogus answer from anywhere between here and the authoritative servers turns
-  # into a SERVFAIL instead of a silently wrong address.
-  #
-  # The deploy path uses the IP from ~/.ssh/config, so a resolver outage cannot
-  # lock the box out of itself.
   services.resolved = {
     enable = true;
     settings.Resolve = {
-      # adguard home first, so this box is filtered like everything else on the
-      # network, then cloudflare over TLS if the container is down or slow: one
-      # server was a single point of stall, because FallbackDNS is only
-      # consulted when DNS is empty and resolved's retry chain on a lost reply
-      # is 5+10+20+30+30s. resolved uses whichever server answers, so a query
-      # that falls through to cloudflare once keeps going there until the
-      # current server fails in turn.
-      #
-      # the hop to adguard is loopback rather than 192.168.0.179: the container
-      # binds 127.0.0.1 for this client alone, so the query needs no LAN
-      # address, no firewall hole and no interface to be up, and cannot be
-      # answered by anything off the box. adguard serves DoT with a
-      # certificate from the CA in stacks/adguardhome.nix, which is what lets
-      # DNSOverTLS be "yes" here instead of "opportunistic": the #name is the
-      # name each certificate is verified against.
       DNS = [
         "127.0.0.1#adguard.aether.internal"
         "1.1.1.1#one.one.one.one"
@@ -207,20 +142,11 @@
     };
   };
 
-  # HA's bluetooth integration talks to bluetoothd over D-Bus; without this the
-  # radio shows up as hci0 but nothing can manage it
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
 
-  # the media stack's tailscale sidecar runs with --device /dev/net/tun; the
-  # device only appears once the module is loaded, and without it podman fails
-  # to create the container (exit 125) and the whole activation rolls back
-  # tun: the media stack's tailscale sidecar. i2c: OpenRGB reaches the Corsair
-  # DIMMs' RGB controller over the SMBus, which only works once the kernel stops
-  # honouring ACPI's claim on that region — hence the kernel parameter. Without
-  # it i2c-piix4 loads but finds no devices at all (decode-dimms sees 0 DIMMs).
   boot.kernelModules = [
     "tun"
     "i2c-dev"
@@ -232,34 +158,20 @@
     "page_alloc.shuffle=1"
   ];
 
-  # fish is the login shell, same as the Mac. The NixOS module is needed as
-  # well: it puts fish in /etc/shells and writes /etc/fish/config.fish, while
-  # home-manager only writes the user's own config.
   programs.fish.enable = true;
 
   environment.systemPackages = [
     pkgs.openrgb
-    # neofetch is gone from nixpkgs (unmaintained upstream); fastfetch is the
-    # maintained successor. `neowofetch` from the hyfetch package is the
-    # faithful look-alike if that is what you want instead.
     pkgs.fastfetch
   ];
 
-  # the box is UEFI: ESP on nvme0n1p1. This cannot live in hardware.nix because
-  # `make bootstrap` regenerates that file from nixos-generate-config, which
-  # emits no bootloader settings at all
   boot.loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
-    # memtest86+ in the boot menu: the only way to cover every cell of the 32G
-    # kit, which memtester inside the running system cannot do
     systemd-boot.memtest86.enable = true;
-    # the ESP is only 511M and every generation adds a bootloader entry, so cap
-    # them rather than letting twenty pile up
     systemd-boot.configurationLimit = 2;
   };
 
-  # same key as the old box, so `ssh arch` style access keeps working
   users.users.karthihegde = {
     isNormalUser = true;
     shell = pkgs.fish;
@@ -286,9 +198,6 @@
     }
   ];
 
-  # SSH extras from the hardening checklist. The rest of it (no password auth,
-  # no root login, MaxAuthTries 3, modern kex/ciphers, AllowUsers) is already
-  # on; AllowTcpForwarding stays enabled on purpose.
   services.openssh.settings = {
     AllowAgentForwarding = false;
     PermitTunnel = "no";
@@ -296,8 +205,6 @@
     ClientAliveCountMax = 2;
   };
 
-  # Kernel/network hardening from the same checklist. rp_filter is deliberately
-  # NOT set: tailscale needs asymmetric routing to work.
   boot.kernel.sysctl = {
     "kernel.kptr_restrict" = 2;
     "kernel.dmesg_restrict" = 1;
@@ -314,8 +221,6 @@
     "net.ipv4.tcp_rfc1337" = 1;
   };
 
-  # no firewire on this box, and these four are only ever loaded by an attacker
-  # or a very exotic client; nothing here uses them
   boot.blacklistedKernelModules = [
     "dccp"
     "sctp"
@@ -328,11 +233,6 @@
 
   services.tailscale.enable = true;
 
-  # cartero's embedder talks to ollama at host.docker.internal:11434, which in
-  # a container is the podman gateway. Binding that address (rather than
-  # 0.0.0.0) keeps 11434 off the LAN and the tailnet, which is the same
-  # ip:port rule every other service on this box follows. The host can still
-  # reach it, because 10.88.0.1 is a local address.
   services.ollama = {
     enable = true;
     host = "10.88.0.1";
@@ -349,14 +249,8 @@
     ];
   };
 
-  # stacks publish host ports; the firewall opens each one in its own module
   networking.firewall.enable = true;
 
-  # The 1 TB Crucial P3 that used to boot archmaestro: all container state and
-  # the media library live there, so the Verbatim is boot-only. Two subvolumes
-  # of one filesystem, so a runaway download cannot fill the filesystem
-  # Postgres lives on. Deliberately no `nofail`: if this disk is missing, the
-  # containers must fail to start rather than come up against empty state.
   fileSystems."/var/lib/stacks" = {
     device = "/dev/disk/by-uuid/fa207171-ce84-40fc-b066-19f2736aca45";
     fsType = "btrfs";
@@ -367,17 +261,9 @@
     ];
   };
 
-  # One SOPS-encrypted dotenv file per stack (devices/aether/nix/secrets/<stack>.env),
-  # decrypted at activation into /run/secrets/<stack> and handed to the
-  # container as an environment file. Same age key as the Mac; put it at
-  # /var/lib/sops-nix/key.txt on aether.
   sops = {
-    # install secrets from a systemd unit, not from the activation script: the
-    # activation hook is deprecated in 26.05 and removed in 26.11, and it is
-    # what writes /run/nixos/activation-restart-list
     useSystemdActivation = true;
     age.keyFile = "/var/lib/sops-nix/key.txt";
-    # builds shouldn't need the private key just to evaluate the config
     validateSopsFiles = false;
     secrets = lib.genAttrs [
       "beszel"
@@ -400,8 +286,6 @@
     });
   };
 
-  # data that used to be `./config`, `./data` next to each compose file lives
-  # here now, one directory per stack, created by that stack's module
   environment.etc."stacks/README".text = ''
     /var/lib/stacks/<stack>/  persistent data, one dir per stack
     secrets come from sops: devices/aether/nix/secrets/<stack>.env -> /run/secrets/<stack>

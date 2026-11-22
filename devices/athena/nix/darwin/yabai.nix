@@ -1,6 +1,3 @@
-# Tiling window manager and hotkeys, from nixpkgs. yabai's scripting
-# addition needs SIP partly off (see `make bootstrap-mac`); nix-darwin then
-# loads it at boot and keeps the sudoers rule matched to the exact binary.
 {
   config,
   pkgs,
@@ -9,24 +6,6 @@
 }:
 
 let
-  # TODO(macOS 27): temporary yabai build, remove once upstream supports macOS 27.
-  #
-  # yabai 7.1.25 (the last release) can't patch the macOS 27 Dock, so space
-  # create/focus/destroy silently do nothing. This builds AhsanFazal's fork with
-  # macOS 27 Dock patterns (pinned as `yabai-macos27` in flake.nix).
-  # Track: https://github.com/asmvik/yabai/issues/2802 and /issues/2822
-  #
-  # It has landed when a yabai release newer than 7.1.25 mentions macOS 27 in
-  # https://github.com/asmvik/yabai/blob/master/CHANGELOG.md and nixpkgs has
-  # it: `nix eval --raw .#darwinConfigurations.mac.pkgs.yabai.version`
-  # (after `nix flake update`). Then:
-  #   1. delete this `let … in` block and the `package = yabai;` line below
-  #   2. delete the `yabai-macos27` input from flake.nix, run `nix flake lock`
-  #   3. `make switch`, and approve yabai in Accessibility again (new binary)
-  #
-  # Built with Apple's own clang (xcrun): the scripting addition is injected
-  # into the Dock, so it must be arm64e, which nixpkgs' toolchain can't build
-  # (nixpkgs#188322). Nix's build sandbox is off on macOS, so it's reachable.
   yabai = pkgs.stdenvNoCC.mkDerivation {
     pname = "yabai";
     version = "7.1.25-macos27";
@@ -36,10 +15,7 @@ let
     buildPhase = ''
       runHook preBuild
       unset SDKROOT DEVELOPER_DIR MACOSX_DEPLOYMENT_TARGET
-      # Apple's xcrun/make only for the build itself
       HOME=$TMPDIR PATH=${pkgs.xxd}/bin:/usr/bin:/bin:/usr/sbin:/sbin make install
-      # the linker's minimal signature has no code requirement, so macOS can't
-      # attach an Accessibility grant to it; give it a real ad-hoc signature
       /usr/bin/codesign --force --sign - --identifier com.asmvik.yabai bin/yabai
       runHook postBuild
     '';
@@ -67,13 +43,9 @@ in
       window_animation_duration = "0.0";
     };
     extraConfig = ''
-      # exact path: the sudo rule is tied to this binary
       sudo ${config.services.yabai.package}/bin/yabai --load-sa
       yabai -m signal --add event=dock_did_restart action="sudo ${config.services.yabai.package}/bin/yabai --load-sa"
 
-      # always exactly 6 spaces. Counted over regular spaces only: a
-      # native-fullscreen space is in --spaces too, and counting it made the
-      # loop believe six were already there, so the config settled on five.
       normal_spaces() { yabai -m query --spaces | jq '[.[] | select(."is-native-fullscreen" | not)]'; }
       space_count=$(normal_spaces | jq length)
       while [ "$space_count" -lt 6 ]; do
@@ -93,7 +65,6 @@ in
       yabai -m rule --add label=discord  app="^Vesktop$"  space=3
       yabai -m rule --add label=telegram app="^Telegram$" space=3
 
-      # OBS gets the last regular space, labelled "obs"
       [ "$(normal_spaces | jq length)" -lt 3 ] && yabai -m space --create
       yabai -m space "$(normal_spaces | jq '.[-1].index')" --label obs
       yabai -m rule --add label=obs app="^OBS Studio$" space=obs
@@ -105,7 +76,6 @@ in
   services.skhd = {
     enable = true;
     skhdConfig = ''
-      # --- Window Actions ---
       rctrl + shift - q : skhd -k "cmd - q"
       alt + shift - q   : skhd -k "cmd - q"
 
@@ -115,7 +85,6 @@ in
       rctrl - space : yabai -m window --toggle float
       alt - space   : yabai -m window --toggle float
 
-      # --- Move between spaces ---
       rctrl - 1 : yabai -m space --focus 1
       alt - 1   : yabai -m space --focus 1
 
@@ -143,11 +112,6 @@ in
       rctrl - 9 : yabai -m space --focus 9
       alt - 9   : yabai -m space --focus 9
 
-      # --- Open Apps ---
-      # full paths, not names: `open -a <name>` resolves through LaunchServices,
-      # which keeps every store path an app was ever launched from registered,
-      # so the pick can be an outdated copy or another running instance that
-      # shows up as its own Dock tile
       rctrl + shift - g : open -a "/Applications/Ghostty.app"
       alt + shift - g   : open -a "/Applications/Ghostty.app"
 
@@ -166,7 +130,6 @@ in
       rctrl + shift - o : open -a "/Applications/OBS.app"
       alt + shift - o   : open -a "/Applications/OBS.app"
 
-      # --- Send focused window to space (and follow) ---
       rctrl + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
       alt + shift - 1   : yabai -m window --space 1; yabai -m space --focus 1
 
@@ -194,7 +157,6 @@ in
       rctrl + shift - 9 : yabai -m window --space 9; yabai -m space --focus 9
       alt + shift - 9   : yabai -m window --space 9; yabai -m space --focus 9
 
-      # --- Swap window in direction (WASD) ---
       rctrl + cmd - a : yabai -m window --swap west
       alt + cmd - a   : yabai -m window --swap west
 
@@ -207,7 +169,6 @@ in
       rctrl + cmd - d : yabai -m window --swap east
       alt + cmd - d   : yabai -m window --swap east
 
-      # --- Warp window in direction (reflow into tree, HJKL) ---
       rctrl + cmd - h : yabai -m window --warp west
       alt + cmd - h   : yabai -m window --warp west
 
@@ -220,7 +181,6 @@ in
       rctrl + cmd - l : yabai -m window --warp east
       alt + cmd - l   : yabai -m window --warp east
 
-      # --- Resize (grow/shrink east edge, WASD-ish) ---
       rctrl + shift - h : yabai -m window --resize left:-40:0
       alt + shift - h   : yabai -m window --resize left:-40:0
 
@@ -233,14 +193,12 @@ in
       rctrl + shift - j : yabai -m window --resize bottom:0:40
       alt + shift - j   : yabai -m window --resize bottom:0:40
 
-      # --- Balance / rotate layout ---
       rctrl - e : yabai -m space --balance
       alt - e   : yabai -m space --balance
 
       rctrl - r : yabai -m space --rotate 90
       alt - r   : yabai -m space --rotate 90
 
-      # --- Window Focus (Vim-ish HJKL or WASD) ---
       rctrl - a : yabai -m window --focus west
       alt - a   : yabai -m window --focus west
 
@@ -254,6 +212,5 @@ in
       alt - d   : yabai -m window --focus east
     '';
   };
-  # skhd runs every hotkey command through $SHELL; pin one that always exists
   launchd.user.agents.skhd.serviceConfig.EnvironmentVariables.SHELL = "/bin/bash";
 }

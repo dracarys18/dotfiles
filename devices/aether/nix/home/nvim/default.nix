@@ -1,5 +1,3 @@
-# Neovim, configured in Nix with nixvim. Imported by ../default.nix as
-# programs.nixvim.imports, so these are nixvim modules (not home-manager ones).
 {
   imports = [
     ./options.nix

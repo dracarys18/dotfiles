@@ -1,34 +1,25 @@
-# Authelia config is checked in (./authelia/configuration.yml); users live in
-# lldap, and only sessions/2FA live in the sqlite volume.
 { config, lib, pkgs, ... }:
 
 let
   d = "/var/lib/stacks/authelia";
 
-  # Every vhost that uses `import auth` is a service, and every service gets
-  # its own lldap group <name>_users, so adding the vhost here is all it takes.
-  # The group itself is created and populated in lldap (admin.karthihegde.dev).
   gatedVHosts = lib.filterAttrs (_: v: lib.hasInfix "import auth" v.extraConfig) config.services.caddy.virtualHosts;
 
   serviceName = domain: lib.removeSuffix ".karthihegde.dev" domain;
 
-  # the lldap ui cannot be gated by a group it is used to populate
   groupFor = domain: if serviceName domain == "admin" then "admins" else "${serviceName domain}_users";
 
   serviceGroups = lib.unique (
     lib.mapAttrsToList (domain: _: groupFor domain) gatedVHosts ++ lib.attrValues oidcClients
   );
 
-  # OIDC clients cannot be derived from caddy, so they stay explicit.
   oidcClients = {
     jellyfin = "jellyfin_users";
     sparkyfitness = "fit_users";
+    radarr = "radarr_users";
+    sonarr = "sonarr_users";
   };
 
-  # the host's own traffic has to reach the vhosts without a login: gatus used to
-  # run as a container (10.88.x, bypassed), and now runs as a service, so it
-  # connects from this box's LAN and tailnet addresses. only those specific
-  # addresses bypass — the tailnet as a whole still authenticates.
   lanV4 =
     let
       a = lib.head config.networking.interfaces.lan0.ipv4.addresses;
@@ -114,6 +105,16 @@ in
         key = "oidc_sparkyfitness_secret";
         mode = "0400";
       };
+      "authelia/radarr_client_secret" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "radarr_client_secret";
+        mode = "0400";
+      };
+      "authelia/sonarr_client_secret" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "sonarr_client_secret";
+        mode = "0400";
+      };
       "lldap/admin_password" = {
         sopsFile = ../secrets/authelia.yaml;
         key = "lldap_admin_password";
@@ -143,6 +144,8 @@ in
         "@OIDC_HMAC_SECRET@"
         "@JELLYFIN_CLIENT_SECRET@"
         "@SPARKYFITNESS_CLIENT_SECRET@"
+        "@RADARR_CLIENT_SECRET@"
+        "@SONARR_CLIENT_SECRET@"
         "@OIDC_ISSUER_PRIVATE_KEY@"
         "@LLDAP_PASSWORD@"
         "@STORAGE_PASSWORD@"
@@ -156,6 +159,8 @@ in
         config.sops.placeholder."authelia/oidc_hmac_secret"
         config.sops.placeholder."authelia/jellyfin_client_secret"
         config.sops.placeholder."authelia/oidc_sparkyfitness_secret"
+        config.sops.placeholder."authelia/radarr_client_secret"
+        config.sops.placeholder."authelia/sonarr_client_secret"
         config.sops.placeholder."authelia/oidc_issuer_private_key"
         config.sops.placeholder."lldap/admin_password"
         config.sops.placeholder."postgres-apps/authelia_password"

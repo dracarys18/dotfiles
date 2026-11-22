@@ -1,6 +1,3 @@
-# Shell and terminal tools, matching the Mac's programs/*.nix. Difference: no
-# Homebrew paths, no launchctl aliases, no `pdf = mupdf-gl`, and commit signing
-# is off because that key lives in 1Password on the Mac.
 { ... }:
 
 {
@@ -10,12 +7,9 @@
     interactiveShellInit = ''
       set -g fish_greeting
 
-      # tmux keeps its server socket in $TMUX_TMPDIR; the default is /tmp, which
-      # gets cleared often enough to strand running sessions
       set -gx TMUX_TMPDIR $HOME/.local/state
       fish_add_path -g $HOME/.local/bin
 
-      # up/down search history by the prefix already typed
       bind up history-prefix-search-backward
       bind down history-prefix-search-forward
     '';
@@ -40,11 +34,9 @@
 
   programs.zoxide = {
     enable = true;
-    # `cd` jumps by frecency, like the old `alias cd=z`
     options = [ "--cmd cd" ];
   };
 
-  # also adds ll, la, lt and lla aliases next to ls
   programs.eza.enable = true;
   programs.bat.enable = true;
 
@@ -65,7 +57,6 @@
         name = "dracarys18";
         email = "me@karthihegde.dev";
       };
-      # no gpg.ssh.program here: that is 1Password's op-ssh-sign on the Mac
       commit.gpgsign = false;
     };
     ignores = [ "**/.claude/settings.local.json" ];
@@ -80,9 +71,6 @@
     terminal = "tmux-256color";
     clock24 = true;
 
-    # no catppuccin plugin: the Mac pins a specific revision because the
-    # current one breaks the cpu/battery modules, and those mean nothing on a
-    # headless server anyway
     extraConfig = ''
       bind r source-file ~/.config/tmux/tmux.conf
       set -g status-keys vi

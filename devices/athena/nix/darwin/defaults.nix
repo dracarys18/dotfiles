@@ -2,13 +2,11 @@ let
   user = "karthihegde";
 in
 {
-  # Settings changed from the macOS defaults, read off this Mac on 2026-10-05
   system.defaults = {
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
       AppleIconAppearanceTheme = "ClearDark";
       _HIHideMenuBar = true;
-      # don't jump to another Space when switching apps (yabai handles Spaces)
       AppleSpacesSwitchOnActivate = false;
       NSTableViewDefaultSizeMode = 3; # large sidebar icons
       NSAutomaticCapitalizationEnabled = false;
@@ -33,12 +31,6 @@ in
       mru-spaces = false;
       show-recents = false;
       expose-animation-duration = 0.1;
-      # activation rewrites this whole array, so every app pinned by hand is
-      # lost on the next switch: the list here is the Dock. Entries point at
-      # the Home Manager app dir rather than a store path, or the "?" comes
-      # back as soon as the store path behind it is collected
-      # only Firefox is a home-manager app (it needs the .uc.js autoconfig);
-      # every other Dock entry is a cask in /Applications
       persistent-apps = [
         "/Applications/Ghostty.app"
         "/Applications/Vesktop.app"
@@ -63,7 +55,6 @@ in
     };
     screencapture.disable-shadow = true;
     hitoolbox.AppleFnUsageType = "Do Nothing";
-    # settings nix-darwin has no option for
     CustomUserPreferences = {
       NSGlobalDomain = {
         WebAutomaticSpellingCorrectionEnabled = false;
@@ -77,13 +68,9 @@ in
       "com.apple.Siri" = {
         StatusMenuVisible = false;
         VoiceTriggerUserEnabled = false;
-        # the value Settings restores the menu bar item from
         SiriPrefStashedStatusMenuVisible = false;
       };
-      # no .DS_Store files on network drives
       "com.apple.desktopservices".DSDontWriteNetworkStores = true;
-      # Privacy: no personalized ads, Improve Siri, Improve Search or Look Up
-      # suggestions (2 = opted out)
       "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
       "com.apple.assistant.support" = {
         "Siri Data Sharing Opt-In Status" = 2;
@@ -95,24 +82,16 @@ in
   };
 
   system.activationScripts.postActivation.text = ''
-    # Free cmd+space for vicinae: turn off the Spotlight shortcut (symbolic
-    # hotkey 64). -dict-add keeps every other hotkey as it is.
     launchctl asuser "$(id -u -- ${user})" sudo --user=${user} -- \
       defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
       '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>'
     launchctl asuser "$(id -u -- ${user})" sudo --user=${user} -- \
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
 
-    # skhd and yabai read their config once at start, so a switch that changes
-    # /etc/skhdrc or the yabairc store path otherwise leaves the old hotkeys
-    # live until the next login ("alt+shift+z does nothing" every time a path
-    # changed, because it pointed at a bundle that had moved).
     uid="$(id -u -- ${user})"
     launchctl asuser "$uid" launchctl kickstart -k "gui/$uid/org.nixos.skhd" || true
     launchctl asuser "$uid" launchctl kickstart -k "gui/$uid/org.nixos.yabai" || true
   '';
 
-  # Never start the screen saver. It's a per-host setting, which nix-darwin
-  # can't write but home-manager can.
   home-manager.users.${user}.targets.darwin.currentHostDefaults."com.apple.screensaver".idleTime = 0;
 }
