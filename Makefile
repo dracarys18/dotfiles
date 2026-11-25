@@ -47,7 +47,7 @@ ifeq ($(HOST),athena)
 	  '  - sign in to 1Password and turn on its SSH agent, then `make switch` to add uji' \
 	  '  - yabai scripting addition: Recovery Mode -> Terminal ->' \
 	  '    `csrutil enable --without debug --without fs`, then reboot (Nix loads it at boot)' \
-	  '  - open Firefox once, then `make switch` to link its config' \
+	  '  - open LibreWolf once, then `make switch` to link its config' \
 	  '  - optional: `make uji` once GitHub SSH keys are set up'
 else ifeq ($(HOST),aether)
 	@echo "Assuming NixOS is installed on $(AETHER_SSH) and $(AETHER_SSH) is in ~/.ssh/config."

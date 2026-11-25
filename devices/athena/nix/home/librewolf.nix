@@ -31,9 +31,10 @@ let
     "media.cache_size" = 131072; # KB, 128 MB (default 512 MB)
     "browser.tabs.unloadOnLowMemory" = true;
     "browser.tabs.min_inactive_duration_before_unload" = 300000;
+    "extensions.autoDisableScopes" = 0;
   };
 
-  firefox = pkgs.firefox.override {
+  librewolf = pkgs.librewolf.override {
     extraPrefs = ''
       const manifest = Services.dirsvc.get("UChrm", Ci.nsIFile);
       manifest.append("chrome.manifest");
@@ -55,13 +56,13 @@ let
     '';
   };
 
-  inherit (config.programs.firefox) configPath profilesPath;
+  inherit (config.programs.librewolf) configPath profilesPath;
 in
 {
-  programs.firefox = {
+  programs.librewolf = {
     enable = true;
-    package = firefox;
-    darwinDefaultsId = "org.mozilla.firefox";
+    package = librewolf;
+    darwinDefaultsId = "org.nixos.librewolf";
     policies.Handlers.schemes.mailto = {
       action = "useHelperApp";
       ask = false;
@@ -82,17 +83,19 @@ in
 
   home.file = {
     "${profilesPath}/${profilePath}/chrome" = {
-      source = ../../../../config/firefox/chrome;
+      source = writable "config/librewolf/chrome";
       force = true;
     };
     "${profilesPath}/${profilePath}/user.js".force = true;
     "${configPath}/profiles.ini" = {
-      source = writable "config/firefox/profiles.ini";
+      source = writable "config/librewolf/profiles.ini";
       force = true;
     };
   };
 
-  home.activation.firefoxMailto = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    run ${lib.getExe pkgs.duti} -s org.mozilla.firefox mailto
+  home.activation.librewolfDefaultBrowser = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run ${lib.getExe pkgs.duti} -s org.nixos.librewolf http
+    run ${lib.getExe pkgs.duti} -s org.nixos.librewolf https
+    run ${lib.getExe pkgs.duti} -s org.nixos.librewolf mailto
   '';
 }

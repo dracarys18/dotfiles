@@ -8,7 +8,7 @@
     ./catppuccin.nix
     ./vesktop.nix
     ./files.nix
-    ./firefox.nix
+    ./librewolf.nix
     ./llama-cpp.nix
     ./obs.nix
     ./autostart.nix

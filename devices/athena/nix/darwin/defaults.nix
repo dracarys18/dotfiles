@@ -35,7 +35,7 @@ in
         "/Applications/Ghostty.app"
         "/Applications/Vesktop.app"
         "/Applications/Signal.app"
-        "/Users/${user}/Applications/Home Manager Apps/Firefox.app"
+        "/Users/${user}/Applications/Home Manager Apps/LibreWolf.app"
         "/Applications/Telegram.app"
       ];
     };

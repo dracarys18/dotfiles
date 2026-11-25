@@ -10,7 +10,10 @@ in
     enable = true;
     flavor = "mocha";
     tmux.enable = false;
-    firefox.enable = false;
+    librewolf = {
+      enable = true;
+      force = true;
+    };
     vesktop.enable = false;
     ghostty.enable = false;
   };

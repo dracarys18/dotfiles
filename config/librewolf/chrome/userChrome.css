@@ -20,13 +20,16 @@
   border-radius: 0 !important;
 }
 
+#sidebar-container[sidebar-launcher-expanded] {
   width: var(--uc-sidebar-width) !important;
 }
 
+#sidebar-container > sidebar-main {
   --sidebar-expanded-launcher-width: 100%;
   padding-top: var(--uc-toolbox-height) !important;
 }
 
+#navigator-toolbox {
   position: fixed !important;
   top: 0;
   left: 0;
@@ -39,12 +42,17 @@
 }
 
 :root:has(#sidebar-container[sidebar-launcher-expanded]) #navigator-toolbox,
+#navigator-toolbox:hover:not(:has(#urlbar[focused])),
+#navigator-toolbox:has([open="true"], [panelopen="true"]) {
   margin-left: 0 !important;
 }
 
+#TabsToolbar,
+#PersonalToolbar {
   display: none !important;
 }
 
+#nav-bar {
   --toolbarbutton-padding-inner: 5px;
   --toolbarbutton-padding-outer: 1px;
   position: relative;
@@ -54,9 +62,7 @@
   padding: 6px 8px !important;
 }
 
-/* The buttons wrap into rows inside their own box. Flattening it into
-   them (Downloads): the button stays [open] with no panel, pinning the
-   toolbox over the page */
+#nav-bar-customization-target {
   flex: 1 1 100% !important;
   flex-wrap: wrap !important;
   row-gap: 6px;
@@ -68,29 +74,34 @@
   }
 }
 
-/* the two buttons outside that box go on its first row */
+#nav-bar > .titlebar-buttonbox-container {
   position: absolute !important;
   top: 6px;
   left: 8px;
   height: 26px;
 }
 
+#PanelUI-button {
   position: absolute !important;
   top: 6px;
   right: 8px;
 }
 
+#forward-button {
   margin-inline-end: 33px !important;
 }
 
+#nav-bar-customization-target > :is(.unified-extensions-item, #unified-extensions-button, #downloads-button) {
   position: sticky !important;
   order: 5 !important;
 }
 
+#nav-bar-customization-target > #unified-extensions-button {
   order: 6 !important;
   margin-inline-start: auto !important;
 }
 
+#urlbar-container {
   position: sticky !important;
   order: 10 !important;
   flex: 1 0 100% !important;
@@ -100,18 +111,28 @@
   margin: 0 !important;
 }
 
+#fxa-toolbar-menu-button,
+#alltabs-button,
+#smartwindow-group-tabs-button,
+#ai-window-toggle,
+#reset-pbm-toolbar-button,
+#stop-reload-button,
+#sidebar-button,
+#vertical-spacer,
+#customizableui-special-spring1,
+#customizableui-special-spring2 {
   display: none !important;
 }
 
-/* "Customize sidebar" gear: user.js (firefox.nix) sets all of its options on
-   every start anyway, and its panel glitches under the auto-hiding sidebar */
 moz-button[view="viewCustomizeSidebar"] {
   display: none !important;
 }
 
+#back-button {
   margin-inline-start: auto !important;
 }
 
+#urlbar[focused] {
   --uc-urlbar-width: min(760px, 80vw);
   position: fixed !important;
   top: 18vh !important;
@@ -121,6 +142,7 @@ moz-button[view="viewCustomizeSidebar"] {
   box-shadow: 0 24px 64px rgb(0 0 0 / 0.55) !important;
 }
 
+#pinned-tabs-container[orient="vertical"] {
   --uc-tile-height: 52px;
   --uc-tile-gap: 6px;
   --uc-tile-columns: 3;
@@ -163,17 +185,21 @@ moz-button[view="viewCustomizeSidebar"] {
   }
 }
 
+#pinned-tabs-container[orient="vertical"] .tab-content {
   justify-content: center !important;
   padding: 0 !important;
 }
 
+#pinned-tabs-container[orient="vertical"] :is(.tab-label-container, .tab-close-button, .tab-context-line) {
   display: none !important;
 }
 
+#pinned-tabs-container[orient="vertical"] .tab-icon-image {
   width: 18px !important;
   height: 18px !important;
 }
 
+#pinned-tabs-container[orient="vertical"] .tab-background {
   margin: 0 !important;
   border-radius: var(--uc-tile-radius) !important;
   background-color: color-mix(in srgb, currentColor 9%, transparent) !important;
@@ -181,23 +207,29 @@ moz-button[view="viewCustomizeSidebar"] {
   box-shadow: none !important;
 }
 
+#pinned-tabs-container[orient="vertical"] .tabbrowser-tab:hover > .tab-stack > .tab-background {
   background-color: color-mix(in srgb, currentColor 14%, transparent) !important;
 }
 
+#pinned-tabs-container[orient="vertical"] .tabbrowser-tab[selected] > .tab-stack > .tab-background {
   background-color: color-mix(in srgb, currentColor 18%, transparent) !important;
   outline: 1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
   outline-offset: -1px !important;
 }
 
+#tabbrowser-tabs[orient="vertical"] .tab-background {
   background-image: none !important;
   background-clip: border-box !important;
 }
 
+#tabbrowser-tabs[orient="vertical"] #tabbrowser-arrowscrollbox .tabbrowser-tab[selected] > .tab-stack > .tab-background {
   background-color: color-mix(in srgb, currentColor 14%, transparent) !important;
 }
 
+#tabbrowser-tabs[orient="vertical"] .tab-label {
   font-size: 13px !important;
 }
 
+#vertical-pinned-tabs-splitter {
   display: none !important;
 }

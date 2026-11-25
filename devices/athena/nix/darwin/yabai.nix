@@ -60,7 +60,7 @@ in
       yabai -m rule --add app="^(System Settings|Finder|Calculator|Archive Utility)$" manage=off
 
       yabai -m rule --add label=terminal app="^Ghostty$" space=1
-      yabai -m rule --add label=browser  app="^Firefox$" space=2
+      yabai -m rule --add label=browser  app="^LibreWolf$" space=2
       yabai -m rule --add label=signal   app="^Signal$"   space=3
       yabai -m rule --add label=discord  app="^Vesktop$"  space=3
       yabai -m rule --add label=telegram app="^Telegram$" space=3
@@ -115,8 +115,8 @@ in
       rctrl + shift - g : open -a "/Applications/Ghostty.app"
       alt + shift - g   : open -a "/Applications/Ghostty.app"
 
-      rctrl + shift - z : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"
-      alt + shift - z   : open -a "$HOME/Applications/Home Manager Apps/Firefox.app"
+      rctrl + shift - z : open -a "$HOME/Applications/Home Manager Apps/LibreWolf.app"
+      alt + shift - z   : open -a "$HOME/Applications/Home Manager Apps/LibreWolf.app"
 
       rctrl + shift - s : open -a "/Applications/Signal.app"
       alt + shift - s   : open -a "/Applications/Signal.app"
