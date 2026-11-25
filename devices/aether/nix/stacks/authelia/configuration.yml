@@ -1,5 +1,8 @@
 server:
   address: 'tcp://127.0.0.1:9091'
+  buffers:
+    read: 65536
+    write: 65536
 
 log:
   level: 'info'

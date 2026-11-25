@@ -4,6 +4,7 @@
     ./authelia.nix
     ./caddy.nix
     ./cartero.nix
+    ./domain.nix
     ./gatus.nix
     ./homeassistant.nix
     ./homepage.nix

@@ -4,6 +4,8 @@ let
   d = "/var/lib/stacks/tangled";
 in
 {
+  services.caddy.virtualHosts."tangled.${config.homelab.domain}".extraConfig = "import proxy 5555";
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/data 0755 root root -"

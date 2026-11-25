@@ -4,6 +4,8 @@ let
   d = "/var/lib/stacks/obsidian";
 in
 {
+  services.caddy.virtualHosts."note.${config.homelab.domain}".extraConfig = "import proxy 5984";
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/couchdb-data 0755 5984 5984 -"
@@ -11,8 +13,7 @@ in
   ];
 
   virtualisation.oci-containers.containers.couchdb-for-ols = {
-    image = "couchdb:3.5";
-    extraOptions = [ "--pull=newer" ];
+    image = "couchdb@sha256:0ba6b4b8dd823232185fa2c7de04634b925be62f97c9b7cbece7dd9119470e17";
     user = "5984:5984";
     environment.COUCHDB_USER = "obsidian_admin";
     environmentFiles = [ config.sops.secrets."obsidian".path ];

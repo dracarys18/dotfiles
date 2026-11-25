@@ -14,10 +14,10 @@ in
     package = beszel;
     environmentFile = config.sops.secrets."beszel".path;
     environment = {
-      APP_URL = "https://metrics.karthihegde.dev";
+      APP_URL = "https://metrics.${config.homelab.domain}";
       TRUSTED_AUTH_HEADER = "Remote-Email";
       TRUSTED_PROXY_IPS = "127.0.0.1";
-      USER_EMAIL = "karthihegde@karthihegde.dev";
+      USER_EMAIL = "karthihegde@${config.homelab.domain}";
       DISABLE_SSH = "true";
     };
   };
@@ -36,7 +36,7 @@ in
     };
   };
 
-  services.caddy.virtualHosts."metrics.karthihegde.dev".extraConfig = ''
+  services.caddy.virtualHosts."metrics.${config.homelab.domain}".extraConfig = ''
     import auth
     handle / {
       redir * /system/1tl9kujf26b2h0x

@@ -60,6 +60,13 @@ let
       createrole = false;
       extensions = [ ];
     }
+    {
+      role = "seerr";
+      database = "seerr";
+      password = config.sops.placeholder."postgres-apps/seerr_password";
+      createrole = false;
+      extensions = [ ];
+    }
   ];
 
   appSql = a: ''
@@ -138,6 +145,11 @@ in
       key = "gatus_password";
       mode = "0400";
     };
+    "postgres-apps/seerr_password" = {
+      sopsFile = ../secrets/postgres-apps.yaml;
+      key = "seerr_password";
+      mode = "0400";
+    };
   };
 
   sops.templates."postgres-apps.sql" = {
@@ -163,7 +175,7 @@ in
   sops.secrets."postgres".restartUnits = [ "podman-postgres.service" ];
 
   virtualisation.oci-containers.containers.postgres = {
-    image = "pgvector/pgvector:pg17";
+    image = "pgvector/pgvector@sha256:0a547a6067fdea4eec4cfb0887c4ddae2e91b1932cecc071541c14ee318312ce";
     extraOptions = [ ];
     environment = {
       POSTGRES_USER = "postgres";

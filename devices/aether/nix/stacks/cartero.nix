@@ -7,6 +7,8 @@ let
   anubisPolicy = config.sops.templates."anubis-policy.yaml".path;
 in
 {
+  services.caddy.virtualHosts."news.${config.homelab.domain}".extraConfig = "import proxy 8034";
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/redis 0755 root root -"
@@ -99,13 +101,13 @@ in
 
   virtualisation.oci-containers.containers = {
     cartero-redis = {
-      image = "redis/redis-stack:latest";
+      image = "redis/redis-stack@sha256:5d5154123426693540ea6c1d9e638eae2bf2024879c839db6fcfdd7717e817c7";
       volumes = [ "${d}/redis:/data" ];
       ports = [ "127.0.0.1:6379:6379" ];
     };
 
     cartero = {
-      image = "ghcr.io/dracarys18/cartero:latest";
+      image = "ghcr.io/dracarys18/cartero@sha256:3aad361e57b1b1b1725e941d18435a0b5f9c20121d35a49e5e7912e4b617e18c";
       environment = {
         TZ = "UTC";
         OLLAMA_HOST = "http://host.docker.internal:11434";
@@ -131,43 +133,39 @@ in
         "flaresolverr"
       ];
       extraOptions = [
-        "--pull=newer"
         "--add-host=host.docker.internal:host-gateway"
         "--sysctl=net.ipv6.conf.all.disable_ipv6=1"
       ];
     };
 
     anubis-news = {
-      image = "ghcr.io/techarohq/anubis:latest";
+      image = "ghcr.io/techarohq/anubis@sha256:5fcbce70ee6168be5b226d19bec90111d0acd0daf13028fa06b044cf3ebbbd5f";
       environment = {
         BIND = ":8923";
         TARGET = "http://cartero:8080";
-        PUBLIC_URL = "https://news.karthihegde.dev";
+        PUBLIC_URL = "https://news.${config.homelab.domain}";
         POLICY_FNAME = "/etc/anubis/policy.yaml";
         CUSTOM_REAL_IP_HEADER = "CF-Connecting-IP";
       };
       volumes = [ "${anubisPolicy}:/etc/anubis/policy.yaml:ro" ];
-      extraOptions = [ "--pull=newer" ];
       dependsOn = [ "cartero" ];
     };
 
     cloudflare-tunnel = {
-      image = "cloudflare/cloudflared:latest";
+      image = "cloudflare/cloudflared@sha256:55c7e3e8d89d5e8d20b75a82f3602cbf98e06db406e73e282073cfdc5a9a3af6";
       cmd = [
         "tunnel"
         "--no-autoupdate"
         "run"
       ];
       environmentFiles = [ config.sops.secrets."cartero".path ];
-      extraOptions = [ "--pull=newer" ];
       autoStart = true;
     };
 
     cartero-reader = {
-      image = "ghcr.io/jina-ai/reader:latest";
+      image = "ghcr.io/jina-ai/reader@sha256:8cc9a5cf6dc9c240235fccc0026661de74b6e13c21b36e6a86b3281b9ef10f28";
       autoStart = false;
       extraOptions = [
-        "--pull=newer"
         "--memory=2g"
         "--memory-swap=2g"
         "--shm-size=1gb"

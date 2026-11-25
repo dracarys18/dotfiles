@@ -3,9 +3,11 @@
 let
   d = "/var/lib/stacks/authelia";
 
-  gatedVHosts = lib.filterAttrs (_: v: lib.hasInfix "import auth" v.extraConfig) config.services.caddy.virtualHosts;
+  gatedVHosts = lib.filterAttrs (
+    _: v: lib.hasInfix "import auth" v.extraConfig || lib.hasInfix "import gated" v.extraConfig
+  ) config.services.caddy.virtualHosts;
 
-  serviceName = domain: lib.removeSuffix ".karthihegde.dev" domain;
+  serviceName = domain: lib.removeSuffix ".${config.homelab.domain}" domain;
 
   groupFor = domain: if serviceName domain == "admin" then "admins" else "${serviceName domain}_users";
 
@@ -30,7 +32,7 @@ let
     "access_control:\n"
     + "  default_policy: deny\n"
     + "  rules:\n"
-    + "    - domain: '*.karthihegde.dev'\n"
+    + "    - domain: '*.${config.homelab.domain}'\n"
     + "      networks:\n"
     + "        - 127.0.0.1/32\n"
     + "        - 10.88.0.0/16\n"
@@ -105,14 +107,24 @@ in
         key = "oidc_sparkyfitness_secret";
         mode = "0400";
       };
-      "authelia/radarr_client_secret" = {
+      "authelia/jellyfin_client_secret_hash" = {
         sopsFile = ../secrets/authelia.yaml;
-        key = "radarr_client_secret";
+        key = "jellyfin_client_secret_hash";
         mode = "0400";
       };
-      "authelia/sonarr_client_secret" = {
+      "authelia/sparkyfitness_client_secret_hash" = {
         sopsFile = ../secrets/authelia.yaml;
-        key = "sonarr_client_secret";
+        key = "sparkyfitness_client_secret_hash";
+        mode = "0400";
+      };
+      "authelia/radarr_client_secret_hash" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "radarr_client_secret_hash";
+        mode = "0400";
+      };
+      "authelia/sonarr_client_secret_hash" = {
+        sopsFile = ../secrets/authelia.yaml;
+        key = "sonarr_client_secret_hash";
         mode = "0400";
       };
       "lldap/admin_password" = {
@@ -157,10 +169,10 @@ in
         config.sops.placeholder."authelia/storage_encryption_key"
         config.sops.placeholder."authelia/jwt_secret"
         config.sops.placeholder."authelia/oidc_hmac_secret"
-        config.sops.placeholder."authelia/jellyfin_client_secret"
-        config.sops.placeholder."authelia/oidc_sparkyfitness_secret"
-        config.sops.placeholder."authelia/radarr_client_secret"
-        config.sops.placeholder."authelia/sonarr_client_secret"
+        config.sops.placeholder."authelia/jellyfin_client_secret_hash"
+        config.sops.placeholder."authelia/sparkyfitness_client_secret_hash"
+        config.sops.placeholder."authelia/radarr_client_secret_hash"
+        config.sops.placeholder."authelia/sonarr_client_secret_hash"
         config.sops.placeholder."authelia/oidc_issuer_private_key"
         config.sops.placeholder."lldap/admin_password"
         config.sops.placeholder."postgres-apps/authelia_password"
@@ -171,9 +183,8 @@ in
   };
 
   virtualisation.oci-containers.containers.authelia = {
-    image = "ghcr.io/authelia/authelia:latest";
+    image = "ghcr.io/authelia/authelia@sha256:a9931f4443882fcc43bc368bffd40b51ff1867045d46c8dc2e87fb2b03a32178";
     extraOptions = [
-      "--pull=newer"
       "--network=host"
     ];
     environment.TZ = "Asia/Kolkata";
@@ -200,12 +211,12 @@ in
     settings = {
       ldap_base_dn = "dc=karthihegde,dc=dev";
       ldap_user_dn = "admin";
-      ldap_user_email = "admin@karthihegde.dev";
+      ldap_user_email = "admin@${config.homelab.domain}";
       ldap_host = "127.0.0.1";
       ldap_port = 3890;
       http_host = "127.0.0.1";
       http_port = 5090;
-      http_url = "https://admin.karthihegde.dev";
+      http_url = "https://admin.${config.homelab.domain}";
       ldap_user_pass_file = config.sops.secrets."lldap/admin_password".path;
       jwt_secret_file = config.sops.secrets."lldap/jwt_secret".path;
       force_ldap_user_pass_reset = "always";
@@ -245,7 +256,6 @@ in
   };
 
   systemd.services.lldap-groups = {
-    wantedBy = [ "multi-user.target" ];
     after = [
       "lldap.service"
       "sops-install-secrets.service"
@@ -256,7 +266,6 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      RemainAfterExit = true;
     };
     path = [
       pkgs.curl
@@ -280,8 +289,17 @@ in
     '';
   };
 
-  services.caddy.virtualHosts."admin.karthihegde.dev".extraConfig = ''
+  systemd.timers.lldap-groups = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "hourly";
+    };
+  };
+
+  services.caddy.virtualHosts."admin.${config.homelab.domain}".extraConfig = ''
     import auth
     reverse_proxy 127.0.0.1:5090
   '';
+
+  services.caddy.virtualHosts."auth.${config.homelab.domain}".extraConfig = "import proxy 9091";
 }

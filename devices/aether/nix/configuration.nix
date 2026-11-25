@@ -156,6 +156,9 @@
     "acpi_enforce_resources=lax"
     "slab_nomerge"
     "page_alloc.shuffle=1"
+    "randomize_kstack_offset=on"
+    "init_on_alloc=1"
+    "vsyscall=none"
   ];
 
   programs.fish.enable = true;
@@ -185,24 +188,17 @@
   };
 
   services.openssh.enable = true;
-  security.sudo.wheelNeedsPassword = true;
-  security.sudo.extraRules = [
-    {
-      users = [ "karthihegde" ];
-      commands = [
-        {
-          command = "ALL";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
+  security.sudo.wheelNeedsPassword = false;
+  security.sudo.extraConfig = "Defaults use_pty";
 
   services.openssh.settings = {
     AllowAgentForwarding = false;
     PermitTunnel = "no";
     ClientAliveInterval = 300;
     ClientAliveCountMax = 2;
+    X11Forwarding = false;
+    AllowTcpForwarding = "no";
+    MaxStartups = "10:30:60";
   };
 
   boot.kernel.sysctl = {
@@ -219,7 +215,17 @@
     "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
     "net.ipv4.tcp_syncookies" = 1;
     "net.ipv4.tcp_rfc1337" = 1;
+    "net.ipv4.conf.default.accept_redirects" = 0;
+    "net.ipv4.conf.default.secure_redirects" = 0;
+    "net.ipv4.conf.all.log_martians" = 1;
+    "net.ipv6.conf.all.accept_redirects" = 0;
+    "net.ipv6.conf.default.accept_redirects" = 0;
+    "net.ipv6.conf.all.accept_source_route" = 0;
+    "net.ipv6.conf.default.accept_source_route" = 0;
   };
+
+  security.lockKernelModules = true;
+  security.protectKernelImage = true;
 
   boot.blacklistedKernelModules = [
     "dccp"
@@ -243,10 +249,7 @@
       "nix-command"
       "flakes"
     ];
-    trusted-users = [
-      "root"
-      "@wheel"
-    ];
+    trusted-users = [ "root" ];
   };
 
   networking.firewall.enable = true;

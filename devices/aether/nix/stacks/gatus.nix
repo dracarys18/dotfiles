@@ -68,8 +68,28 @@ in
       MemoryHigh = "256M";
       NoNewPrivileges = true;
       PrivateTmp = true;
+      PrivateDevices = true;
       ProtectHome = true;
       ProtectSystem = "strict";
+      ProtectKernelTunables = true;
+      ProtectKernelModules = true;
+      ProtectControlGroups = true;
+      RestrictAddressFamilies = [
+        "AF_UNIX"
+        "AF_INET"
+        "AF_INET6"
+      ];
+      RestrictNamespaces = true;
+      LockPersonality = true;
+      RestrictRealtime = true;
+      RestrictSUIDSGID = true;
+      RemoveIPC = true;
+      CapabilityBoundingSet = [ "" ];
+      AmbientCapabilities = [ ];
+      SystemCallFilter = [
+        "@system-service"
+        "~@privileged"
+      ];
       ReadWritePaths = [ "${d}/data" ];
     };
   };

@@ -14,8 +14,8 @@ let
 
   configuration = pkgs.writeText "configuration.yaml" ''
     homeassistant:
-      external_url: "https://has.karthihegde.dev"
-      internal_url: "https://has.karthihegde.dev"
+      external_url: "https://has.${config.homelab.domain}"
+      internal_url: "https://has.${config.homelab.domain}"
 
     frontend:
       themes: !include_dir_merge_named themes
@@ -111,6 +111,15 @@ let
   '';
 in
 {
+  services.caddy.virtualHosts."has.${config.homelab.domain}".extraConfig = ''
+    reverse_proxy 127.0.0.1:8123 {
+      header_up Host {host}
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto "https"
+    }
+  '';
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/config 0755 root root -"
@@ -147,7 +156,6 @@ in
         "/run/dbus:/run/dbus:ro"
       ];
       extraOptions = [
-        "--pull=newer"
         "--network=host"
         "--cap-add=NET_ADMIN"
         "--cap-add=NET_RAW"
@@ -155,7 +163,7 @@ in
     };
 
     matter-server = {
-      image = "ghcr.io/matter-js/matterjs-server:stable";
+      image = "ghcr.io/matter-js/matterjs-server@sha256:27d68110ba213d35e2f10513be9d379acad4d3e809356df4e00c0e9c4c9e48d7";
       environment = {
         STORAGE_PATH = "/data";
         PRIMARY_INTERFACE = "lan0";
@@ -165,7 +173,6 @@ in
         "/run/dbus:/run/dbus:ro"
       ];
       extraOptions = [
-        "--pull=newer"
         "--network=host"
       ];
     };

@@ -12,6 +12,8 @@ let
   };
 in
 {
+  services.caddy.virtualHosts."fit.${config.homelab.domain}".extraConfig = "import proxy ${toString frontendPort}";
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/uploads 0755 1000 1000 -"
@@ -34,7 +36,7 @@ in
       SPARKY_FITNESS_API_ENCRYPTION_KEY=${config.sops.placeholder."sparkyfitness/api_encryption_key"}
       BETTER_AUTH_SECRET=${config.sops.placeholder."sparkyfitness/better_auth_secret"}
       SPARKY_FITNESS_OIDC_AUTH_ENABLED=true
-      SPARKY_FITNESS_OIDC_ISSUER_URL=https://auth.karthihegde.dev
+      SPARKY_FITNESS_OIDC_ISSUER_URL=https://auth.${config.homelab.domain}
       SPARKY_FITNESS_OIDC_CLIENT_ID=sparkyfitness
       SPARKY_FITNESS_OIDC_CLIENT_SECRET=${config.sops.placeholder."authelia/oidc_sparkyfitness_secret"}
       SPARKY_FITNESS_OIDC_PROVIDER_SLUG=sparkyfitness
@@ -55,10 +57,10 @@ in
         SPARKY_FITNESS_DB_NAME = "sparkyfitness_db";
         SPARKY_FITNESS_DB_USER = "sparky";
         SPARKY_FITNESS_APP_DB_USER = "sparky_app";
-        SPARKY_FITNESS_FRONTEND_URL = "https://fit.karthihegde.dev";
+        SPARKY_FITNESS_FRONTEND_URL = "https://fit.${config.homelab.domain}";
         SPARKY_FITNESS_SERVER_PORT = toString serverPort;
-        SPARKY_FITNESS_DISABLE_SIGNUP = "true";
-        SPARKY_FITNESS_ADMIN_EMAIL = "karthihegde@karthihegde.dev";
+        SPARKY_FITNESS_DISABLE_SIGNUP = "false";
+        SPARKY_FITNESS_ADMIN_EMAIL = "karthihegde@${config.homelab.domain}";
         SPARKY_FITNESS_LOG_LEVEL = "ERROR";
         SPARKY_FITNESS_CUSTOM_UPLOADS_DIRECTORY = "/app/uploads";
         SPARKY_FITNESS_CUSTOM_BACKUP_DIRECTORY = "/data/backups";
@@ -76,10 +78,10 @@ in
     };
 
     sparkyfitness = {
-      image = "codewithcj/sparkyfitness:latest";
+      image = "codewithcj/sparkyfitness@sha256:2e9f8cc0c54229992439177f8a8744bdb95de6d61f0246af2a3214d393010e89";
       dependsOn = [ "sparkyfitness-server" ];
       environment = {
-        SPARKY_FITNESS_FRONTEND_URL = "https://fit.karthihegde.dev";
+        SPARKY_FITNESS_FRONTEND_URL = "https://fit.${config.homelab.domain}";
         SPARKY_FITNESS_SERVER_HOST = "sparkyfitness-server";
         SPARKY_FITNESS_SERVER_PORT = toString serverPort;
         PUID = "1000";

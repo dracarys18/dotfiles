@@ -4,6 +4,13 @@ let
   d = "/var/lib/stacks/shiori";
 in
 {
+  services.caddy.virtualHosts."keep.${config.homelab.domain}".extraConfig = ''
+    import auth
+    reverse_proxy 127.0.0.1:8095 {
+      header_up Remote-User shiori
+    }
+  '';
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/data 0700 1000 1000 -"
@@ -17,8 +24,7 @@ in
   };
 
   virtualisation.oci-containers.containers.shiori = {
-    image = "ghcr.io/go-shiori/shiori:latest";
-    extraOptions = [ "--pull=newer" ];
+    image = "ghcr.io/go-shiori/shiori@sha256:36b8aa7db6a55979dd591f6520c22e7935ff136ba7028355c76235928d959e59";
     dependsOn = [ "postgres" ];
     environment = {
       TZ = "Asia/Kolkata";

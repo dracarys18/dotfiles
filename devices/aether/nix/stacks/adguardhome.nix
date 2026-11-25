@@ -8,6 +8,13 @@ let
   d = "/var/lib/stacks/adguardhome";
 in
 {
+  services.caddy.virtualHosts."dns.${config.homelab.domain}".extraConfig = ''
+    import auth
+    reverse_proxy 127.0.0.1:3000 {
+      header_up Authorization "{$ADGUARD_BASIC_AUTH}"
+    }
+  '';
+
   systemd.tmpfiles.rules = [
     "d ${d} 0755 root root -"
     "d ${d}/conf 0700 root root -"
@@ -70,13 +77,12 @@ in
 
   virtualisation.oci-containers.containers = {
     adguardhome = {
-      image = "adguard/adguardhome:latest";
+      image = "adguard/adguardhome@sha256:c0c09989753b542009c3dc27df14657952de91c204d80079bea6c53df1c6290f";
       volumes = [
         "${d}/conf:/opt/adguardhome/conf"
         "${d}/work:/opt/adguardhome/work"
       ];
       extraOptions = [
-        "--pull=newer"
         "--network=host"
       ];
     };

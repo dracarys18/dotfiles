@@ -9,6 +9,15 @@ let
         header_up -Authorization
       }
     }
+
+    (proxy) {
+      reverse_proxy 127.0.0.1:{args[0]}
+    }
+
+    (gated) {
+      import auth
+      reverse_proxy 127.0.0.1:{args[0]}
+    }
   '';
 
 in
@@ -19,12 +28,37 @@ in
     mode = "0400";
   };
 
+  sops.secrets."caddy".restartUnits = [ "caddy.service" ];
+
   sops.templates."caddy-adguard.env".restartUnits = [ "caddy.service" ];
 
   sops.templates."caddy-adguard.env".content = ''
     ADGUARD_BASIC_AUTH="${config.sops.placeholder."adguardhome/basic_auth"}"
   '';
 
+
+  systemd.services.caddy.serviceConfig = {
+    RuntimeDirectory = "caddy";
+    RuntimeDirectoryPreserve = true;
+    ProtectKernelTunables = true;
+    ProtectKernelModules = true;
+    ProtectControlGroups = true;
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+      "AF_NETLINK"
+    ];
+    RestrictNamespaces = true;
+    LockPersonality = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    RemoveIPC = true;
+    CapabilityBoundingSet = [
+      "CAP_NET_BIND_SERVICE"
+      "CAP_NET_ADMIN"
+    ];
+  };
 
   services.caddy = {
     enable = true;
@@ -44,77 +78,6 @@ in
     '';
 
     extraConfig = auth;
-
-    virtualHosts = {
-      "note.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:5984";
-
-      "dns.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:3000 {
-          header_up Authorization "{$ADGUARD_BASIC_AUTH}"
-        }
-      '';
-
-      "fit.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3670";
-
-      "keep.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:8095 {
-          header_up Remote-User shiori
-        }
-      '';
-      "pdf.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:8069
-      '';
-      "media.karthihegde.dev".extraConfig = ''
-        @plainRoot {
-          path /
-          not header Referer */sso/OIDC/Callback/*
-        }
-        redir @plainRoot /sso/OIDC/Start/authelia 302
-        reverse_proxy 127.0.0.1:8096
-      '';
-      "requests.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:5055 {
-          header_up X-Api-Key {env.SEERR_API_KEY}
-        }
-      '';
-      "home.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:3669";
-
-      "auth.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:9091";
-      "search.karthihegde.dev".extraConfig = "reverse_proxy 127.0.0.1:6996";
-
-      "radarr.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:7878
-      '';
-
-      "sonarr.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:8989
-      '';
-
-      "prowlarr.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:9696
-      '';
-
-      "torrent.karthihegde.dev".extraConfig = ''
-        import auth
-        reverse_proxy 127.0.0.1:8080
-      '';
-
-      "has.karthihegde.dev".extraConfig = ''
-        reverse_proxy 127.0.0.1:8123 {
-          header_up Host {host}
-          header_up X-Real-IP {remote_host}
-          header_up X-Forwarded-For {remote_host}
-          header_up X-Forwarded-Proto "https"
-        }
-      '';
-    };
   };
 
 

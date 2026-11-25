@@ -16,8 +16,6 @@ in
   networking.firewall = {
     enable = true;
 
-    trustedInterfaces = [ "tailscale0" ];
-
     allowedTCPPorts = [ 6881 ];
     allowedUDPPorts = [
       6881
@@ -25,6 +23,13 @@ in
     ];
 
     extraCommands = ''
+      iptables -A nixos-fw -i tailscale0 -s 100.64.0.0/10 -p tcp -m multiport --dports 22,80,443 -j nixos-fw-accept
+      iptables -A nixos-fw -i tailscale0 -s 100.64.0.0/10 -p udp --dport 53 -j nixos-fw-accept
+      iptables -A nixos-fw -i tailscale0 -s 100.64.0.0/10 -p tcp --dport 53 -j nixos-fw-accept
+      ip6tables -A nixos-fw -i tailscale0 -s fd7a:115c:a1e0::/48 -p tcp -m multiport --dports 22,80,443 -j nixos-fw-accept
+      ip6tables -A nixos-fw -i tailscale0 -s fd7a:115c:a1e0::/48 -p udp --dport 53 -j nixos-fw-accept
+      ip6tables -A nixos-fw -i tailscale0 -s fd7a:115c:a1e0::/48 -p tcp --dport 53 -j nixos-fw-accept
+
       iptables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
       ip6tables -A nixos-fw -i lan0 -p tcp --dport 22 -j DROP
 
@@ -55,7 +60,7 @@ in
 
     checkReversePath = "loose";
 
-    logRefusedConnections = false;
+    logRefusedConnections = true;
   };
 
   services.openssh.openFirewall = false;
